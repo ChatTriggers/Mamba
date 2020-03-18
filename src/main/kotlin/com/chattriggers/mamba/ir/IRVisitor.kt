@@ -498,7 +498,9 @@ internal class IRVisitor {
     }
 
     private fun makeStrings(strings: List<TerminalNode>): ExpressionNode {
-        return StringLiteral(strings.joinToString { it.text })
+        return StringLiteral(strings.joinToString(separator = "") {
+            it.text.replace("\"", "").replace("'", "")
+        })
     }
 
     private fun codeBug(): Nothing {
