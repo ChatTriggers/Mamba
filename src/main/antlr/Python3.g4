@@ -162,8 +162,9 @@ statement: simpleStatement | compoundStatement;
 simpleStatement: smallStatement (';' smallStatement)* (((';')? NEWLINE) | EOF);
 smallStatement: (exprStatement | delStatement | passStatement | flowStatement |
              importStatement | globalStatement | nonLocalStatement | assertStatement);
-exprStatement: testlistStarExpression (annAssign | augAssign (yieldExpression | testList) |
-                     ('=' (yieldExpression | testlistStarExpression))*);
+exprStatement: testlistStarExpression (annAssign | augAssignment | annAssignment*);
+augAssignment: augAssign (yieldExpression | testList);
+annAssignment: '=' (yieldExpression | testlistStarExpression)*;
 annAssign: ':' test ('=' test)?;
 testlistStarExpression: (test | starExpression) (',' (test | starExpression))* (',')?;
 augAssign: ('+=' | '-=' | '*=' | '@=' | '/=' | '%=' | '&=' | '|=' | '^=' | '<<=' | '>>=' | '**=' | '//=');

@@ -97,11 +97,40 @@ internal class IRVisitor {
     private fun visitExprStatement(ctx: ExprStatementContext): List<ExpressionNode> {
         val testListStarExpr = ctx.testlistStarExpression()
 
-        if (testListStarExpr.size > 1) {
-            TODO("Handle other possibilities")
+        if (ctx.augAssignment() != null || ctx.annAssign() != null)
+            TODO()
+
+        val annAssignment = ctx.annAssignment()
+        if (annAssignment.isNotEmpty()) {
+            if (annAssignment.size > 1)
+                TODO()
+
+            val testListExprs = visitTestListStarExpr(testListStarExpr)
+
+            if (testListExprs.isEmpty() || testListExprs.size > 2 || testListExprs[0] !is IdentifierNode)
+                TODO()
+
+            return listOf(
+                AssignmentNode(testListExprs[0] as IdentifierNode, visitAnnAssignment(annAssignment[0]))
+            )
         }
 
-        return visitTestListStarExpr(testListStarExpr[0])
+        return visitTestListStarExpr(testListStarExpr)
+    }
+
+    private fun visitAnnAssignment(ctx: AnnAssignmentContext): ExpressionNode {
+        if (ctx.yieldExpression().isNotEmpty())
+            TODO()
+
+        val testListStarExprs = ctx.testlistStarExpression()
+        if (testListStarExprs.isEmpty() || testListStarExprs.size > 2)
+            TODO()
+
+        val result = visitTestListStarExpr(testListStarExprs[0])
+        if (result.size > 1)
+            TODO()
+
+        return result[0]
     }
 
     private fun visitTestListStarExpr(ctx: TestlistStarExpressionContext): List<ExpressionNode> {
