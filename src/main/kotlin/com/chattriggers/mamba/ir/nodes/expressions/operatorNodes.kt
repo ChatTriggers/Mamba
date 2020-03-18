@@ -56,7 +56,7 @@ class ArithmeticExpressionNode(
     private val right: ExpressionNode
 ) : ExpressionNode(listOf(left, right)) {
     override fun execute(interp: Interpreter): Value {
-        return Runtime.add(left.execute(interp), right.execute(interp))
+        return interp.runtime.add(left.execute(interp), right.execute(interp))
     }
 
     override fun print(indent: Int) {

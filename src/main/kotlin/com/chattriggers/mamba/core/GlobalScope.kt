@@ -3,6 +3,9 @@ package com.chattriggers.mamba.core
 import com.chattriggers.mamba.core.values.VNone
 import com.chattriggers.mamba.core.values.VObject
 import com.chattriggers.mamba.core.values.VType
+import com.chattriggers.mamba.core.values.collections.VDict
+import com.chattriggers.mamba.core.values.collections.VList
+import com.chattriggers.mamba.core.values.numbers.VInt
 
 object GlobalScope : VObject() {
     val TYPE = object : VType() {
@@ -13,6 +16,10 @@ object GlobalScope : VObject() {
             addNativeMethod("print") { _, args ->
                 print(args.joinToString(separator = " "))
                 VNone
+            }
+
+            addNativeMethod("dir") { interp, args ->
+                interp.runtime.dir(args)
             }
         }
     }
@@ -26,5 +33,11 @@ object GlobalScope : VObject() {
 
     init {
         inherit(TYPE)
+
+        // Add all native type object
+        slots["object"] = VObject.TYPE
+        slots["int"] = VInt.TYPE
+        slots["list"] = VList.TYPE
+        slots["dict"] = VDict.TYPE
     }
 }

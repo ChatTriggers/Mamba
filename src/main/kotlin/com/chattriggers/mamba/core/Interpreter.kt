@@ -7,6 +7,7 @@ import java.util.*
 
 class Interpreter private constructor(private val script: ScriptNode) {
     internal val scopeStack = Stack<VObject>()
+    internal val runtime = Runtime(this)
 
     init {
         scopeStack.push(GlobalScope)

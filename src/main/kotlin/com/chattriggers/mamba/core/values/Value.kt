@@ -41,6 +41,9 @@ abstract class Value(
         }
     }
 
+    internal fun slotKeys() = slots.keys
+    internal fun slotValues() = slots.values
+
     companion object {
         inline fun <reified T : Value> assertSelf(args: List<Value>): T {
             if (args.isEmpty() || args[0] !is T)
