@@ -174,9 +174,16 @@ class FunctionCallNode(
     private val args: List<ExpressionNode>
 ) : ExpressionNode(listOf(target) + args) {
     override fun execute(interp: Interpreter): Value {
-        val callable = target.execute(interp)
+        val targetValue = target.execute(interp)
+        var callable: ICallable? = null
 
-        if (callable !is ICallable)
+        if (targetValue is ICallable)
+            callable = targetValue
+
+        if (targetValue is VWrapper && targetValue.value is ICallable)
+            callable = targetValue.value
+
+        if (callable == null)
             TODO()
 
         return callable.call(interp, args.map { it.execute(interp) })
