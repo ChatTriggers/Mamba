@@ -2,6 +2,7 @@ package com.chattriggers.mamba.ir.nodes
 
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.*
+import com.chattriggers.mamba.ir.nodes.expressions.IdentifierNode
 
 class FunctionNode(
     private val identifier: IdentifierNode,

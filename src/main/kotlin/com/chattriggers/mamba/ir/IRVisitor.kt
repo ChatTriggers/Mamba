@@ -5,6 +5,9 @@ import com.chattriggers.mamba.api.ComparisonOperator
 import com.chattriggers.mamba.api.UnaryOperator
 import com.chattriggers.mamba.generated.Python3Parser.*
 import com.chattriggers.mamba.ir.nodes.*
+import com.chattriggers.mamba.ir.nodes.expressions.*
+import com.chattriggers.mamba.ir.nodes.expressions.literals.NumberLiteral
+import com.chattriggers.mamba.ir.nodes.expressions.literals.StringLiteral
 import org.antlr.v4.runtime.tree.TerminalNode
 
 internal class IRVisitor {
@@ -111,7 +114,10 @@ internal class IRVisitor {
                 TODO()
 
             return listOf(
-                AssignmentNode(testListExprs[0] as IdentifierNode, visitAnnAssignment(annAssignment[0]))
+                AssignmentNode(
+                    testListExprs[0] as IdentifierNode,
+                    visitAnnAssignment(annAssignment[0])
+                )
             )
         }
 
@@ -474,18 +480,27 @@ internal class IRVisitor {
             val call = trailer.trailerCall()
 
             if (call != null) {
-                node = FunctionCallNode(node, visitArgList(call.argList()))
+                node = FunctionCallNode(
+                    node,
+                    visitArgList(call.argList())
+                )
                 continue
             }
 
             val memberAccess = trailer.trailerMemberAccess()
             if (memberAccess != null) {
-                node = MemberAccessNode(node, visitSubscriptList(memberAccess.subscriptList()))
+                node = MemberAccessNode(
+                    node,
+                    visitSubscriptList(memberAccess.subscriptList())
+                )
                 continue
             }
 
             val dotAccess = trailer.trailerDotAccess()
-            node = DotAccessNode(node, IdentifierNode(dotAccess.NAME().text))
+            node = DotAccessNode(
+                node,
+                IdentifierNode(dotAccess.NAME().text)
+            )
         }
 
         return node
@@ -527,9 +542,12 @@ internal class IRVisitor {
     }
 
     private fun makeStrings(strings: List<TerminalNode>): ExpressionNode {
-        return StringLiteral(strings.joinToString(separator = "") {
-            it.text.replace("\"", "").replace("'", "")
-        })
+        return StringLiteral(
+            strings.joinToString(
+                separator = ""
+            ) {
+                it.text.replace("\"", "").replace("'", "")
+            })
     }
 
     private fun codeBug(): Nothing {
