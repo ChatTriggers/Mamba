@@ -11,7 +11,7 @@ class IdentifierNode(val identifier: String) : ExpressionNode() {
                 return result
         }
 
-        TODO()
+        TODO("throw NameError")
     }
 
     override fun print(indent: Int) {

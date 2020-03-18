@@ -8,22 +8,6 @@ import com.chattriggers.mamba.core.values.collections.VList
 import com.chattriggers.mamba.core.values.numbers.VInt
 
 object GlobalScope : VObject() {
-    val TYPE = object : VType() {
-        override val className: String
-            get() = throw IllegalStateException("Invalid attempt to get class name of global object")
-
-        init {
-            addNativeMethod("print") { _, args ->
-                print(args.joinToString(separator = " "))
-                VNone
-            }
-
-            addNativeMethod("dir") { interp, args ->
-                interp.runtime.dir(args)
-            }
-        }
-    }
-
     override fun toString(): String {
         // TODO: Is it possible to get a reference to the global scope?
         // In JavaScript, you can get it quite easily with 'this' on
@@ -32,12 +16,13 @@ object GlobalScope : VObject() {
     }
 
     init {
-        inherit(TYPE)
+        addNativeMethod("print") { _, args ->
+            print(args.joinToString(separator = " "))
+            VNone
+        }
 
-        // Add all native type object
-        slots["object"] = VObject.TYPE
-        slots["int"] = VInt.TYPE
-        slots["list"] = VList.TYPE
-        slots["dict"] = VDict.TYPE
+        addNativeMethod("dir") { interp, args ->
+            interp.runtime.dir(args)
+        }
     }
 }

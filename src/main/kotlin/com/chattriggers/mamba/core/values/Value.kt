@@ -35,12 +35,6 @@ abstract class Value(
         return result.call(interp, listOf(this) + args)
     }
 
-    protected fun inherit(type: VType) {
-        type.slots.forEach { (key, value) ->
-            this.slots[key] = value
-        }
-    }
-
     internal fun slotKeys() = slots.keys
     internal fun slotValues() = slots.values
 

@@ -1,10 +1,12 @@
 package com.chattriggers.mamba.core.values.collections
 
-import com.chattriggers.mamba.core.values.VString
-import com.chattriggers.mamba.core.values.VType
+import com.chattriggers.mamba.core.values.VObject
 import com.chattriggers.mamba.core.values.Value
 
-class VList<T : Value>(val list: MutableList<T>) : Value() {
+class VList<T : Value>(val list: MutableList<T>) : VObject() {
+    override val className: String
+        get() = "list"
+
     override fun toString(): String {
         return StringBuilder().apply {
             append('[')
@@ -15,13 +17,6 @@ class VList<T : Value>(val list: MutableList<T>) : Value() {
 
             append(']')
         }.toString()
-    }
-
-    companion object {
-        val TYPE = object : VType() {
-            override val className: String
-                get() = "list"
-        }
     }
 }
 

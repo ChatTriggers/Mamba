@@ -1,12 +1,8 @@
 package com.chattriggers.mamba.core.values
 
-class VString(val string: String) : Value() {
-    companion object {
-        val TYPE = object : VType() {
-            override val className: String
-                get() = "str"
-        }
-    }
+class VString(val string: String) : VObject() {
+    override val className: String
+        get() = "str"
 
     override fun toString() = string
 }
