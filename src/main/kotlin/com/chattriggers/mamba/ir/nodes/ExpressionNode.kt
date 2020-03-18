@@ -148,6 +148,17 @@ object NoneNode : ExpressionNode() {
 
 abstract class Literal : ExpressionNode()
 
+class StringLiteral(private val string: String) : Literal() {
+    override fun execute(interp: Interpreter): Value {
+        return VString(string)
+    }
+
+    override fun print(indent: Int) {
+        printNodeHeader(indent, this, newLine = false)
+        println(" $string")
+    }
+}
+
 // TODO: Number formatting
 class NumberLiteral(private val num: Int) : Literal() {
     override fun execute(interp: Interpreter) = num.toValue()

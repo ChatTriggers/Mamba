@@ -498,7 +498,7 @@ internal class IRVisitor {
     }
 
     private fun makeStrings(strings: List<TerminalNode>): ExpressionNode {
-        TODO()
+        return StringLiteral(strings.joinToString { it.text })
     }
 
     private fun codeBug(): Nothing {
