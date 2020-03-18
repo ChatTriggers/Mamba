@@ -26,17 +26,14 @@ class FunctionNode(
         interp.pushScope(scope)
 
         var i = 0
-        var statement = statements[i]
 
-        while (returnedValue == null) {
-            statement.execute(interp)
-            statement = statements[i]
-            i++
+        while (returnedValue == null && i < statements.size) {
+            statements[i++].execute(interp)
         }
 
         interp.popScope()
 
-        return returnedValue!!
+        return returnedValue ?: VNone
     }
 
     override fun returnValue(value: Value) {
