@@ -1,7 +1,7 @@
 package com.chattriggers.mamba.core.values
 
 import com.chattriggers.mamba.core.Interpreter
-import java.util.concurrent.Callable
+import com.chattriggers.mamba.core.values.functions.ICallable
 
 /**
  * Represents a Mamba runtime object. Every object

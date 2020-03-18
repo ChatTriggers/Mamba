@@ -2,19 +2,18 @@ package com.chattriggers.mamba.ir.nodes
 
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.*
+import com.chattriggers.mamba.core.values.functions.ICallable
+import com.chattriggers.mamba.core.values.functions.VFunction
 import com.chattriggers.mamba.ir.nodes.expressions.IdentifierNode
 
 data class FunctionNode(
     private val identifier: IdentifierNode,
-    private val statements: List<StatementNode>
-) : StatementNode(), ICallable {
+    internal val statements: List<StatementNode>
+) : StatementNode(listOf(identifier) + statements), ICallable {
     private var returnedValue: Value? = null
 
-    override fun execute(interp: Interpreter): Value {
-        val scope = interp.getScope()
-        scope[identifier.identifier] = VWrapper(this)
-        return VNone
-    }
+    override val name: String
+        get() = identifier.identifier
 
     override fun call(interp: Interpreter, args: List<Value>): Value {
         returnedValue = null
@@ -37,10 +36,16 @@ data class FunctionNode(
         return returnedValue ?: VNone
     }
 
-    override fun returnValue(value: Value) {
+    internal fun returnValue(value: Value) {
         if (returnedValue != null)
             TODO("Error")
         returnedValue = value
+    }
+
+    override fun execute(interp: Interpreter): Value {
+        val scope = interp.getScope()
+        scope[identifier.identifier] = VFunction(identifier.identifier, this)
+        return VNone
     }
 
     override fun print(indent: Int) {

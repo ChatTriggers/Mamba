@@ -1,7 +1,7 @@
 package com.chattriggers.mamba.ir.nodes
 
 import com.chattriggers.mamba.core.Interpreter
-import com.chattriggers.mamba.core.values.ICallable
+import com.chattriggers.mamba.core.values.functions.ICallable
 import com.chattriggers.mamba.core.values.VNone
 import com.chattriggers.mamba.core.values.Value
 import com.chattriggers.mamba.ir.nodes.expressions.ExpressionNode
@@ -24,7 +24,7 @@ open class StatementNode(children: List<Node>): Node(children) {
 
 class ReturnNode(private val child: ExpressionNode) : StatementNode(child) {
     override fun execute(interp: Interpreter): Value {
-        val parentFunc = getParentOfType<ICallable>() ?: TODO("Error")
+        val parentFunc = getParentOfType<FunctionNode>() ?: TODO("Error")
         parentFunc.returnValue(child.execute(interp))
 
         return VNone

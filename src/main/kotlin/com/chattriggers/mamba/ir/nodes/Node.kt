@@ -13,10 +13,6 @@ abstract class Node(val children: List<Node>) {
         }
     }
 
-    constructor(child: Node) : this(listOf(child))
-
-    constructor() : this(emptyList())
-
     open fun execute(interp: Interpreter): Value = VNone
 
     /* fun compile(compiler: Compiler) */

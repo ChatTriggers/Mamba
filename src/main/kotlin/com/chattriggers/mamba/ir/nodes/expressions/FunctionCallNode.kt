@@ -1,8 +1,7 @@
 package com.chattriggers.mamba.ir.nodes.expressions
 
 import com.chattriggers.mamba.core.Interpreter
-import com.chattriggers.mamba.core.values.ICallable
-import com.chattriggers.mamba.core.values.VWrapper
+import com.chattriggers.mamba.core.values.functions.ICallable
 import com.chattriggers.mamba.core.values.Value
 
 class FunctionCallNode(
@@ -15,9 +14,6 @@ class FunctionCallNode(
 
         if (targetValue is ICallable)
             callable = targetValue
-
-        if (targetValue is VWrapper && targetValue.value is ICallable)
-            callable = targetValue.value
 
         if (callable == null)
             TODO()
