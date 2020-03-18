@@ -4,7 +4,7 @@ import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.*
 import com.chattriggers.mamba.ir.nodes.expressions.IdentifierNode
 
-class FunctionNode(
+data class FunctionNode(
     private val identifier: IdentifierNode,
     private val statements: List<StatementNode>
 ) : StatementNode(), ICallable {
@@ -48,4 +48,6 @@ class FunctionNode(
         println(" \"${identifier.identifier}\"")
         statements.forEach { it.print(indent + 1) }
     }
+
+    override fun toString() = "<function $identifier>"
 }

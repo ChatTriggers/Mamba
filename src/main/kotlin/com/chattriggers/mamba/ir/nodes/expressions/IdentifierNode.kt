@@ -18,4 +18,6 @@ class IdentifierNode(val identifier: String) : ExpressionNode() {
         printNodeHeader(indent, this, newLine = false)
         println(" \"$identifier\"")
     }
+
+    override fun toString() = identifier
 }
