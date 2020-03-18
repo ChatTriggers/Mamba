@@ -19,6 +19,10 @@ open class VObject : Value() {
         }
     }
 
+    fun addProperty(name: String, value: Value) {
+        slots[name] = value
+    }
+
     fun addNativeMethod(name: String, func: VNativeFuncType) {
         slots[name] = VNativeMethod(name, this, func)
     }

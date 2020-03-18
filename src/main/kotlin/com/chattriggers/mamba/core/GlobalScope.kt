@@ -1,11 +1,8 @@
 package com.chattriggers.mamba.core
 
-import com.chattriggers.mamba.core.values.VNone
-import com.chattriggers.mamba.core.values.VObject
-import com.chattriggers.mamba.core.values.VType
-import com.chattriggers.mamba.core.values.collections.VDict
-import com.chattriggers.mamba.core.values.collections.VList
-import com.chattriggers.mamba.core.values.numbers.VInt
+import com.chattriggers.mamba.core.values.*
+import com.chattriggers.mamba.core.values.numbers.VFalse
+import com.chattriggers.mamba.core.values.numbers.VTrue
 
 object GlobalScope : VObject() {
     override fun toString(): String {
@@ -16,6 +13,11 @@ object GlobalScope : VObject() {
     }
 
     init {
+        addProperty("True", VTrue)
+        addProperty("False", VFalse)
+        addProperty("None", VNone)
+        addProperty("...", VEllipsis)
+
         addNativeMethod("print") { _, args ->
             print(args.joinToString(separator = " "))
             VNone
