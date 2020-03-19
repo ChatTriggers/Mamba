@@ -1,6 +1,7 @@
 package com.chattriggers.mamba.ir.nodes.statements
 
 import com.chattriggers.mamba.core.Interpreter
+import com.chattriggers.mamba.core.values.VBool
 import com.chattriggers.mamba.core.values.VNone
 import com.chattriggers.mamba.core.values.VObject
 import com.chattriggers.mamba.core.values.collections.toValue
@@ -10,67 +11,54 @@ import com.chattriggers.mamba.ir.nodes.expressions.ExpressionNode
 
 enum class IfConditionalNodeType {
     IF,
-    ELIF,
-    ELSE
+    ELIF
 }
 
 data class IfConditionalNode(
     val type: IfConditionalNodeType,
-    val condition: ExpressionNode?,
+    val condition: ExpressionNode,
     val body: List<StatementNode>
-) : Node((if (condition == null) emptyList() else listOf(condition)) + body) {
-    override fun execute(interp: Interpreter): VObject {
-        return if (condition == null || interp.runtime.toBoolean(condition.execute(interp))) {
-            body.forEach { it.execute(interp) }
-            true
-        } else {
-            false
-        }.toValue()
-    }
-
-    override fun print(indent: Int) {
-        printNodeHeader(indent, this, newLine = false)
-
-        when (type) {
-            IfConditionalNodeType.IF -> println(" (if)")
-            IfConditionalNodeType.ELIF -> println(" (elif)")
-            IfConditionalNodeType.ELSE -> println(" (else)")
-        }
-
-        condition?.print(indent + 1)
-        body.forEach {
-            it.print(indent + 1)
-        }
-    }
-}
+)
 
 class IfStatementNode(
     private val ifBlock: IfConditionalNode,
     private val elifBlocks: List<IfConditionalNode> = emptyList(),
-    private val elseBlock: IfConditionalNode? = null
-) : StatementNode(listOf(ifBlock) + elifBlocks + if (elseBlock == null) emptyList() else listOf(elseBlock)) {
+    private val elseBlock: List<StatementNode>
+) : StatementNode() {
+    init {
+        val children = mutableListOf<Node>(ifBlock.condition)
+        children.addAll(ifBlock.body.toMutableList())
+
+        for (elifBlock in elifBlocks) {
+            children.add(elifBlock.condition)
+            children.addAll(elifBlock.body)
+        }
+
+        children.addAll(elseBlock)
+
+        for (child in children) {
+            child.parent = this
+        }
+    }
+
     override fun execute(interp: Interpreter): VObject {
         interp.pushScope()
 
         try {
-            var result = ifBlock.execute(interp)
+            val rt = interp.runtime
+            var ifCond = ifBlock.condition.execute(interp)
 
-            if (interp.runtime.toBoolean(result))
-                return VNone
+            if (rt.toBoolean(ifCond)) {
+                return executeStatements(interp, ifBlock.body)
+            }
 
             for (elifBlock in elifBlocks) {
-                result = elifBlock.execute(interp)
-                if (interp.runtime.toBoolean(result))
-                    return VNone
+                ifCond = elifBlock.condition.execute(interp)
+                if (rt.toBoolean(ifCond))
+                    return executeStatements(interp, elifBlock.body)
             }
 
-            if (elseBlock != null) {
-                result = elseBlock.execute(interp)
-                if (interp.runtime.toBoolean(result))
-                    return VNone
-            }
-
-            return VNone
+            return executeStatements(interp, elseBlock)
         } finally {
             interp.popScope()
         }
@@ -78,10 +66,18 @@ class IfStatementNode(
 
     override fun print(indent: Int) {
         printNodeHeader(indent, this)
-        ifBlock.print(indent + 1)
+        ifBlock.condition.print(indent + 1)
+        ifBlock.body.forEach { it.print(indent + 1) }
         elifBlocks.forEach {
+            it.condition.print(indent + 1)
+            it.body.forEach {
+                it.print(indent + 1)
+            }
+        }
+        printIndent(indent + 1)
+        println("ElseBlock")
+        elseBlock.forEach {
             it.print(indent + 1)
         }
-        elseBlock?.print(indent + 1)
     }
 }

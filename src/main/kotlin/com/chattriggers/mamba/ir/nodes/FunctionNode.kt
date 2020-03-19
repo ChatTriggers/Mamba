@@ -10,35 +10,24 @@ import com.chattriggers.mamba.ir.nodes.statements.StatementNode
 data class FunctionNode(
     private val identifier: IdentifierNode,
     internal val statements: List<StatementNode>
-) : StatementNode(listOf(identifier) + statements),
-    ICallable {
-    private var returnedValue: VObject? = null
-
+) : StatementNode(listOf(identifier) + statements), ICallable {
     override fun call(interp: Interpreter, args: List<VObject>): VObject {
-        returnedValue = null
+        try {
+            val scope = VObject()
+            // TODO: Populate arguments
+            // Accept a list of identifiers in the constructor,
+            // and associate each one of those with the corresponding
+            // arguments in the scope
+            interp.pushScope(scope)
 
-        val scope = VObject()
-        // TODO: Populate arguments
-        // Accept a list of identifiers in the constructor,
-        // and associate each one of those with the corresponding
-        // arguments in the scope
-        interp.pushScope(scope)
-
-        var i = 0
-
-        while (returnedValue == null && i < statements.size) {
-            statements[i++].execute(interp)
+            return when (val returned = executeStatements(interp, statements)) {
+                is VReturnWrapper -> returned.wrapped
+                is VFlowWrapper -> TODO() // Should have been handled by an enclosing node
+                else -> VNone
+            }
+        } finally {
+            interp.popScope()
         }
-
-        interp.popScope()
-
-        return returnedValue ?: VNone
-    }
-
-    internal fun returnValue(value: VObject) {
-        if (returnedValue != null)
-            TODO("Error")
-        returnedValue = value
     }
 
     override fun execute(interp: Interpreter): VObject {

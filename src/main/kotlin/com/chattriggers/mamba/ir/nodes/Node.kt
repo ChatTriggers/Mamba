@@ -5,7 +5,7 @@ import com.chattriggers.mamba.core.values.VNone
 import com.chattriggers.mamba.core.values.VObject
 
 abstract class Node(val children: List<Node>) {
-    protected var parent: Node? = null
+    internal var parent: Node? = null
 
     init {
         children.forEach {
@@ -19,7 +19,7 @@ abstract class Node(val children: List<Node>) {
 
     abstract fun print(indent: Int)
 
-    protected inline fun <reified T> getParentOfType(): T? {
+    internal inline fun <reified T> getParentOfType(): T? {
         var p = parent
 
         while (p != null) {

@@ -13,23 +13,20 @@ import org.antlr.v4.runtime.tree.TerminalNode
 
 internal class IRVisitor {
     fun visitFileInput(ctx: FileInputContext): ScriptNode {
-        return ScriptNode(ctx.statement().map(this::visitStatement))
+        return ScriptNode(ctx.statement().map(this::visitStatement).flatten())
     }
 
-    private fun visitStatement(ctx: StatementContext): StatementNode {
+    private fun visitStatement(ctx: StatementContext): List<StatementNode> {
         val simple = ctx.simpleStatement()
         return if (simple != null) {
             visitSimpleStatement(simple)
         } else {
-            visitCompoundStatement(ctx.compoundStatement())
+            listOf(visitCompoundStatement(ctx.compoundStatement()))
         }
     }
 
-    private fun visitSimpleStatement(ctx: SimpleStatementContext): StatementNode {
+    private fun visitSimpleStatement(ctx: SimpleStatementContext): List<StatementNode> {
         return ctx.smallStatement().map(::visitSmallStatement)
-            .map { it.children }
-            .flatten()
-            .let(::StatementNode)
     }
 
     private fun visitSmallStatement(ctx: SmallStatementContext): StatementNode {
@@ -44,11 +41,7 @@ internal class IRVisitor {
 
         val flowStatement = ctx.flowStatement()
         if (flowStatement != null)
-            return StatementNode(
-                visitFlowStatement(
-                    flowStatement
-                )
-            )
+            return visitFlowStatement(flowStatement)
 
         TODO("Handle other branch possibilities")
     }
@@ -73,20 +66,16 @@ internal class IRVisitor {
     private fun visitCompoundStatement(ctx: CompoundStatementContext): StatementNode {
         val functionCtx = ctx.funcDef()
         if (functionCtx != null)
-            return StatementNode(visitFuncDef(functionCtx))
+            return visitFuncDef(functionCtx)
 
         val ifStatement = ctx.ifStatement()
         if (ifStatement != null)
-            return StatementNode(
-                visitIfStatement(
-                    ifStatement
-                )
-            )
+            return visitIfStatement(ifStatement)
 
         TODO("Handle other possibilities")
     }
 
-    private fun visitIfStatement(ctx: IfStatementContext): Node {
+    private fun visitIfStatement(ctx: IfStatementContext): StatementNode {
         val ifBlock = ctx.ifBlock()
         val elifBlocks = ctx.elifBlock()
         val elseBlock = ctx.elseBlock()
@@ -105,12 +94,8 @@ internal class IRVisitor {
                 )
             },
             elseBlock?.let {
-                IfConditionalNode(
-                    IfConditionalNodeType.ELSE,
-                    null,
-                    visitSuite(it.suite())
-                )
-            }
+                visitSuite(it.suite())
+            } ?: emptyList()
         )
     }
 
@@ -118,9 +103,9 @@ internal class IRVisitor {
         val simpleStatement = ctx.simpleStatement()
 
         if (simpleStatement != null)
-            return listOf(visitSimpleStatement(simpleStatement))
+            return visitSimpleStatement(simpleStatement)
 
-        return ctx.statement().map(::visitStatement)
+        return ctx.statement().map(::visitStatement).flatten()
     }
 
     private fun visitFuncDef(ctx: FuncDefContext): FunctionNode {
@@ -143,9 +128,9 @@ internal class IRVisitor {
         val simpleStatement = suite.simpleStatement()
 
         if (simpleStatement != null) {
-            statements.add(visitSimpleStatement(simpleStatement))
+            statements.addAll(visitSimpleStatement(simpleStatement))
         } else {
-            statements.addAll(suite.statement().map(::visitStatement))
+            statements.addAll(suite.statement().map(::visitStatement).flatten())
         }
 
         return FunctionNode(IdentifierNode(name), statements)
@@ -534,27 +519,18 @@ internal class IRVisitor {
             val call = trailer.trailerCall()
 
             if (call != null) {
-                node = FunctionCallNode(
-                    node,
-                    visitArgList(call.argList())
-                )
+                node = FunctionCallNode(node, visitArgList(call.argList()))
                 continue
             }
 
             val memberAccess = trailer.trailerMemberAccess()
             if (memberAccess != null) {
-                node = MemberAccessNode(
-                    node,
-                    visitSubscriptList(memberAccess.subscriptList())
-                )
+                node = MemberAccessNode(node, visitSubscriptList(memberAccess.subscriptList()))
                 continue
             }
 
             val dotAccess = trailer.trailerDotAccess()
-            node = DotAccessNode(
-                node,
-                IdentifierNode(dotAccess.NAME().text)
-            )
+            node = DotAccessNode(node, IdentifierNode(dotAccess.NAME().text))
         }
 
         return node
