@@ -39,5 +39,11 @@ abstract class Value() : MutableMap<String, Value> by mutableMapOf() {
                 TODO("Error")
             return args[0] as T
         }
+
+        inline fun <reified T : Value> assertArg(args: List<Value>, index: Int): T {
+            if (index >= args.size || args[index] !is T)
+                TODO("Error")
+            return args[index] as T
+        }
     }
 }
