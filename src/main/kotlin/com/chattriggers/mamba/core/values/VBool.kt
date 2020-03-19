@@ -1,6 +1,8 @@
 package com.chattriggers.mamba.core.values
 
-sealed class VBool(value: Boolean) : VInt(if (value) 1 else 0, BoolDescriptor)
+sealed class VBool(private val value: Boolean) : VInt(if (value) 1 else 0, BoolDescriptor) {
+    override fun toString() = value.toString().capitalize()
+}
 
  object BoolDescriptor : ClassDescriptor(IntDescriptor)
 

@@ -44,4 +44,15 @@ class Runtime(val interp: Interpreter) {
 
         return args[0].callProperty(interp, "__dir__")
     }
+
+    companion object {
+        fun toValue(obj: Any): VObject {
+            return when (obj) {
+                is Int -> obj.toValue()
+                is String -> obj.toValue()
+                is Boolean -> obj.toValue()
+                else -> throw IllegalArgumentException()
+            }
+        }
+    }
 }

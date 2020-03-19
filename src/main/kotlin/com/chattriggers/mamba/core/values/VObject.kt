@@ -28,5 +28,9 @@ object ObjectDescriptor : ClassDescriptor() {
             val self = assertSelf<VObject>(args)
             self.keys.toList().map(::VString).toValue()
         }
+        addClassMethod("__str__") { _, args ->
+            val arg = assertArg<VObject>(args, 0)
+            arg.toString().toValue()
+        }
     }
 }
