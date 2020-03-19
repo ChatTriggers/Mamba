@@ -1,6 +1,7 @@
 package com.chattriggers.mamba.core
 
 import com.chattriggers.mamba.core.values.VObject
+import com.chattriggers.mamba.core.values.Value
 import com.chattriggers.mamba.ir.nodes.ScriptNode
 import java.util.*
 
@@ -29,6 +30,18 @@ class Interpreter private constructor(private val script: ScriptNode) {
     }
 
     internal fun getScope() = scopeStack.peek()
+
+    internal fun lexicalAssign(name: String, value: Value): Value {
+        for (scope in scopeStack) {
+            if (name in scope) {
+                scope[name] = value
+            }
+        }
+
+        getScope()[name] = value
+
+        return value
+    }
 
     companion object {
         fun execute(node: ScriptNode): Any {
