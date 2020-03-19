@@ -18,7 +18,7 @@ data class IfConditionalNode(
     val type: IfConditionalNodeType,
     val condition: ExpressionNode?,
     val body: List<StatementNode>
-) : Node(if (condition == null) emptyList() else listOf(condition) + body) {
+) : Node((if (condition == null) emptyList() else listOf(condition)) + body) {
     override fun execute(interp: Interpreter): VObject {
         return if (condition == null || interp.runtime.toBoolean(condition.execute(interp))) {
             body.forEach { it.execute(interp) }
