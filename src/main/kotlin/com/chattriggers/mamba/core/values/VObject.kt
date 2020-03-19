@@ -15,16 +15,16 @@ open class VObject : Value() {
     init {
         addNativeMethod("__dir__") { _, args ->
             val self = assertSelf<VObject>(args)
-            self.slotKeys().map(::VString).toValue()
+            self.keys.map(::VString).toValue()
         }
     }
 
     fun addProperty(name: String, value: Value) {
-        slots[name] = value
+        this[name] = value
     }
 
     fun addNativeMethod(name: String, func: VNativeFuncType) {
-        slots[name] = VNativeMethod(name, this, func)
+        this[name] = VNativeMethod(name, this, func)
     }
 
     override fun toString() = "<object object>"

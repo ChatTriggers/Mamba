@@ -1,6 +1,7 @@
 package com.chattriggers.mamba.core
 
 import com.chattriggers.mamba.core.values.VNone
+import com.chattriggers.mamba.core.values.VNotImplemented
 import com.chattriggers.mamba.core.values.VString
 import com.chattriggers.mamba.core.values.Value
 import com.chattriggers.mamba.core.values.collections.VDict
@@ -28,12 +29,19 @@ class Runtime(val interp: Interpreter) {
         TODO()
     }
 
-    fun add(left: Value, right: Value): Value {
-        when {
-            left is VInt && right is VInt -> return VInt(left.num + right.num)
+    fun valueCompare(method: String, left: Value, right: Value): Value {
+        return when (method) {
+            in left -> left.callFunction(interp, method, listOf(right))
+            else -> VNotImplemented
         }
+    }
 
-        return VNone
+    fun valueArithmetic(method: String, reverseMethod: String, left: Value, right: Value): Value {
+        return when {
+            method in left -> left.callFunction(interp, method, listOf(right))
+            reverseMethod in right -> right.callFunction(interp, method, listOf(left)) // TODO: Only if types differ
+            else -> VNotImplemented
+        }
     }
 
     fun dir(args: List<Value>): Value {

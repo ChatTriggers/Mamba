@@ -11,9 +11,7 @@ import com.chattriggers.mamba.core.values.functions.ICallable
  *      as it is only a constructor property to allow MutableMap
  *      implementation delegation
  */
-abstract class Value(
-    protected val slots: MutableMap<String, Value> = mutableMapOf()
-) : MutableMap<String, Value> by slots {
+abstract class Value() : MutableMap<String, Value> by mutableMapOf() {
     abstract override fun toString(): String
 
     fun callFunction(interp: Interpreter, name: String, args: List<Value> = emptyList()): Value {
@@ -34,9 +32,6 @@ abstract class Value(
         // Add "self" arguments
         return result.call(interp, listOf(this) + args)
     }
-
-    internal fun slotKeys() = slots.keys
-    internal fun slotValues() = slots.values
 
     companion object {
         inline fun <reified T : Value> assertSelf(args: List<Value>): T {
