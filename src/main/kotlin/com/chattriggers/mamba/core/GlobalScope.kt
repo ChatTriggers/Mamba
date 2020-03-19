@@ -28,7 +28,7 @@ object GlobalScopeDescriptor : ClassDescriptor() {
         }
 
         addClassMethod("print") { _, args ->
-            print(args.joinToString(separator = " "))
+            println(args.joinToString(separator = " "))
             VNone
         }
     }
