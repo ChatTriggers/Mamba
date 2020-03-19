@@ -1,6 +1,7 @@
 package com.chattriggers.mamba.core.values.numbers
 
 import com.chattriggers.mamba.core.values.VObject
+import kotlin.math.abs
 import kotlin.math.floor
 import kotlin.math.pow
 
@@ -9,6 +10,10 @@ open class VInt(internal val num: Int) : VObject() {
         get() = "int"
 
     init {
+        addNativeMethod("__abs__") { _, args ->
+            val self = assertSelf<VInt>(args)
+            abs(self.num).toValue()
+        }
         addNativeMethod("__add__") { _, args ->
             val self = assertSelf<VInt>(args)
             val other = assertArg<VInt>(args, 1)

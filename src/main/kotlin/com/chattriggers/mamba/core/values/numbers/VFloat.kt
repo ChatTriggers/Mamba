@@ -1,7 +1,6 @@
 package com.chattriggers.mamba.core.values.numbers
 
 import com.chattriggers.mamba.core.values.VObject
-import kotlin.math.floor
 
 open class VFloat(internal val num: Double) : VObject() {
     override val className: String

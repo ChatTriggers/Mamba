@@ -18,13 +18,20 @@ object GlobalScope : VObject() {
         addProperty("None", VNone)
         addProperty("...", VEllipsis)
 
-        addNativeMethod("print") { _, args ->
-            print(args.joinToString(separator = " "))
-            VNone
+        addNativeMethod("abs") { interp, args ->
+            if (args.isEmpty() || args.size > 1)
+                TODO()
+
+            args[0].callFunction(interp, "__abs__")
         }
 
         addNativeMethod("dir") { interp, args ->
             interp.runtime.dir(args)
+        }
+
+        addNativeMethod("print") { _, args ->
+            print(args.joinToString(separator = " "))
+            VNone
         }
     }
 }
