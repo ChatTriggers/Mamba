@@ -2,7 +2,7 @@ package com.chattriggers.mamba.core.values.numbers
 
 import com.chattriggers.mamba.core.values.VObject
 
-open class VInt(val num: Int) : VObject() {
+open class VInt(internal val num: Int) : VObject() {
     override val className: String
         get() = "int"
 

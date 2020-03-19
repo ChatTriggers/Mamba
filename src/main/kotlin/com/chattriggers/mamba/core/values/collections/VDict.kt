@@ -4,7 +4,7 @@ import com.chattriggers.mamba.core.values.VObject
 import com.chattriggers.mamba.core.values.VType
 import com.chattriggers.mamba.core.values.Value
 
-class VDict(val map: MutableMap<String, Value>) : VObject() {
+class VDict<T : Value>(internal val map: MutableMap<String, T>) : VObject() {
     override val className: String
         get() = "dict"
 
@@ -14,5 +14,5 @@ class VDict(val map: MutableMap<String, Value>) : VObject() {
     }
 }
 
-fun MutableMap<String, Value>.toValue() =
+fun <T : Value> MutableMap<String, T>.toValue() =
     VDict(this)

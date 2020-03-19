@@ -8,6 +8,7 @@ import com.chattriggers.mamba.ir.nodes.*
 import com.chattriggers.mamba.ir.nodes.expressions.*
 import com.chattriggers.mamba.ir.nodes.expressions.literals.NumberLiteral
 import com.chattriggers.mamba.ir.nodes.expressions.literals.StringLiteral
+import com.chattriggers.mamba.ir.nodes.statements.*
 import org.antlr.v4.runtime.tree.TerminalNode
 
 internal class IRVisitor {
@@ -34,12 +35,20 @@ internal class IRVisitor {
     private fun visitSmallStatement(ctx: SmallStatementContext): StatementNode {
         val exprStatement = ctx.exprStatement()
         if (exprStatement != null) {
-            return StatementNode(visitExprStatement(exprStatement))
+            return StatementNode(
+                visitExprStatement(
+                    exprStatement
+                )
+            )
         }
 
         val flowStatement = ctx.flowStatement()
         if (flowStatement != null)
-            return StatementNode(visitFlowStatement(flowStatement))
+            return StatementNode(
+                visitFlowStatement(
+                    flowStatement
+                )
+            )
 
         TODO("Handle other branch possibilities")
     }
@@ -66,7 +75,52 @@ internal class IRVisitor {
         if (functionCtx != null)
             return StatementNode(visitFuncDef(functionCtx))
 
+        val ifStatement = ctx.ifStatement()
+        if (ifStatement != null)
+            return StatementNode(
+                visitIfStatement(
+                    ifStatement
+                )
+            )
+
         TODO("Handle other possibilities")
+    }
+
+    private fun visitIfStatement(ctx: IfStatementContext): Node {
+        val ifBlock = ctx.ifBlock()
+        val elifBlocks = ctx.elifBlock()
+        val elseBlock = ctx.elseBlock()
+
+        return IfStatementNode(
+            IfConditionalNode(
+                IfConditionalNodeType.IF,
+                visitTest(ifBlock.test()),
+                visitSuite(ifBlock.suite())
+            ),
+            elifBlocks.map {
+                IfConditionalNode(
+                    IfConditionalNodeType.ELIF,
+                    visitTest(it.test()),
+                    visitSuite(it.suite())
+                )
+            },
+            elseBlock?.let {
+                IfConditionalNode(
+                    IfConditionalNodeType.ELSE,
+                    null,
+                    visitSuite(it.suite())
+                )
+            }
+        )
+    }
+
+    private fun visitSuite(ctx: SuiteContext): List<StatementNode> {
+        val simpleStatement = ctx.simpleStatement()
+
+        if (simpleStatement != null)
+            return listOf(visitSimpleStatement(simpleStatement))
+
+        return ctx.statement().map(::visitStatement)
     }
 
     private fun visitFuncDef(ctx: FuncDefContext): FunctionNode {

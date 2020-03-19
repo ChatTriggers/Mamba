@@ -3,7 +3,7 @@ package com.chattriggers.mamba.core.values.collections
 import com.chattriggers.mamba.core.values.VObject
 import com.chattriggers.mamba.core.values.Value
 
-class VList<T : Value>(val list: MutableList<T>) : VObject() {
+class VList<T : Value>(internal val list: MutableList<T>) : VObject() {
     override val className: String
         get() = "list"
 

@@ -5,6 +5,7 @@ import com.chattriggers.mamba.core.values.*
 import com.chattriggers.mamba.core.values.functions.ICallable
 import com.chattriggers.mamba.core.values.functions.VFunction
 import com.chattriggers.mamba.ir.nodes.expressions.IdentifierNode
+import com.chattriggers.mamba.ir.nodes.statements.StatementNode
 
 data class FunctionNode(
     private val identifier: IdentifierNode,

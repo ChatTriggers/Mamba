@@ -1,6 +1,5 @@
 package com.chattriggers.mamba.core
 
-import codes.som.anthony.koffee.modifiers.private
 import com.chattriggers.mamba.core.values.VObject
 import com.chattriggers.mamba.ir.nodes.ScriptNode
 import java.util.*

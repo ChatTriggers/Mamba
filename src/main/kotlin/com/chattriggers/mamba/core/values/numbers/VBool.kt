@@ -1,8 +1,6 @@
 package com.chattriggers.mamba.core.values.numbers
 
-import com.chattriggers.mamba.core.values.VObject
-
-sealed class VBool(val bool: Boolean) : VInt(if (bool) 1 else 0) {
+sealed class VBool(private val bool: Boolean) : VInt(if (bool) 1 else 0) {
     override val className: String
         get() = "bool"
 }
