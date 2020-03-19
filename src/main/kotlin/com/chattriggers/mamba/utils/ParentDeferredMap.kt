@@ -14,6 +14,10 @@ open class ParentDeferredMap<K, V>(private val parentMap: MutableMap<K, V>? = nu
         return map.containsValue(value) || (parentMap?.containsValue(value) ?: false)
     }
 
+    fun ownGet(key: K): V? {
+        return map[key]
+    }
+
     override fun get(key: K): V? {
         return if (map.contains(key)) {
             map[key]
@@ -38,6 +42,12 @@ open class ParentDeferredMap<K, V>(private val parentMap: MutableMap<K, V>? = nu
     override fun clear() {
         map.clear()
         parentMap?.clear()
+    }
+
+    fun ownPut(key: K, value: V): V? {
+        val v = map[key]
+        map[key] = value
+        return v
     }
 
     override fun put(key: K, value: V): V? {

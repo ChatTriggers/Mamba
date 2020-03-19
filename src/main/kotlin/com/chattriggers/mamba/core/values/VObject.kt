@@ -24,6 +24,22 @@ open class VObject(descriptor: ClassDescriptor = ObjectDescriptor) : ParentDefer
 
 object ObjectDescriptor : ClassDescriptor() {
     init {
+        addClassMethod("__eq__") { _, args ->
+            val self = assertSelf<VObject>(args)
+            val other = assertArg<VObject>(args, 1)
+            (self == other).toValue()
+        }
+        addClassMethod("__ne__") { interp, args ->
+            val self = assertSelf<VObject>(args)
+            val other = assertArg<VObject>(args, 1)
+            val eq = self.callProperty(interp, "__eq__", listOf(other))
+            (!interp.runtime.toBoolean(eq)).toValue()
+        }
+        addClassMethod("__lt__") { _, _ -> VNotImplemented }
+        addClassMethod("__le__") { _, _ -> VNotImplemented }
+        addClassMethod("__gt__") { _, _ -> VNotImplemented }
+        addClassMethod("__ge__") { _, _ -> VNotImplemented }
+
         addClassMethod("__dir__") { _, args ->
             val self = assertSelf<VObject>(args)
             self.keys.toList().map(::VString).toValue()

@@ -6,6 +6,11 @@ open class VInt(val num: Int, descriptor: ClassDescriptor = IntDescriptor) : VOb
 
 object IntDescriptor : ClassDescriptor(ObjectDescriptor) {
     init {
+        addClassMethod("__lt__") { _, args ->
+            val self = assertSelf<VInt>(args)
+            val other = assertArg<VInt>(args, 1)
+            (self.num < other.num).toValue()
+        }
         addClassMethod("__add__") { _, args ->
             val self = assertSelf<VInt>(args)
             val other = assertArg<VInt>(args, 1)
