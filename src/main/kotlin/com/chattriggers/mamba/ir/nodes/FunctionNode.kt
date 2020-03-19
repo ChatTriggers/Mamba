@@ -10,13 +10,11 @@ import com.chattriggers.mamba.ir.nodes.statements.StatementNode
 data class FunctionNode(
     private val identifier: IdentifierNode,
     internal val statements: List<StatementNode>
-) : StatementNode(listOf(identifier) + statements), ICallable {
-    private var returnedValue: Value? = null
+) : StatementNode(listOf(identifier) + statements),
+    ICallable {
+    private var returnedValue: VObject? = null
 
-    override val name: String
-        get() = identifier.identifier
-
-    override fun call(interp: Interpreter, args: List<Value>): Value {
+    override fun call(interp: Interpreter, args: List<VObject>): VObject {
         returnedValue = null
 
         val scope = VObject()
@@ -37,15 +35,16 @@ data class FunctionNode(
         return returnedValue ?: VNone
     }
 
-    internal fun returnValue(value: Value) {
+    internal fun returnValue(value: VObject) {
         if (returnedValue != null)
             TODO("Error")
         returnedValue = value
     }
 
-    override fun execute(interp: Interpreter): Value {
+    override fun execute(interp: Interpreter): VObject {
         val scope = interp.getScope()
-        scope[identifier.identifier] = VFunction(identifier.identifier, this)
+        scope[identifier.identifier] =
+            VFunction(identifier.identifier, this)
         return VNone
     }
 

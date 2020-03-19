@@ -1,13 +1,13 @@
 package com.chattriggers.mamba.ir.nodes.expressions
 
 import com.chattriggers.mamba.core.Interpreter
-import com.chattriggers.mamba.core.values.Value
+import com.chattriggers.mamba.core.values.VObject
 
 class AssignmentNode(
     private val identifier: IdentifierNode,
     private val expr: ExpressionNode
 ) : ExpressionNode(listOf(identifier, expr)) {
-    override fun execute(interp: Interpreter): Value {
+    override fun execute(interp: Interpreter): VObject {
         val value = expr.execute(interp)
         return interp.lexicalAssign(identifier.identifier, value)
     }

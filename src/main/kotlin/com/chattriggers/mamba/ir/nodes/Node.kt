@@ -2,7 +2,7 @@ package com.chattriggers.mamba.ir.nodes
 
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.VNone
-import com.chattriggers.mamba.core.values.Value
+import com.chattriggers.mamba.core.values.VObject
 
 abstract class Node(val children: List<Node>) {
     protected var parent: Node? = null
@@ -13,7 +13,7 @@ abstract class Node(val children: List<Node>) {
         }
     }
 
-    open fun execute(interp: Interpreter): Value = VNone
+    open fun execute(interp: Interpreter): VObject = VNone
 
     /* fun compile(compiler: Compiler) */
 

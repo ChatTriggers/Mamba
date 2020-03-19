@@ -2,7 +2,8 @@ package com.chattriggers.mamba.ir.nodes.statements
 
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.VNone
-import com.chattriggers.mamba.core.values.Value
+import com.chattriggers.mamba.core.values.VObject
+import com.chattriggers.mamba.core.values.collections.toValue
 import com.chattriggers.mamba.core.values.toValue
 import com.chattriggers.mamba.ir.nodes.Node
 import com.chattriggers.mamba.ir.nodes.expressions.ExpressionNode
@@ -18,7 +19,7 @@ data class IfConditionalNode(
     val condition: ExpressionNode?,
     val body: List<StatementNode>
 ) : Node(if (condition == null) emptyList() else listOf(condition) + body) {
-    override fun execute(interp: Interpreter): Value {
+    override fun execute(interp: Interpreter): VObject {
         return if (condition == null || interp.runtime.toBoolean(condition.execute(interp))) {
             body.forEach { it.execute(interp) }
             true
@@ -48,7 +49,7 @@ class IfStatementNode(
     private val elifBlocks: List<IfConditionalNode> = emptyList(),
     private val elseBlock: IfConditionalNode? = null
 ) : StatementNode(listOf(ifBlock) + elifBlocks + if (elseBlock == null) emptyList() else listOf(elseBlock)) {
-    override fun execute(interp: Interpreter): Value {
+    override fun execute(interp: Interpreter): VObject {
         interp.pushScope()
 
         try {

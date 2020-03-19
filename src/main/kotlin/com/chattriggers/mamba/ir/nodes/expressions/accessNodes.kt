@@ -2,13 +2,13 @@ package com.chattriggers.mamba.ir.nodes.expressions
 
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.VNone
-import com.chattriggers.mamba.core.values.Value
+import com.chattriggers.mamba.core.values.VObject
 
 class MemberAccessNode(
     private val target: ExpressionNode,
     private val members: List<ExpressionNode>)
     : ExpressionNode(listOf(target) + members) {
-    override fun execute(interp: Interpreter): Value {
+    override fun execute(interp: Interpreter): VObject {
         TODO()
     }
 
@@ -23,7 +23,7 @@ class DotAccessNode(
     private val target: ExpressionNode,
     private val property: IdentifierNode
 ) : ExpressionNode(listOf(target, property)) {
-    override fun execute(interp: Interpreter): Value {
+    override fun execute(interp: Interpreter): VObject {
         return target.execute(interp)[property.identifier] ?: VNone
     }
 

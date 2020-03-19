@@ -1,7 +1,10 @@
 package com.chattriggers.mamba.core.values
 
-abstract class VType : VObject() {
-    override fun toString(): String {
-        return "<class '$className'>"
-    }
+open class VType(val targetDescriptor: ClassDescriptor) : VObject() {
+    override val descriptor: ClassDescriptor
+        get() = TypeDescriptor
+}
+
+object TypeDescriptor : ClassDescriptor(ObjectDescriptor) {
+
 }

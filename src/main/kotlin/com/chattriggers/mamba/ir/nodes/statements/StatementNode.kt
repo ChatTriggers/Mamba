@@ -2,7 +2,7 @@ package com.chattriggers.mamba.ir.nodes.statements
 
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.VNone
-import com.chattriggers.mamba.core.values.Value
+import com.chattriggers.mamba.core.values.VObject
 import com.chattriggers.mamba.ir.nodes.Node
 
 open class StatementNode(children: List<Node>): Node(children) {
@@ -10,7 +10,7 @@ open class StatementNode(children: List<Node>): Node(children) {
 
     constructor() : this(emptyList())
 
-    override fun execute(interp: Interpreter): Value {
+    override fun execute(interp: Interpreter): VObject {
         children.forEach { it.execute(interp) }
         return VNone
     }

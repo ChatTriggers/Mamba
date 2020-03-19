@@ -1,35 +1,31 @@
 package com.chattriggers.mamba.core
 
 import com.chattriggers.mamba.core.values.*
-import com.chattriggers.mamba.core.values.numbers.VFalse
-import com.chattriggers.mamba.core.values.numbers.VTrue
 
 object GlobalScope : VObject() {
-    override fun toString(): String {
-        // TODO: Is it possible to get a reference to the global scope?
-        // In JavaScript, you can get it quite easily with 'this' on
-        // the script level, but there is no 'this' in Python
-        throw IllegalStateException("Invalid attempt to stringify the global scope object")
-    }
+    override val descriptor: ClassDescriptor
+        get() = GlobalScopeDescriptor
+}
 
+object GlobalScopeDescriptor : ClassDescriptor() {
     init {
-        addProperty("True", VTrue)
-        addProperty("False", VFalse)
-        addProperty("None", VNone)
-        addProperty("...", VEllipsis)
+        addClassProperty("True", VTrue)
+        addClassProperty("False", VFalse)
+        addClassProperty("None", VNone)
+        addClassProperty("...", VEllipsis)
 
-        addNativeMethod("abs") { interp, args ->
+        addClassMethod("abs") { interp, args ->
             if (args.isEmpty() || args.size > 1)
                 TODO()
 
-            args[0].callFunction(interp, "__abs__")
+            args[0].callProperty(interp, "__abs__")
         }
 
-        addNativeMethod("dir") { interp, args ->
+        addClassMethod("dir") { interp, args ->
             interp.runtime.dir(args)
         }
 
-        addNativeMethod("print") { _, args ->
+        addClassMethod("print") { _, args ->
             print(args.joinToString(separator = " "))
             VNone
         }

@@ -4,8 +4,7 @@ import com.chattriggers.mamba.api.ArithmeticOperator
 import com.chattriggers.mamba.api.ComparisonOperator
 import com.chattriggers.mamba.api.UnaryOperator
 import com.chattriggers.mamba.core.Interpreter
-import com.chattriggers.mamba.core.Runtime
-import com.chattriggers.mamba.core.values.Value
+import com.chattriggers.mamba.core.values.VObject
 import com.chattriggers.mamba.core.values.collections.toValue
 import com.chattriggers.mamba.core.values.toValue
 
@@ -43,7 +42,7 @@ class ComparisonNode(
     private val left: ExpressionNode,
     private val right: ExpressionNode
 ) : ExpressionNode(listOf(left, right)) {
-    override fun execute(interp: Interpreter): Value {
+    override fun execute(interp: Interpreter): VObject {
         val rt = interp.runtime
         val leftValue = left.execute(interp)
         val rightValue = right.execute(interp)
@@ -77,7 +76,7 @@ class ArithmeticExpressionNode(
     private val left: ExpressionNode,
     private val right: ExpressionNode
 ) : ExpressionNode(listOf(left, right)) {
-    override fun execute(interp: Interpreter): Value {
+    override fun execute(interp: Interpreter): VObject {
         val rt = interp.runtime
         val leftValue = left.execute(interp)
         val rightValue = right.execute(interp)
@@ -111,13 +110,13 @@ class UnaryExpressionNode(
     private val op: UnaryOperator,
     private val child: ExpressionNode
 ) : ExpressionNode(child) {
-    override fun execute(interp: Interpreter): Value {
+    override fun execute(interp: Interpreter): VObject {
         val value = child.execute(interp)
 
         return when (op) {
-            UnaryOperator.NEG -> value.callFunction(interp, "__neg__")
-            UnaryOperator.POS -> value.callFunction(interp, "__pos__")
-            UnaryOperator.INVERT -> value.callFunction(interp, "__invert__")
+            UnaryOperator.NEG -> value.callProperty(interp, "__neg__")
+            UnaryOperator.POS -> value.callProperty(interp, "__pos__")
+            UnaryOperator.INVERT -> value.callProperty(interp, "__invert__")
         }
     }
 

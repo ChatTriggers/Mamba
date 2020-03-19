@@ -1,14 +1,21 @@
 package com.chattriggers.mamba.core.values.functions
 
 import com.chattriggers.mamba.core.Interpreter
-import com.chattriggers.mamba.core.values.*
+import com.chattriggers.mamba.core.values.ClassDescriptor
+import com.chattriggers.mamba.core.values.ObjectDescriptor
+import com.chattriggers.mamba.core.values.VObject
+import com.chattriggers.mamba.ir.nodes.FunctionNode
 
-typealias VNativeFuncType = (Interpreter, List<Value>) -> Value
+// User-defined function
+class VNativeFunction(
+    private val name: String,
+    private val func: (interp: Interpreter, args: List<VObject>) -> VObject
+) : VObject(),
+    ICallable {
+    override val descriptor: ClassDescriptor
+        get() = FunctionDescriptor // TODO: Does this need it's own descriptor?
 
-open class VNativeFunction(name: String, val function: VNativeFuncType) : VCallable(name) {
-    override fun toString() = "<built-in function $name>"
-
-    override fun call(interp: Interpreter, args: List<Value>): Value {
-        return function.invoke(interp, args)
+    override fun call(interp: Interpreter, args: List<VObject>): VObject {
+        return func.invoke(interp, args)
     }
 }
