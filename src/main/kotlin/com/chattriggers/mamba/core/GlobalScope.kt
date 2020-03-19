@@ -22,6 +22,11 @@ object GlobalScopeDescriptor : ClassDescriptor() {
             interp.runtime.dir(args)
         }
 
+        addClassMethod("str") { interp, args ->
+            val obj = assertArg<VObject>(args, 0)
+            obj.callProperty(interp, "__str__")
+        }
+
         addClassMethod("print") { _, args ->
             print(args.joinToString(separator = " "))
             VNone
