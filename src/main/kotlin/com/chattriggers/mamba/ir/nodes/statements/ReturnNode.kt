@@ -8,10 +8,7 @@ import com.chattriggers.mamba.ir.nodes.expressions.ExpressionNode
 
 class ReturnNode(private val child: ExpressionNode) : StatementNode(child) {
     override fun execute(interp: Interpreter): VObject {
-        val parentFunc = getParentOfType<FunctionNode>()
-
-        if (parentFunc == null)
-            TODO("Error")
+        val parentFunc = getParentOfType<FunctionNode>() ?: TODO("Error")
 
         parentFunc.returnValue(child.execute(interp))
 
