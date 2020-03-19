@@ -4,14 +4,9 @@ import com.chattriggers.mamba.core.values.ClassDescriptor
 import com.chattriggers.mamba.core.values.ObjectDescriptor
 import com.chattriggers.mamba.core.values.VObject
 
-class VList<T : VObject>(val list: MutableList<T>) : VObject() {
-    override val descriptor: ClassDescriptor
-        get() = ListDescriptor
-}
+class VList<T : VObject>(val list: MutableList<T>) : VObject(ListDescriptor)
 
-object ListDescriptor : ClassDescriptor(ObjectDescriptor) {
-
-}
+object ListDescriptor : ClassDescriptor(ObjectDescriptor)
 
 fun <T : VObject> MutableList<T>.toValue() = VList(this)
 

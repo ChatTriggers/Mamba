@@ -2,10 +2,7 @@ package com.chattriggers.mamba.core
 
 import com.chattriggers.mamba.core.values.*
 
-object GlobalScope : VObject() {
-    override val descriptor: ClassDescriptor
-        get() = GlobalScopeDescriptor
-}
+object GlobalScope : VObject(GlobalScopeDescriptor)
 
 object GlobalScopeDescriptor : ClassDescriptor() {
     init {

@@ -4,14 +4,9 @@ import com.chattriggers.mamba.core.values.ClassDescriptor
 import com.chattriggers.mamba.core.values.ObjectDescriptor
 import com.chattriggers.mamba.core.values.VObject
 
-class VDict<K : VObject, V : VObject>(val dict: MutableMap<K, V>) : VObject() {
-    override val descriptor: ClassDescriptor
-        get() = DictDescriptor
-}
+class VDict<K : VObject, V : VObject>(val dict: MutableMap<K, V>) : VObject(DictDescriptor)
 
-object DictDescriptor : ClassDescriptor(ObjectDescriptor) {
-
-}
+object DictDescriptor : ClassDescriptor(ObjectDescriptor)
 
 fun <K : VObject, V : VObject> MutableMap<K, V>.toValue() = VDict(this)
 

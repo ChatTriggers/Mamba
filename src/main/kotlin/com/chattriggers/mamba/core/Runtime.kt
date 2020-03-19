@@ -32,8 +32,8 @@ class Runtime(val interp: Interpreter) {
 
     fun valueArithmetic(method: String, reverseMethod: String, left: VObject, right: VObject): VObject {
         return when {
-            left.has(method) -> left.callProperty(interp, method, listOf(right))
-            right.has(reverseMethod) -> right.callProperty(interp, reverseMethod, listOf(left)) // TODO: Only if types differ
+            left.contains(method) -> left.callProperty(interp, method, listOf(right))
+            right.contains(reverseMethod) -> right.callProperty(interp, reverseMethod, listOf(left)) // TODO: Only if types differ
             else -> VNotImplemented
         }
     }

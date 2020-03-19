@@ -6,8 +6,8 @@ import com.chattriggers.mamba.core.values.VObject
 class IdentifierNode(val identifier: String) : ExpressionNode() {
     override fun execute(interp: Interpreter): VObject {
         for (scope in interp.scopeStack) {
-            if (scope.has(identifier)) {
-                return scope.lookup(identifier)!!
+            if (scope.contains(identifier)) {
+                return scope[identifier]!!
             }
         }
 

@@ -1,8 +1,5 @@
 package com.chattriggers.mamba.core.values
 
-object VEllipsis : VObject() {
-    override val descriptor: ClassDescriptor
-        get() = EllipsisDescriptor
-}
+object VEllipsis : VObject(EllipsisDescriptor)
 
 object EllipsisDescriptor : ClassDescriptor(ObjectDescriptor)

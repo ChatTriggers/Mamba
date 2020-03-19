@@ -1,12 +1,7 @@
 package com.chattriggers.mamba.core.values
 
-class VString(val string: String) : VObject() {
-    override val descriptor: ClassDescriptor
-        get() = StringDescriptor
-}
+class VString(val string: String) : VObject(StringDescriptor)
 
-object StringDescriptor : ClassDescriptor(ObjectDescriptor) {
-
-}
+object StringDescriptor : ClassDescriptor(ObjectDescriptor)
 
 fun String.toValue() = VString(this)

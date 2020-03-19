@@ -1,11 +1,8 @@
 package com.chattriggers.mamba.core.values
 
-sealed class VBool(val value: Boolean) : VInt(if (value) 1 else 0) {
-    override val descriptor: ClassDescriptor
-        get() = BoolDescriptor
-}
+sealed class VBool(value: Boolean) : VInt(if (value) 1 else 0, BoolDescriptor)
 
-object BoolDescriptor : ClassDescriptor(IntDescriptor)
+ object BoolDescriptor : ClassDescriptor(IntDescriptor)
 
 object VTrue : VBool(true)
 

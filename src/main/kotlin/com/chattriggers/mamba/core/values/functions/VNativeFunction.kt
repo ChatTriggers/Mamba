@@ -10,11 +10,7 @@ import com.chattriggers.mamba.ir.nodes.FunctionNode
 class VNativeFunction(
     private val name: String,
     private val func: (interp: Interpreter, args: List<VObject>) -> VObject
-) : VObject(),
-    ICallable {
-    override val descriptor: ClassDescriptor
-        get() = FunctionDescriptor // TODO: Does this need it's own descriptor?
-
+) : VObject(FunctionDescriptor), ICallable {
     override fun call(interp: Interpreter, args: List<VObject>): VObject {
         return func.invoke(interp, args)
     }

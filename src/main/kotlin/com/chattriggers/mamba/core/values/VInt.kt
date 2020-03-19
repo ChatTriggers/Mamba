@@ -1,9 +1,6 @@
 package com.chattriggers.mamba.core.values
 
-open class VInt(val num: Int) : VObject() {
-    override val descriptor: ClassDescriptor
-        get() = IntDescriptor
-
+open class VInt(val num: Int, descriptor: ClassDescriptor = IntDescriptor) : VObject(descriptor) {
     override fun toString() = num.toString()
 }
 
