@@ -14,6 +14,8 @@ class VFunction(
     override fun call(interp: Interpreter, args: List<VObject>): VObject {
         return func.call(interp, args)
     }
+
+    override fun toString() = "<function $name>"
 }
 
 object FunctionDescriptor : ClassDescriptor(ObjectDescriptor)

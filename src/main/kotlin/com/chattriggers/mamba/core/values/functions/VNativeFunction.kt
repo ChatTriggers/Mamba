@@ -14,4 +14,6 @@ class VNativeFunction(
     override fun call(interp: Interpreter, args: List<VObject>): VObject {
         return func.invoke(interp, args)
     }
+
+    override fun toString() = "<function $name>"
 }
