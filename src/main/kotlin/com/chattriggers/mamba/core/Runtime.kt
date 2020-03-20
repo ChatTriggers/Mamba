@@ -29,10 +29,10 @@ class Runtime(val interp: Interpreter) {
     }
 
     private fun widenHelper(self: VObject, other: VObject): VObject {
-        if (self !is VInt || self !is VFloat || self !is VComplex)
+        if (self !is VInt && self !is VFloat && self !is VComplex)
             TODO()
 
-        if (other !is VInt || other !is VFloat || other !is VComplex)
+        if (other !is VInt && other !is VFloat && other !is VComplex)
             TODO()
 
         return when (other) {

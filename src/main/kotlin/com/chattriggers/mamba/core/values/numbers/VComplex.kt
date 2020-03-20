@@ -6,7 +6,23 @@ import kotlin.math.floor
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-class VComplex(val real: Double, val imag: Double) : VObject(ComplexDescriptor)
+class VComplex(val real: Double, val imag: Double) : VObject(ComplexDescriptor) {
+    override fun toString(): String {
+        val r = when (real) {
+            0.0 -> ""
+            floor(real) -> real.toInt().toString()
+            else -> real.toString()
+        }
+        val i = when {
+            real != 0.0 && imag == 0.0 -> ""
+            imag == floor(imag) -> imag.toInt().toString()
+            else -> imag.toString()
+        }
+        val op = if (imag >= 0.0 && real != 0.0) "+" else ""
+
+        return "$r$op${i}j"
+    }
+}
 
 object ComplexDescriptor : ClassDescriptor(ObjectDescriptor) {
     init {

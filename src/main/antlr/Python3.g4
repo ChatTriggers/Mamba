@@ -237,7 +237,7 @@ atom: parenAtom | listAtom | dictOrSetAtom | basicAtom;
 parenAtom: '(' (yieldExpression | testListComp)? ')';
 listAtom: '[' testListComp? ']';
 dictOrSetAtom: '{' (dictMaker | setMaker) '}';
-basicAtom: NAME | NUMBER | STRING+ | ELLIPSIS | NONE | TRUE | FALSE;
+basicAtom: NAME | number | STRING+ | ELLIPSIS | NONE | TRUE | FALSE;
 testListComp: (test | starExpression) (compFor | (',' (test | starExpression))* (',')?);
 trailer: trailerCall | trailerMemberAccess | trailerDotAccess;
 trailerCall: '(' argList? ')';
@@ -282,6 +282,9 @@ encondingDecl: NAME;
 yieldExpression: 'yield' (yieldArg)?;
 yieldArg: 'from' test | testList;
 
+number: integer | FLOAT_NUMBER | IMAG_NUMBER;
+integer: dec=DECIMAL_INTEGER | oct=OCT_INTEGER | hex=HEX_INTEGER | bin=BIN_INTEGER;
+
 /*
  * lexer rules
  */
@@ -289,19 +292,6 @@ yieldArg: 'from' test | testList;
 STRING
  : STRING_LITERAL
  | BYTES_LITERAL
- ;
-
-NUMBER
- : INTEGER
- | FLOAT_NUMBER
- | IMAG_NUMBER
- ;
-
-INTEGER
- : DECIMAL_INTEGER
- | OCT_INTEGER
- | HEX_INTEGER
- | BIN_INTEGER
  ;
 
 DEF : 'def';
@@ -398,6 +388,12 @@ BYTES_LITERAL
  : ( [bB] | ( [bB] [rR] ) | ( [rR] [bB] ) ) ( SHORT_BYTES | LONG_BYTES )
  ;
 
+/// floatnumber   ::=  pointfloat | exponentfloat
+FLOAT_NUMBER: POINT_FLOAT | EXPONENT_FLOAT;
+
+/// imagnumber ::=  (floatnumber | intpart) ("j" | "J")
+IMAG_NUMBER: (FLOAT_NUMBER | INT_PART) [jJ];
+
 /// decimalinteger ::=  nonzerodigit digit* | "0"+
 DECIMAL_INTEGER
  : NON_ZERO_DIGIT DIGIT*
@@ -417,17 +413,6 @@ HEX_INTEGER
 /// bininteger     ::=  "0" ("b" | "B") bindigit+
 BIN_INTEGER
  : '0' [bB] BIN_DIGIT+
- ;
-
-/// floatnumber   ::=  pointfloat | exponentfloat
-FLOAT_NUMBER
- : POINT_FLOAT
- | EXPONENT_FLOAT
- ;
-
-/// imagnumber ::=  (floatnumber | intpart) ("j" | "J")
-IMAG_NUMBER
- : ( FLOAT_NUMBER | INT_PART ) [jJ]
  ;
 
 DOT : '.';

@@ -6,7 +6,9 @@ import com.chattriggers.mamba.api.UnaryOperator
 import com.chattriggers.mamba.generated.Python3Parser.*
 import com.chattriggers.mamba.ir.nodes.*
 import com.chattriggers.mamba.ir.nodes.expressions.*
-import com.chattriggers.mamba.ir.nodes.expressions.literals.NumberLiteral
+import com.chattriggers.mamba.ir.nodes.expressions.literals.ComplexLiteral
+import com.chattriggers.mamba.ir.nodes.expressions.literals.FloatLiteral
+import com.chattriggers.mamba.ir.nodes.expressions.literals.IntegerLiteral
 import com.chattriggers.mamba.ir.nodes.expressions.literals.StringLiteral
 import com.chattriggers.mamba.ir.nodes.statements.*
 import org.antlr.v4.runtime.tree.TerminalNode
@@ -504,12 +506,39 @@ internal class IRVisitor {
 
     private fun visitBasicAtom(ctx: BasicAtomContext): ExpressionNode {
         return ctx.NAME()?.let { IdentifierNode(it.text) } ?:
-                ctx.NUMBER()?.let { makeNumber(it.text) } ?:
+                ctx.number()?.let { visitNumber(it) } ?:
                 ctx.ELLIPSIS()?.let { EllipsisNode } ?:
                 ctx.NONE()?.let { NoneNode } ?:
                 ctx.TRUE()?.let { TrueNode } ?:
                 ctx.FALSE()?.let { FalseNode } ?:
                 ctx.STRING().let(this::makeStrings)
+    }
+
+    private fun visitNumber(ctx: NumberContext): ExpressionNode {
+        val intCtx = ctx.integer()
+        if (intCtx != null) {
+            var token = intCtx.dec
+            if (token != null)
+                return IntegerLiteral(Integer.parseInt(token.text, 10))
+
+            token = intCtx.oct
+            if (token != null)
+                return IntegerLiteral(Integer.parseInt(token.text.replace("0o", "").replace("0O", ""), 8))
+
+            token = intCtx.hex
+            if (token != null)
+                return IntegerLiteral(Integer.parseInt(token.text.replace("0x", "").replace("0X", ""), 16))
+
+            token = intCtx.bin
+            return IntegerLiteral(Integer.parseInt(token.text.replace("0b", "").replace("0B", ""), 2))
+        }
+
+        val floatTerm = ctx.FLOAT_NUMBER()
+        if (floatTerm != null)
+            return FloatLiteral(java.lang.Double.parseDouble(floatTerm.text))
+
+        val imagTerm = ctx.IMAG_NUMBER()
+        return ComplexLiteral(java.lang.Double.parseDouble(imagTerm.text.replace("j", "").replace("J", "")))
     }
 
     private fun makeTrailers(atomNode: ExpressionNode, trailers: List<TrailerContext>): ExpressionNode {
@@ -568,7 +597,7 @@ internal class IRVisitor {
 
     private fun makeNumber(number: String): ExpressionNode {
         // TODO: Number formatting
-        return NumberLiteral(number.toInt())
+        return IntegerLiteral(number.toInt())
     }
 
     private fun makeStrings(strings: List<TerminalNode>): ExpressionNode {
