@@ -32,8 +32,7 @@ data class FunctionNode(
 
     override fun execute(interp: Interpreter): VObject {
         val scope = interp.getScope()
-        scope[identifier.identifier] =
-            VFunction(identifier.identifier, this)
+        scope[identifier.identifier] = VFunction(identifier.identifier, this)
         return VNone
     }
 

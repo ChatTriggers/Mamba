@@ -26,7 +26,7 @@ class VComplex(val real: Double, val imag: Double) : VObject(ComplexDescriptor) 
 
 object ComplexDescriptor : ClassDescriptor(ObjectDescriptor) {
     init {
-        addClassMethod("conjugate") {
+        addMethodDescriptor("conjugate") {
             when (val self = argument(0)) {
                 is VComplex -> VComplex(self.real, -self.imag)
                 is VFloat, is VInt -> self
@@ -35,7 +35,7 @@ object ComplexDescriptor : ClassDescriptor(ObjectDescriptor) {
         }
 
         // Magic methods
-        addClassMethod("__abs__") {
+        addMethodDescriptor("__abs__") {
             when (val self = argument(0)) {
                 is VComplex -> sqrt(self.real.pow(2.0) + self.imag.pow(2.0))
                 is VFloat -> self.double
@@ -43,7 +43,7 @@ object ComplexDescriptor : ClassDescriptor(ObjectDescriptor) {
                 else -> TODO()
             }.toValue()
         }
-        addClassMethod("__add__") {
+        addMethodDescriptor("__add__") {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {
@@ -56,7 +56,7 @@ object ComplexDescriptor : ClassDescriptor(ObjectDescriptor) {
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addClassMethod("__bool__") {
+        addMethodDescriptor("__bool__") {
             when (val self = argument(0)) {
                 is VComplex -> if (self.real == 0.0 && self.imag == 0.0) VFalse else VTrue
                 is VFloat -> if (self.double == 0.0) VFalse else VTrue
@@ -64,7 +64,7 @@ object ComplexDescriptor : ClassDescriptor(ObjectDescriptor) {
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addClassMethod("__eq__") {
+        addMethodDescriptor("__eq__") {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {
@@ -77,7 +77,7 @@ object ComplexDescriptor : ClassDescriptor(ObjectDescriptor) {
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addClassMethod("__float__") {
+        addMethodDescriptor("__float__") {
             when (val self = argument(0)) {
                 is VComplex -> TODO("TypeError")
                 is VFloat -> self
@@ -85,7 +85,7 @@ object ComplexDescriptor : ClassDescriptor(ObjectDescriptor) {
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addClassMethod("__floordiv__") {
+        addMethodDescriptor("__floordiv__") {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {
@@ -95,7 +95,7 @@ object ComplexDescriptor : ClassDescriptor(ObjectDescriptor) {
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addClassMethod("__ge__") {
+        addMethodDescriptor("__ge__") {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {
@@ -107,7 +107,7 @@ object ComplexDescriptor : ClassDescriptor(ObjectDescriptor) {
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addClassMethod("__gt__") {
+        addMethodDescriptor("__gt__") {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {
@@ -119,7 +119,7 @@ object ComplexDescriptor : ClassDescriptor(ObjectDescriptor) {
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addClassMethod("__int__") {
+        addMethodDescriptor("__int__") {
             when (val self = argument(0)) {
                 is VComplex -> TODO("TypeError")
                 is VFloat -> self.double.toInt().toValue()
@@ -127,7 +127,7 @@ object ComplexDescriptor : ClassDescriptor(ObjectDescriptor) {
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addClassMethod("__le__") {
+        addMethodDescriptor("__le__") {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {
@@ -139,7 +139,7 @@ object ComplexDescriptor : ClassDescriptor(ObjectDescriptor) {
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addClassMethod("__lt__") {
+        addMethodDescriptor("__lt__") {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {
@@ -151,7 +151,7 @@ object ComplexDescriptor : ClassDescriptor(ObjectDescriptor) {
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addClassMethod("__mod__") {
+        addMethodDescriptor("__mod__") {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {
@@ -163,7 +163,7 @@ object ComplexDescriptor : ClassDescriptor(ObjectDescriptor) {
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addClassMethod("__mul__") {
+        addMethodDescriptor("__mul__") {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {
@@ -179,7 +179,7 @@ object ComplexDescriptor : ClassDescriptor(ObjectDescriptor) {
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addClassMethod("__ne__") {
+        addMethodDescriptor("__ne__") {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {
@@ -192,7 +192,7 @@ object ComplexDescriptor : ClassDescriptor(ObjectDescriptor) {
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addClassMethod("__neg__") {
+        addMethodDescriptor("__neg__") {
             when (val self = argument(0)) {
                 is VComplex -> VComplex(-self.real, -self.imag)
                 is VFloat -> (-self.double.toInt()).toValue()
@@ -200,13 +200,13 @@ object ComplexDescriptor : ClassDescriptor(ObjectDescriptor) {
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addClassMethod("__pos__") {
+        addMethodDescriptor("__pos__") {
             when (val self = argument(0)) {
                 is VComplex, is VFloat, is VInt -> self
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addClassMethod("__pow__") {
+        addMethodDescriptor("__pow__") {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {
@@ -218,31 +218,31 @@ object ComplexDescriptor : ClassDescriptor(ObjectDescriptor) {
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addClassMethod("__radd__") {
+        addMethodDescriptor("__radd__") {
             argument(1).callProperty(interp, "__add__", listOf(argument(0)))
         }
-        addClassMethod("__rdivmod__") {
+        addMethodDescriptor("__rdivmod__") {
             argument(1).callProperty(interp, "__divmod__", listOf(argument(0)))
         }
-        addClassMethod("__rfloordiv__") {
+        addMethodDescriptor("__rfloordiv__") {
             argument(1).callProperty(interp, "__floordiv__", listOf(argument(0)))
         }
-        addClassMethod("__rmod__") {
+        addMethodDescriptor("__rmod__") {
             argument(1).callProperty(interp, "__mod__", listOf(argument(0)))
         }
-        addClassMethod("__rmul__") {
+        addMethodDescriptor("__rmul__") {
             argument(1).callProperty(interp, "__mul__", listOf(argument(0)))
         }
-        addClassMethod("__rpow__") {
+        addMethodDescriptor("__rpow__") {
             argument(1).callProperty(interp, "__pow__", listOf(argument(0)))
         }
-        addClassMethod("__rsub__") {
+        addMethodDescriptor("__rsub__") {
             argument(1).callProperty(interp, "__sub__", listOf(argument(0)))
         }
-        addClassMethod("__rtruediv__") {
+        addMethodDescriptor("__rtruediv__") {
             argument(1).callProperty(interp, "__truediv__", listOf(argument(0)))
         }
-        addClassMethod("__add__") {
+        addMethodDescriptor("__sub__") {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {
@@ -255,7 +255,7 @@ object ComplexDescriptor : ClassDescriptor(ObjectDescriptor) {
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addClassMethod("__truediv__") {
+        addMethodDescriptor("__truediv__") {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {

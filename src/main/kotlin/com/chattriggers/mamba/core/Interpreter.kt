@@ -33,7 +33,7 @@ class Interpreter private constructor(private val script: ScriptNode) {
     internal fun lexicalAssign(name: String, value: VObject): VObject {
         for (scope in scopeStack) {
             if (scope.contains(name)) {
-                return scope[name]!!
+                return scope.getProperty(name)!!
             }
         }
 

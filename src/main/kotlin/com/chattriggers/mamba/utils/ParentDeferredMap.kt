@@ -14,10 +14,6 @@ open class ParentDeferredMap<K, V>(private val parentMap: MutableMap<K, V>? = nu
         return map.containsValue(value) || (parentMap?.containsValue(value) ?: false)
     }
 
-    fun ownGet(key: K): V? {
-        return map[key]
-    }
-
     override fun get(key: K): V? {
         return if (map.contains(key)) {
             map[key]

@@ -24,7 +24,7 @@ class DotAccessNode(
     private val property: IdentifierNode
 ) : ExpressionNode(listOf(target, property)) {
     override fun execute(interp: Interpreter): VObject {
-        return target.execute(interp)[property.identifier] ?: VNone
+        return target.execute(interp).getProperty(property.identifier) ?: VNone
     }
 
     override fun print(indent: Int) {

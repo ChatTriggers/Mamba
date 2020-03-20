@@ -6,10 +6,7 @@ import com.chattriggers.mamba.core.values.VObject
 
 typealias NativeClassMethod = ClassMethodBuilder.() -> VObject
 
-class ClassMethodBuilder(
-    val interp: Interpreter,
-    private val args: List<VObject>
-) {
+class ClassMethodBuilder(val interp: Interpreter, private val args: List<VObject>) {
     val runtime: Runtime
         get() = interp.runtime
 
@@ -42,8 +39,8 @@ class ClassMethodBuilder(
 
 // User-defined function
 class VNativeFunction(
-    private val name: String,
-    private val func: NativeClassMethod
+    internal val name: String,
+    internal val func: NativeClassMethod
 ) : VObject(FunctionDescriptor), ICallable {
     override fun call(interp: Interpreter, args: List<VObject>): VObject {
         return func.invoke(ClassMethodBuilder(interp, args))

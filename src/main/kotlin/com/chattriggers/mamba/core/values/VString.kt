@@ -6,13 +6,13 @@ class VString(val string: String) : VObject(StringDescriptor) {
 
 object StringDescriptor : ClassDescriptor(ObjectDescriptor) {
     init {
-        addClassMethod("__add__") {
+        addMethodDescriptor("__add__") {
             val self = assertSelf<VString>()
             val other = assertArg<VString>(1)
 
             (self.string + other.string).toValue()
         }
-        addClassMethod("lower") {
+        addMethodDescriptor("lower") {
             assertSelf<VString>().string.toLowerCase().toValue()
         }
     }

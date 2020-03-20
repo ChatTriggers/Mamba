@@ -7,7 +7,7 @@ class IdentifierNode(val identifier: String) : ExpressionNode() {
     override fun execute(interp: Interpreter): VObject {
         for (scope in interp.scopeStack) {
             if (scope.contains(identifier)) {
-                return scope[identifier]!!
+                return scope.getProperty(identifier)!!
             }
         }
 
