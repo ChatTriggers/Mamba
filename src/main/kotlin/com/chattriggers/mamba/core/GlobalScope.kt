@@ -11,24 +11,20 @@ object GlobalScopeDescriptor : ClassDescriptor() {
         addClassProperty("None", VNone)
         addClassProperty("...", VEllipsis)
 
-        addClassMethod("abs") { interp, args ->
-            if (args.isEmpty() || args.size > 1)
-                TODO()
-
-            args[0].callProperty(interp, "__abs__")
+        addClassMethod("abs") {
+            assertArg<VObject>(0).callProperty(interp, "__abs__")
         }
 
-        addClassMethod("dir") { interp, args ->
-            interp.runtime.dir(args)
+        addClassMethod("dir") {
+            interp.runtime.dir(arguments())
         }
 
-        addClassMethod("str") { interp, args ->
-            val obj = assertArg<VObject>(args, 0)
-            obj.callProperty(interp, "__str__")
+        addClassMethod("str") {
+            assertArg<VObject>(0).callProperty(interp, "__str__")
         }
 
-        addClassMethod("print") { _, args ->
-            println(args.joinToString(separator = " "))
+        addClassMethod("print") {
+            println(arguments().joinToString(separator = " "))
             VNone
         }
     }

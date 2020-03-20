@@ -6,7 +6,7 @@ import com.chattriggers.mamba.core.values.ObjectDescriptor
 import com.chattriggers.mamba.core.values.VObject
 
 class VList<T : VObject>(val list: MutableList<T>) : VObject(ListDescriptor) {
-    override fun toString() = "[${keys.map { Runtime.toValue(it) }.joinToString()}]"
+    override fun toString() = "[${list.joinToString()}]"
 }
 
 object ListDescriptor : ClassDescriptor(ObjectDescriptor)

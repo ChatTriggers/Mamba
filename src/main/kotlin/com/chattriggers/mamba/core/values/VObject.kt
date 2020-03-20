@@ -24,29 +24,27 @@ open class VObject(descriptor: ClassDescriptor = ObjectDescriptor) : ParentDefer
 
 object ObjectDescriptor : ClassDescriptor() {
     init {
-        addClassMethod("__eq__") { _, args ->
-            val self = assertSelf<VObject>(args)
-            val other = assertArg<VObject>(args, 1)
+        addClassMethod("__eq__") {
+            val self = assertSelf<VObject>()
+            val other = assertArg<VObject>(1)
             (self == other).toValue()
         }
-        addClassMethod("__ne__") { interp, args ->
-            val self = assertSelf<VObject>(args)
-            val other = assertArg<VObject>(args, 1)
+        addClassMethod("__ne__") {
+            val self = assertSelf<VObject>()
+            val other = assertArg<VObject>(1)
             val eq = self.callProperty(interp, "__eq__", listOf(other))
             (!interp.runtime.toBoolean(eq)).toValue()
         }
-        addClassMethod("__lt__") { _, _ -> VNotImplemented }
-        addClassMethod("__le__") { _, _ -> VNotImplemented }
-        addClassMethod("__gt__") { _, _ -> VNotImplemented }
-        addClassMethod("__ge__") { _, _ -> VNotImplemented }
+        addClassMethod("__lt__") { VNotImplemented }
+        addClassMethod("__le__") { VNotImplemented }
+        addClassMethod("__gt__") { VNotImplemented }
+        addClassMethod("__ge__") { VNotImplemented }
 
-        addClassMethod("__dir__") { _, args ->
-            val self = assertSelf<VObject>(args)
-            self.keys.toList().map(::VString).toValue()
+        addClassMethod("__dir__") {
+            assertSelf<VObject>().keys.sorted().toList().map(::VString).toValue()
         }
-        addClassMethod("__str__") { _, args ->
-            val arg = assertArg<VObject>(args, 0)
-            arg.toString().toValue()
+        addClassMethod("__str__") {
+            assertArg<VObject>(0).toString().toValue()
         }
     }
 }

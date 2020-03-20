@@ -1,11 +1,7 @@
 package com.chattriggers.mamba.ir.nodes.statements
 
 import com.chattriggers.mamba.core.Interpreter
-import com.chattriggers.mamba.core.values.VBool
-import com.chattriggers.mamba.core.values.VNone
 import com.chattriggers.mamba.core.values.VObject
-import com.chattriggers.mamba.core.values.collections.toValue
-import com.chattriggers.mamba.core.values.toValue
 import com.chattriggers.mamba.ir.nodes.Node
 import com.chattriggers.mamba.ir.nodes.expressions.ExpressionNode
 
