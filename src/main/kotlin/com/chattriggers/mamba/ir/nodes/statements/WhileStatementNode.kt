@@ -12,16 +12,20 @@ class WhileStatementNode(
     private val elseBlock: List<StatementNode>
 ) : StatementNode(listOf(condition) + body + elseBlock) {
     override fun execute(interp: Interpreter): VObject {
+        var broke = false
+
         loop@
         while (interp.runtime.toBoolean(condition.execute(interp))) {
             // We don't really need to check for VContinueWrapper
             // here, since it's already the last statement
-            when (executeStatements(interp, body)) {
-                VBreakWrapper -> break@loop
+            if (executeStatements(interp, body) is VBreakWrapper) {
+                broke = true
+                break@loop
             }
         }
 
-        executeStatements(interp, elseBlock)
+        if (!broke)
+            executeStatements(interp, elseBlock)
 
         return VNone
     }
