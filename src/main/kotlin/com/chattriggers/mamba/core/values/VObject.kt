@@ -90,7 +90,7 @@ open class VObject(private vararg val _baseTypes: LazyValue<VType>) : Value {
             if (key in baseType)
                 return baseType[key].unwrap()
 
-        TODO()
+        TODO("AttributeError: $key")
     }
 
     open operator fun set(key: String, value: VObject) {

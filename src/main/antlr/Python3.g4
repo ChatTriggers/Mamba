@@ -221,6 +221,7 @@ comparison: expression (compOperator expression)*;
 // sake of a __future__ import described in PEP 401 (which really works :-)
 compOperator: '<'|'>'|'=='|'>='|'<='|'<>'|'!='|'in'|'not' 'in'|'is'|'is' 'not';
 starExpression: '*' expression;
+kstarExpression: '**' expression;
 expression: bitXorExpr ('|' bitXorExpr)*;
 bitXorExpr: bitAndExpr ('^' bitAndExpr)*;
 bitAndExpr: bitShiftExpr ('&' bitShiftExpr)*;
@@ -247,10 +248,10 @@ trailerDotAccess: '.' NAME;
 subscriptList: subscript (',' subscript)* (',')?;
 subscript: test | (start=test)? ':' (stop=test)? (':' (step=test)?)?;
 sliceop: ':' (test)?;
-expressionList: (expression|starExpression) (',' (expression|starExpression))* (',')?;
+expressionList: (expression | starExpression) (',' (expression | starExpression))* (',')?;
 testList: test (',' test)* (',')?;
 dictMaker: dictTerm (',' dictTerm)* (',')?;
-dictTerm: test ':' test compFor? | '**' expression;
+dictTerm: id=test ':' value=test compFor? | kstarExpression;
 setMaker: setTerm (',' setTerm)* (',')?;
 setTerm: testlistElem compFor?;
 

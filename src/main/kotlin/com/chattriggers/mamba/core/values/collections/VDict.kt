@@ -9,6 +9,12 @@ class VDict(val dict: MutableMap<String, VObject>) : VObject(LazyValue("VDictTyp
     override val className = "dict"
 }
 
-object VDictType : VType(LazyValue("VObjectType") { VObjectType })
+object VDictType : VType(LazyValue("VObjectType") { VObjectType }) {
+    init {
+        addMethodDescriptor("__iter__") {
+            VDictIterator(assertSelf())
+        }
+    }
+}
 
 fun Map<String, VObject>.toValue() = VDict(this.toMutableMap())

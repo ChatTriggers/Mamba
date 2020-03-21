@@ -523,7 +523,22 @@ internal class IRVisitor {
     }
 
     private fun visitDictOrSetAtom(ctx: DictOrSetAtomContext): ExpressionNode {
+        val dictMaker = ctx.dictMaker()
+        if (dictMaker != null)
+            return visitDictMaker(dictMaker)
+
         TODO()
+    }
+
+    private fun visitDictMaker(ctx: DictMakerContext): ExpressionNode {
+        return DictLiteral(
+            ctx.dictTerm().map {
+                if (it.compFor() != null || it.kstarExpression() != null)
+                    TODO()
+
+                visitTest(it.id) to visitTest(it.value)
+            }.toMap()
+        )
     }
 
     private fun visitBasicAtom(ctx: BasicAtomContext): ExpressionNode {
