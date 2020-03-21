@@ -37,6 +37,8 @@ open class VObject(private vararg val _baseTypes: LazyValue<VType>) : Value {
                 )
 
                 bindMethodsFrom(evaluatedBaseTypesBacker)
+
+                baseTypesEvaluated = true
             }
 
             return evaluatedBaseTypesBacker.toList()
