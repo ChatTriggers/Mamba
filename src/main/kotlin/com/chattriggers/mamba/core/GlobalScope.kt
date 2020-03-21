@@ -1,15 +1,31 @@
 package com.chattriggers.mamba.core
 
 import com.chattriggers.mamba.core.values.*
+import com.chattriggers.mamba.core.values.collections.VDictType
+import com.chattriggers.mamba.core.values.collections.VListType
+import com.chattriggers.mamba.core.values.numbers.VComplexType
+import com.chattriggers.mamba.core.values.numbers.VFloatType
+import com.chattriggers.mamba.core.values.numbers.VIntType
+import com.chattriggers.mamba.core.values.singletons.*
 
-object GlobalScope : VObject(GlobalScopeDescriptor)
+object GlobalScope : VObject(LazyValue("GlobalScopeType") { GlobalScopeType })
 
-object GlobalScopeDescriptor : ClassDescriptor() {
+object GlobalScopeType : VType() {
     init {
         addFieldDescriptor("True", VTrue)
         addFieldDescriptor("False", VFalse)
         addFieldDescriptor("None", VNone)
         addFieldDescriptor("...", VEllipsis)
+
+        addFieldDescriptor("object", VObjectType)
+        addFieldDescriptor("type", VTypeType)
+        addFieldDescriptor("complex", VComplexType)
+        addFieldDescriptor("float", VFloatType)
+        addFieldDescriptor("int", VIntType)
+        addFieldDescriptor("bool", VBoolType)
+        addFieldDescriptor("str", VStringType)
+        addFieldDescriptor("list", VListType)
+        addFieldDescriptor("dict", VDictType)
 
         addStaticMethodDescriptor("abs") {
             assertArg<VObject>(0).callProperty(interp, "__abs__")
@@ -17,10 +33,6 @@ object GlobalScopeDescriptor : ClassDescriptor() {
 
         addStaticMethodDescriptor("dir") {
             runtime.dir(arguments())
-        }
-
-        addStaticMethodDescriptor("str") {
-            assertArg<VObject>(0).callProperty(interp, "__str__")
         }
 
         addStaticMethodDescriptor("print") {

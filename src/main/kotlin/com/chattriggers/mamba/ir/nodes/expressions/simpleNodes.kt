@@ -2,6 +2,10 @@ package com.chattriggers.mamba.ir.nodes.expressions
 
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.*
+import com.chattriggers.mamba.core.values.singletons.VEllipsis
+import com.chattriggers.mamba.core.values.singletons.VFalse
+import com.chattriggers.mamba.core.values.singletons.VNone
+import com.chattriggers.mamba.core.values.singletons.VTrue
 
 object EllipsisNode : ExpressionNode() {
     override fun execute(interp: Interpreter): VObject = VEllipsis

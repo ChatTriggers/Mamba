@@ -2,16 +2,17 @@ package com.chattriggers.mamba.core.values
 
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.collections.toValue
-import com.chattriggers.mamba.core.values.functions.ICallable
-import com.chattriggers.mamba.core.values.functions.VFunction
-import com.chattriggers.mamba.core.values.functions.VNativeBoundFunction
-import com.chattriggers.mamba.core.values.functions.VNativeFunction
+import com.chattriggers.mamba.core.values.functions.IMethod
+import com.chattriggers.mamba.core.values.functions.VFunctionWrapper
+import com.chattriggers.mamba.core.values.functions.VNativeFunctionWrapper
+import com.chattriggers.mamba.core.values.singletons.VNotImplemented
+import com.chattriggers.mamba.core.values.singletons.toValue
 
 /**
  * This is the base class of all regular Python types.
  *
  * Every type inherits from this class, and will typically
- * provide it's own descriptor for custom inheritance,
+ * provide it's own base type for custom inheritance,
  * though that is of course not necessary. Normally,
  * anything that wants to work with a Python value in
  * Mamba will require it to be a VObject.
@@ -19,49 +20,106 @@ import com.chattriggers.mamba.core.values.functions.VNativeFunction
  * @see Value
  * @see LazyValue
  */
-open class VObject(descriptor: ClassDescriptor = ObjectDescriptor) : Value(descriptor) {
-    init {
-        descriptor.keys.forEach(::bindMethod)
-    }
+open class VObject(private vararg val _baseTypes: LazyValue<VType>) : Value {
+    protected val map = mutableMapOf<String, Value>()
 
-    private fun bindMethod(name: String) {
-        val prop = descriptor[name]!!
+    private val evaluatedBaseTypesBacker = mutableListOf<VType>()
+    private var baseTypesEvaluated = false
 
-        this[name] = when (prop) {
-            is FieldDescriptor -> prop.value
-            is MethodDescriptor -> LazyValue {
-                VNativeBoundFunction(name, prop.func, this)
+    protected open val baseTypes: List<LazyValue<VType>>
+        get() = _baseTypes.toList()
+
+    protected open val evaluatedBaseTypes: List<VType>
+        get() {
+            if (!baseTypesEvaluated) {
+                evaluatedBaseTypesBacker.addAll(
+                    baseTypes.map { it.valueProducer() }
+                )
+
+                bindMethodsFrom(evaluatedBaseTypesBacker)
             }
-            is StaticMethodDescriptor -> LazyValue {
-                VNativeFunction(name, prop.func)
+
+            return evaluatedBaseTypesBacker.toList()
+        }
+
+    private fun bindMethodsFrom(baseTypes: List<VType>) {
+        baseTypes.forEach { baseType ->
+            // Bind methods to this object from the base's base types
+            bindMethodsFrom(baseType.evaluatedBaseTypes)
+
+            for (key in baseType.keys) {
+                val value = baseType[key]
+
+                if (value is IMethod && !value.isStatic) {
+                    when (value) {
+                        is VNativeFunctionWrapper -> this[key] = value.copy()
+                        is VFunctionWrapper -> this[key] = value.copy()
+                        else -> TODO()
+                    }
+
+                    (this[key] as IMethod).bind(this)
+                }
             }
         }
     }
 
-    fun getProperty(name: String): VObject? {
-        if (name !in this)
-            return null
+    open val keys: MutableList<String>
+        get() {
+            val k = map.keys.toMutableList()
 
-        val prop = this[name]
+            for (baseType in evaluatedBaseTypes)
+                k.addAll(baseType.keys)
 
-        if (prop is LazyValue)
-            return prop.valueProducer()
+            return k
+        }
 
-        return prop as VObject
+    open operator fun contains(key: String) = containsKey(key)
+
+    open operator fun get(key: String): VObject {
+        if (key in map)
+            return map[key].unwrap()
+
+        for (baseType in evaluatedBaseTypes)
+            if (key in baseType)
+                return baseType[key].unwrap()
+
+        TODO()
+    }
+
+    open operator fun set(key: String, value: VObject) {
+        map[key] = value
+    }
+
+    open fun containsKey(key: String): Boolean {
+        if (key in map)
+            return true
+
+        for (baseType in evaluatedBaseTypes)
+            if (key in baseType)
+                return true
+
+        return false
+    }
+
+    open fun getOrNull(key: String): VObject? {
+        return if (key in this)
+            this[key].unwrap()
+        else null
+    }
+
+    open fun getOrDefault(key: String, defaultValue: VObject): VObject {
+        return if (key in this)
+            this[key].unwrap()
+        else defaultValue
     }
 
     fun callProperty(interp: Interpreter, name: String, args: List<VObject> = emptyList()): VObject {
-        val prop = getProperty(name)
-
-        if (prop == null || prop !is ICallable)
-            TODO()
-
-        // TODO: Bound method check
-        return prop.call(interp, args)
+        val prop = this[name]
+        return interp.runtime.call(prop, args)
     }
 }
 
-object ObjectDescriptor : ClassDescriptor() {
+object VObjectType : VType() {
     init {
         addMethodDescriptor("__eq__") {
             val self = assertSelf<VObject>()
@@ -86,4 +144,10 @@ object ObjectDescriptor : ClassDescriptor() {
             assertArg<VObject>(0).toString().toValue()
         }
     }
+}
+
+fun Value?.unwrap(): VObject {
+    if (this !is VObject)
+        TODO()
+    return this
 }

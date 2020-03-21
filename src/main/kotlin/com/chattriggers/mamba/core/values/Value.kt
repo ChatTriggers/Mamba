@@ -3,9 +3,12 @@ package com.chattriggers.mamba.core.values
 /**
  * Superclass of every value accessible in the Python runtime.
  *
- * This class just serves primarily as a map. It has two
- * subclasses: VObject, and LazyValue. The sole reason for
- * it's existence is to allow a value delegator (LazyValue).
+ * The sole reason this class exists is to allow VObjects to
+ * be lazily delegated by LazyValue. It's two children are
+ * LazyValue and VObject. Any code outside of VObject should
+ * use VObjects as a global base type. All instances of
+ * Value in VObject that must be used are casted to VObject,
+ * or retrieved from LazyValue, if applicable.
  *
  * Value should be considered sealed, and should not be
  * inherited from by any class other than the two listed above
@@ -13,4 +16,4 @@ package com.chattriggers.mamba.core.values
  * @see VObject
  * @see LazyValue
  */
-abstract class Value(protected open val descriptor: ClassDescriptor) : MutableMap<String, Value> by mutableMapOf()
+interface Value

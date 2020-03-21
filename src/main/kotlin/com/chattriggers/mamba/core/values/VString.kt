@@ -1,16 +1,19 @@
 package com.chattriggers.mamba.core.values
 
-class VString(val string: String) : VObject(StringDescriptor) {
+class VString(val string: String) : VObject(LazyValue("VStringType") { VStringType }) {
     override fun toString() = "'$string'"
 }
 
-object StringDescriptor : ClassDescriptor(ObjectDescriptor) {
+object VStringType : VType(LazyValue("VObjectType") { VObjectType }) {
     init {
         addMethodDescriptor("__add__") {
             val self = assertSelf<VString>()
             val other = assertArg<VString>(1)
 
             (self.string + other.string).toValue()
+        }
+        addMethodDescriptor("__call__") {
+            assertArg<VObject>(0).callProperty(interp, "__str__")
         }
         addMethodDescriptor("lower") {
             assertSelf<VString>().string.toLowerCase().toValue()

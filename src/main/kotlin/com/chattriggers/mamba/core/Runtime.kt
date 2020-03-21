@@ -3,7 +3,13 @@ package com.chattriggers.mamba.core
 import com.chattriggers.mamba.core.values.*
 import com.chattriggers.mamba.core.values.collections.VDict
 import com.chattriggers.mamba.core.values.collections.VList
+import com.chattriggers.mamba.core.values.functions.ICallable
+import com.chattriggers.mamba.core.values.functions.IMethod
 import com.chattriggers.mamba.core.values.numbers.*
+import com.chattriggers.mamba.core.values.singletons.VFalse
+import com.chattriggers.mamba.core.values.singletons.VNone
+import com.chattriggers.mamba.core.values.singletons.VNotImplemented
+import com.chattriggers.mamba.core.values.singletons.toValue
 
 class Runtime(val interp: Interpreter) {
     fun toBoolean(value: VObject): Boolean {
@@ -60,6 +66,13 @@ class Runtime(val interp: Interpreter) {
         }
     }
 
+    fun call(obj: VObject, args: List<VObject>): VObject {
+        if (obj is ICallable)
+            return obj.call(interp, args)
+
+        return obj.callProperty(interp, "__call__", args)
+    }
+
     fun valueCompare(method: String, left: VObject, right: VObject): VObject {
         return when (method) {
             in left -> left.callProperty(interp, method, listOf(right))
@@ -69,8 +82,8 @@ class Runtime(val interp: Interpreter) {
 
     fun valueArithmetic(method: String, reverseMethod: String, left: VObject, right: VObject): VObject {
         return when {
-            left.contains(method) -> left.callProperty(interp, method, listOf(right))
-            right.contains(reverseMethod) -> right.callProperty(interp, reverseMethod, listOf(left)) // TODO: Only if types differ
+            method in left -> left.callProperty(interp, method, listOf(right))
+            reverseMethod in right -> right.callProperty(interp, reverseMethod, listOf(left))
             else -> VNotImplemented
         }
     }

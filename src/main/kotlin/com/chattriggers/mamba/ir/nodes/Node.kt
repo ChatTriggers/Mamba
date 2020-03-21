@@ -1,7 +1,7 @@
 package com.chattriggers.mamba.ir.nodes
 
 import com.chattriggers.mamba.core.Interpreter
-import com.chattriggers.mamba.core.values.VNone
+import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.VObject
 
 abstract class Node(val children: List<Node>) {

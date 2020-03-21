@@ -21,8 +21,8 @@ package com.chattriggers.mamba.core.values
  * it instead constructs a LazyValue, which will produce it's
  * value at a later time, outside of the constructor.
  *
- * This will also power the ability for automatic infinite
- * property chaining, such as 
- * {@code (9).__ceil__.__call__.__call__.__call__.# etc..}
+ * This powers the ability for automatic infinite property chaining,
+ * such as
+ * {@code 'AAaa'.lower.__call__.__call__.__call__.# etc..}
  */
-class LazyValue(val valueProducer: () -> VObject) : Value(ObjectDescriptor)
+class LazyValue<T : VObject>(val name: String? = null, val valueProducer: () -> T) : Value

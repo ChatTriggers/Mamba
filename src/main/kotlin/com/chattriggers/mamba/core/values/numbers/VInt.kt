@@ -1,15 +1,16 @@
 package com.chattriggers.mamba.core.values.numbers
 
-import com.chattriggers.mamba.core.values.ClassDescriptor
+import com.chattriggers.mamba.core.values.LazyValue
 import com.chattriggers.mamba.core.values.VObject
+import com.chattriggers.mamba.core.values.VType
 import kotlin.math.ceil
 import kotlin.math.ln
 
-open class VInt(val int: Int, descriptor: ClassDescriptor = IntDescriptor) : VObject(descriptor) {
+open class VInt(val int: Int, type: LazyValue<VType> = LazyValue("VIntType") { VIntType }) : VObject(type) {
     override fun toString() = int.toString()
 }
 
-object IntDescriptor : ClassDescriptor(ComplexDescriptor) {
+object VIntType : VType(LazyValue("VComplexType") { VComplexType }) {
     init {
         addMethodDescriptor("bit_length") {
             val self = assertSelf<VInt>()

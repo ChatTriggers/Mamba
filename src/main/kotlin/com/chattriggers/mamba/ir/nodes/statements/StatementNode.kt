@@ -2,7 +2,7 @@ package com.chattriggers.mamba.ir.nodes.statements
 
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.VFlowWrapper
-import com.chattriggers.mamba.core.values.VNone
+import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.VObject
 import com.chattriggers.mamba.ir.nodes.Node
 

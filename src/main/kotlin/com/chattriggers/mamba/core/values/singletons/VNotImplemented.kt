@@ -1,7 +1,12 @@
-package com.chattriggers.mamba.core.values
+package com.chattriggers.mamba.core.values.singletons
 
-object VNotImplemented : VObject(NotImplementedDescriptor) {
+import com.chattriggers.mamba.core.values.LazyValue
+import com.chattriggers.mamba.core.values.VObject
+import com.chattriggers.mamba.core.values.VObjectType
+import com.chattriggers.mamba.core.values.VType
+
+object VNotImplemented : VObject(LazyValue("VNotImplementedType") { VNotImplementedType }) {
     override fun toString() = "NotImplemented"
 }
 
-object NotImplementedDescriptor : ClassDescriptor(ObjectDescriptor)
+object VNotImplementedType : VType(LazyValue("VObjectType") { VObjectType })

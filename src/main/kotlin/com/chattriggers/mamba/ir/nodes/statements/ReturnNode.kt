@@ -1,10 +1,8 @@
 package com.chattriggers.mamba.ir.nodes.statements
 
 import com.chattriggers.mamba.core.Interpreter
-import com.chattriggers.mamba.core.values.VNone
 import com.chattriggers.mamba.core.values.VObject
 import com.chattriggers.mamba.core.values.VReturnWrapper
-import com.chattriggers.mamba.ir.nodes.FunctionNode
 import com.chattriggers.mamba.ir.nodes.expressions.ExpressionNode
 
 class ReturnNode(private val child: ExpressionNode) : StatementNode(child) {

@@ -1,6 +1,7 @@
 package com.chattriggers.mamba.core
 
 import com.chattriggers.mamba.core.values.VObject
+import com.chattriggers.mamba.core.values.unwrap
 import com.chattriggers.mamba.ir.nodes.ScriptNode
 import java.util.*
 
@@ -32,9 +33,9 @@ class Interpreter private constructor(private val script: ScriptNode) {
 
     internal fun lexicalAssign(name: String, value: VObject): VObject {
         for (scope in scopeStack) {
-            if (scope.contains(name)) {
-                return scope.getProperty(name)!!
-            }
+            val prop = scope.getOrNull(name)
+            if (prop != null)
+                return prop.unwrap()
         }
 
         getScope()[name] = value

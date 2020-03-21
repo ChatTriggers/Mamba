@@ -5,8 +5,7 @@ import com.chattriggers.mamba.api.ComparisonOperator
 import com.chattriggers.mamba.api.UnaryOperator
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.VObject
-import com.chattriggers.mamba.core.values.numbers.toValue
-import com.chattriggers.mamba.core.values.toValue
+import com.chattriggers.mamba.core.values.singletons.toValue
 
 class OrExpresionNode(
     private val left: ExpressionNode,

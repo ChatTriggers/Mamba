@@ -1,12 +1,15 @@
 package com.chattriggers.mamba.core.values.numbers
 
 import com.chattriggers.mamba.core.values.*
+import com.chattriggers.mamba.core.values.singletons.VFalse
+import com.chattriggers.mamba.core.values.singletons.VTrue
+import com.chattriggers.mamba.core.values.singletons.toValue
 import java.lang.IllegalStateException
 import kotlin.math.floor
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-class VComplex(val real: Double, val imag: Double) : VObject(ComplexDescriptor) {
+class VComplex(val real: Double, val imag: Double) : VObject(LazyValue("VComplexType") { VComplexType }) {
     override fun toString(): String {
         val r = when (real) {
             0.0 -> ""
@@ -24,7 +27,7 @@ class VComplex(val real: Double, val imag: Double) : VObject(ComplexDescriptor) 
     }
 }
 
-object ComplexDescriptor : ClassDescriptor(ObjectDescriptor) {
+object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
     init {
         addMethodDescriptor("conjugate") {
             when (val self = argument(0)) {

@@ -1,13 +1,12 @@
 package com.chattriggers.mamba.core.values.numbers
 
 import com.chattriggers.mamba.core.values.*
-import com.chattriggers.mamba.core.values.numbers.toValue
 
-class VFloat(val double: Double) : VObject(FloatDescriptor) {
+class VFloat(val double: Double) : VObject(LazyValue("VFloatType") { VFloatType }) {
     override fun toString() = double.toString()
 }
 
-object FloatDescriptor : ClassDescriptor(ComplexDescriptor)
+object VFloatType : VType(LazyValue("VComplexType") { VComplexType })
 
 fun Double.toValue() = VFloat(this)
 

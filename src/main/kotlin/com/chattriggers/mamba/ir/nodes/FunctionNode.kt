@@ -3,7 +3,8 @@ package com.chattriggers.mamba.ir.nodes
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.*
 import com.chattriggers.mamba.core.values.functions.ICallable
-import com.chattriggers.mamba.core.values.functions.VFunction
+import com.chattriggers.mamba.core.values.functions.VFunctionWrapper
+import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.ir.nodes.expressions.IdentifierNode
 import com.chattriggers.mamba.ir.nodes.statements.StatementNode
 
@@ -32,7 +33,7 @@ data class FunctionNode(
 
     override fun execute(interp: Interpreter): VObject {
         val scope = interp.getScope()
-        scope[identifier.identifier] = VFunction(identifier.identifier, this)
+        scope[identifier.identifier] = VFunctionWrapper(identifier.identifier, this)
         return VNone
     }
 

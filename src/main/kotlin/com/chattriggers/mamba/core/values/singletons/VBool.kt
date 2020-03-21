@@ -1,13 +1,15 @@
-package com.chattriggers.mamba.core.values
+package com.chattriggers.mamba.core.values.singletons
 
-import com.chattriggers.mamba.core.values.numbers.IntDescriptor
+import com.chattriggers.mamba.core.values.LazyValue
+import com.chattriggers.mamba.core.values.VType
 import com.chattriggers.mamba.core.values.numbers.VInt
+import com.chattriggers.mamba.core.values.numbers.VIntType
 
-sealed class VBool(private val value: Boolean) : VInt(if (value) 1 else 0, BoolDescriptor) {
+sealed class VBool(private val value: Boolean) : VInt(if (value) 1 else 0, LazyValue("VBoolType") { VBoolType }) {
     override fun toString() = value.toString().capitalize()
 }
 
- object BoolDescriptor : ClassDescriptor(IntDescriptor)
+object VBoolType : VType(LazyValue("VIntType") { VIntType })
 
 object VTrue : VBool(true)
 

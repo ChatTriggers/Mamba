@@ -1,7 +1,6 @@
 package com.chattriggers.mamba.ir.nodes.expressions
 
 import com.chattriggers.mamba.core.Interpreter
-import com.chattriggers.mamba.core.values.functions.ICallable
 import com.chattriggers.mamba.core.values.VObject
 
 class FunctionCallNode(
@@ -10,9 +9,7 @@ class FunctionCallNode(
 ) : ExpressionNode(listOf(target) + args) {
     override fun execute(interp: Interpreter): VObject {
         val targetValue = target.execute(interp)
-        val callable = if (targetValue is ICallable) targetValue else TODO()
-
-        return callable.call(interp, args.map { it.execute(interp) })
+        return interp.runtime.call(targetValue, args.map { it.execute(interp) })
     }
 
     override fun print(indent: Int) {

@@ -1,12 +1,13 @@
 package com.chattriggers.mamba.core.values.collections
 
-import com.chattriggers.mamba.core.values.ClassDescriptor
-import com.chattriggers.mamba.core.values.ObjectDescriptor
+import com.chattriggers.mamba.core.values.LazyValue
 import com.chattriggers.mamba.core.values.VObject
+import com.chattriggers.mamba.core.values.VObjectType
+import com.chattriggers.mamba.core.values.VType
 
-class VDict<K : VObject, V : VObject>(val dict: MutableMap<K, V>) : VObject(DictDescriptor)
+class VDict<K : VObject, V : VObject>(val dict: MutableMap<K, V>) : VObject(LazyValue("VDictType") { VDictType })
 
-object DictDescriptor : ClassDescriptor(ObjectDescriptor)
+object VDictType : VType(LazyValue("VObjectType") { VObjectType })
 
 fun <K : VObject, V : VObject> MutableMap<K, V>.toValue() = VDict(this)
 

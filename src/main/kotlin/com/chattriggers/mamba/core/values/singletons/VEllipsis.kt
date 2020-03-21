@@ -1,7 +1,12 @@
-package com.chattriggers.mamba.core.values
+package com.chattriggers.mamba.core.values.singletons
 
-object VEllipsis : VObject(EllipsisDescriptor) {
+import com.chattriggers.mamba.core.values.LazyValue
+import com.chattriggers.mamba.core.values.VObject
+import com.chattriggers.mamba.core.values.VObjectType
+import com.chattriggers.mamba.core.values.VType
+
+object VEllipsis : VObject(LazyValue("VEllipsisType") { VEllipsisType }) {
     override fun toString() = "Ellipsis"
 }
 
-object EllipsisDescriptor : ClassDescriptor(ObjectDescriptor)
+object VEllipsisType : VType(LazyValue("VObjectType") { VObjectType })

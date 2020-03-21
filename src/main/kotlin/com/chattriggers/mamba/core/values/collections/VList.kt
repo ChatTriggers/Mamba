@@ -1,15 +1,15 @@
 package com.chattriggers.mamba.core.values.collections
 
-import com.chattriggers.mamba.core.Runtime
-import com.chattriggers.mamba.core.values.ClassDescriptor
-import com.chattriggers.mamba.core.values.ObjectDescriptor
+import com.chattriggers.mamba.core.values.LazyValue
 import com.chattriggers.mamba.core.values.VObject
+import com.chattriggers.mamba.core.values.VObjectType
+import com.chattriggers.mamba.core.values.VType
 
-class VList<T : VObject>(val list: MutableList<T>) : VObject(ListDescriptor) {
+class VList<T : VObject>(val list: MutableList<T>) : VObject(LazyValue("VListType") { VListType }) {
     override fun toString() = "[${list.joinToString()}]"
 }
 
-object ListDescriptor : ClassDescriptor(ObjectDescriptor)
+object VListType : VType(LazyValue("VObjectType") { VObjectType })
 
 fun <T : VObject> MutableList<T>.toValue() = VList(this)
 
