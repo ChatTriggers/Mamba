@@ -17,8 +17,8 @@ class Runtime(val interp: Interpreter) {
             value is VNone || value is VFalse -> false
             value is VInt -> value.int != 0
             value is VString -> value.string.isNotEmpty()
-            value is VList<*> -> value.list.isNotEmpty()
-            value is VDict<*, *> -> value.dict.isNotEmpty()
+            value is VList -> value.list.isNotEmpty()
+            value is VDict -> value.dict.isNotEmpty()
             "__bool__" in value -> toBoolean(value.callProperty(interp, "__bool__"))
             "__len__" in value -> toInt(value.callProperty(interp, "__len__")) != 0
             else -> true
