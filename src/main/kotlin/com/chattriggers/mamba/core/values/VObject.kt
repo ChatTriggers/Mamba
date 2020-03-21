@@ -49,7 +49,7 @@ open class VObject(private vararg val _baseTypes: LazyValue<VType>) : Value {
             // Bind methods to this object from the base's base types
             bindMethodsFrom(baseType.evaluatedBaseTypes)
 
-            for (key in baseType.keys) {
+            for (key in baseType.ownKeys) {
                 val value = baseType[key]
 
                 if (value is IMethod && !value.isStatic) {
@@ -64,6 +64,9 @@ open class VObject(private vararg val _baseTypes: LazyValue<VType>) : Value {
             }
         }
     }
+
+    val ownKeys: MutableSet<String>
+        get() = map.keys
 
     open val keys: MutableList<String>
         get() {
