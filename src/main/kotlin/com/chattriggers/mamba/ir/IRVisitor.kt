@@ -513,8 +513,7 @@ internal class IRVisitor {
         return if (numTests == 0 && numCommas == 0) {
             TupleLiteral(emptyList())
         } else if (numTests == 1 && numCommas == 0) {
-            // Parenthesized expression
-            TODO()
+            visitTestListComp(testListCtx)[0]
         } else {
             // numCommas > 0, which implies numTests > 1
             TupleLiteral(visitTestListComp(testListCtx))
