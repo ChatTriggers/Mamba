@@ -6,6 +6,8 @@ import com.chattriggers.mamba.core.values.VObjectType
 import com.chattriggers.mamba.core.values.VType
 
 class VList<T : VObject>(val list: MutableList<T>) : VObject(LazyValue("VListType") { VListType }) {
+    override val className = "list"
+
     override fun toString() = "[${list.joinToString()}]"
 }
 

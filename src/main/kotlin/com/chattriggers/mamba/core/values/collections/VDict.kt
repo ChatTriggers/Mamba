@@ -5,7 +5,9 @@ import com.chattriggers.mamba.core.values.VObject
 import com.chattriggers.mamba.core.values.VObjectType
 import com.chattriggers.mamba.core.values.VType
 
-class VDict<K : VObject, V : VObject>(val dict: MutableMap<K, V>) : VObject(LazyValue("VDictType") { VDictType })
+class VDict<K : VObject, V : VObject>(val dict: MutableMap<K, V>) : VObject(LazyValue("VDictType") { VDictType }) {
+    override val className = "dict"
+}
 
 object VDictType : VType(LazyValue("VObjectType") { VObjectType })
 

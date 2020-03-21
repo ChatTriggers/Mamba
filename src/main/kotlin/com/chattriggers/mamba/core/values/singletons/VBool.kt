@@ -6,6 +6,8 @@ import com.chattriggers.mamba.core.values.numbers.VInt
 import com.chattriggers.mamba.core.values.numbers.VIntType
 
 sealed class VBool(private val value: Boolean) : VInt(if (value) 1 else 0, LazyValue("VBoolType") { VBoolType }) {
+    override val className = "bool"
+
     override fun toString() = value.toString().capitalize()
 }
 

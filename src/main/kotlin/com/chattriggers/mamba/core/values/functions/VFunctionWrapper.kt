@@ -21,6 +21,8 @@ data class VFunctionWrapper(
     val method: FunctionNode,
     override val isStatic: Boolean = false
 ) : VObject(LazyValue("VMethodWrapperType") { VFunctionWrapperType }), IMethod {
+    override val className = "function"
+
     override var self: VObject? = null
 
     override fun bind(newSelf: VObject) {

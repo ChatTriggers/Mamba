@@ -3,6 +3,8 @@ package com.chattriggers.mamba.core.values.numbers
 import com.chattriggers.mamba.core.values.*
 
 class VFloat(val double: Double) : VObject(LazyValue("VFloatType") { VFloatType }) {
+    override val className = "float"
+
     override fun toString() = double.toString()
 }
 

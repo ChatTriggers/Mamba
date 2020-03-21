@@ -1,6 +1,8 @@
 package com.chattriggers.mamba.core.values
 
 class VString(val string: String) : VObject(LazyValue("VStringType") { VStringType }) {
+    override val className = "str"
+
     override fun toString() = "'$string'"
 }
 

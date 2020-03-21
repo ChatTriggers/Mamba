@@ -16,6 +16,8 @@ data class VNativeFunctionWrapper(
     val method: NativeClassMethod,
     override val isStatic: Boolean = false
 ) : VObject(LazyValue("VMethodWrapperType") { VFunctionWrapperType }), IMethod {
+    override val className = "builtin_function_or_method" // from CPython
+
     override var self: VObject? = null
 
     override fun bind(newSelf: VObject) {
@@ -32,5 +34,8 @@ data class VNativeFunctionWrapper(
         }
     }
 
-    override fun toString() = "<method '$name' of '<TODO: Type class names>' objects>"
+    override fun toString() = if (self == null)
+        "<built-in function $name>"
+    else
+        "<method '$name' of '${self!!.className}' objects>"
 }

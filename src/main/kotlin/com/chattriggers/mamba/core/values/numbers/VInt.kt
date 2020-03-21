@@ -7,6 +7,8 @@ import kotlin.math.ceil
 import kotlin.math.ln
 
 open class VInt(val int: Int, type: LazyValue<VType> = LazyValue("VIntType") { VIntType }) : VObject(type) {
+    override val className = "int"
+
     override fun toString() = int.toString()
 }
 

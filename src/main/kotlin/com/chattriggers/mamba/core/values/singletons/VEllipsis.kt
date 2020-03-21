@@ -6,6 +6,8 @@ import com.chattriggers.mamba.core.values.VObjectType
 import com.chattriggers.mamba.core.values.VType
 
 object VEllipsis : VObject(LazyValue("VEllipsisType") { VEllipsisType }) {
+    override val className = "ellipsis"
+
     override fun toString() = "Ellipsis"
 }
 

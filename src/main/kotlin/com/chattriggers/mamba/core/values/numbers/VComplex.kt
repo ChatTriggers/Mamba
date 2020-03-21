@@ -10,6 +10,8 @@ import kotlin.math.pow
 import kotlin.math.sqrt
 
 class VComplex(val real: Double, val imag: Double) : VObject(LazyValue("VComplexType") { VComplexType }) {
+    override val className = "complex"
+
     override fun toString(): String {
         val r = when (real) {
             0.0 -> ""

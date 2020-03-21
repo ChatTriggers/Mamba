@@ -26,6 +26,8 @@ open class VObject(private vararg val _baseTypes: LazyValue<VType>) : Value {
     private val evaluatedBaseTypesBacker = mutableListOf<VType>()
     private var baseTypesEvaluated = false
 
+    internal open val className = "object"
+
     protected open val baseTypes: List<LazyValue<VType>>
         get() = _baseTypes.toList()
 

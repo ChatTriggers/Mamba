@@ -14,6 +14,8 @@ import com.chattriggers.mamba.core.values.functions.VNativeFunctionWrapper
  * circularity.
  */
 open class VType(private val parentType: LazyValue<VType>? = null) : VObject(LazyValue("VTypeType") { VTypeType }) {
+    override val className = "type"
+
     override val baseTypes: List<LazyValue<VType>>
         get() = parentType?.let(::listOf) ?: emptyList()
 
