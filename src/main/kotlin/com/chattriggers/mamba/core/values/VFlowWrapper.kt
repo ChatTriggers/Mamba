@@ -5,7 +5,7 @@ package com.chattriggers.mamba.core.values
  * with their parent about flow statements.
  *
  * For example, consider the following (not necessarily
- * accurate) IR tree:
+ * accurate) AST tree:
  *
  *      FunctionNode
  *          IfStatement

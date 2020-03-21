@@ -1,8 +1,7 @@
-package com.chattriggers.mamba.ir.nodes.statements
+package com.chattriggers.mamba.ast.nodes.statements
 
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.VBreakWrapper
-import com.chattriggers.mamba.core.values.VObject
 
 object BreakNode : StatementNode() {
     override fun execute(interp: Interpreter) = VBreakWrapper

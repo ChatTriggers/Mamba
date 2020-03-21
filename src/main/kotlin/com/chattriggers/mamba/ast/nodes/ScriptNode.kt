@@ -1,9 +1,9 @@
-package com.chattriggers.mamba.ir.nodes
+package com.chattriggers.mamba.ast.nodes
 
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.VObject
-import com.chattriggers.mamba.ir.nodes.statements.StatementNode
+import com.chattriggers.mamba.ast.nodes.statements.StatementNode
 
 class ScriptNode(private val statements: List<StatementNode>) : Node(statements) {
     override fun execute(interp: Interpreter): VObject {

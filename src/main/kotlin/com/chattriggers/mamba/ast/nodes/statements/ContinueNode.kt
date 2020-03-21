@@ -1,4 +1,4 @@
-package com.chattriggers.mamba.ir.nodes.statements
+package com.chattriggers.mamba.ast.nodes.statements
 
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.VContinueWrapper

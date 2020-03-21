@@ -1,10 +1,10 @@
-package com.chattriggers.mamba.ir.nodes.statements
+package com.chattriggers.mamba.ast.nodes.statements
 
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.VFlowWrapper
 import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.VObject
-import com.chattriggers.mamba.ir.nodes.Node
+import com.chattriggers.mamba.ast.nodes.Node
 
 open class StatementNode(children: List<Node>): Node(children) {
     constructor(child: Node) : this(listOf(child))

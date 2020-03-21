@@ -1,4 +1,4 @@
-package com.chattriggers.mamba.ir.nodes
+package com.chattriggers.mamba.ast.nodes
 
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.singletons.VNone

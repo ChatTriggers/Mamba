@@ -1,9 +1,9 @@
-package com.chattriggers.mamba.ir.nodes.statements
+package com.chattriggers.mamba.ast.nodes.statements
 
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.VObject
 import com.chattriggers.mamba.core.values.VReturnWrapper
-import com.chattriggers.mamba.ir.nodes.expressions.ExpressionNode
+import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
 
 class ReturnNode(private val child: ExpressionNode) : StatementNode(child) {
     override fun execute(interp: Interpreter): VObject {

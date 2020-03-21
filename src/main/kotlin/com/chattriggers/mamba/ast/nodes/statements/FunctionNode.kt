@@ -1,11 +1,11 @@
-package com.chattriggers.mamba.ir.nodes.statements
+package com.chattriggers.mamba.ast.nodes.statements
 
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.*
 import com.chattriggers.mamba.core.values.functions.ICallable
 import com.chattriggers.mamba.core.values.functions.VFunctionWrapper
 import com.chattriggers.mamba.core.values.singletons.VNone
-import com.chattriggers.mamba.ir.nodes.expressions.IdentifierNode
+import com.chattriggers.mamba.ast.nodes.expressions.IdentifierNode
 
 data class FunctionNode(
     private val identifier: IdentifierNode,

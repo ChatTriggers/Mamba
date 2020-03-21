@@ -1,16 +1,16 @@
-package com.chattriggers.mamba.ir
+package com.chattriggers.mamba.ast
 
 import com.chattriggers.mamba.api.ArithmeticOperator
 import com.chattriggers.mamba.api.ComparisonOperator
 import com.chattriggers.mamba.api.UnaryOperator
 import com.chattriggers.mamba.generated.Python3Parser.*
-import com.chattriggers.mamba.ir.nodes.*
-import com.chattriggers.mamba.ir.nodes.expressions.*
-import com.chattriggers.mamba.ir.nodes.expressions.literals.*
-import com.chattriggers.mamba.ir.nodes.statements.*
+import com.chattriggers.mamba.ast.nodes.*
+import com.chattriggers.mamba.ast.nodes.expressions.*
+import com.chattriggers.mamba.ast.nodes.expressions.literals.*
+import com.chattriggers.mamba.ast.nodes.statements.*
 import org.antlr.v4.runtime.tree.TerminalNode
 
-internal class IRVisitor {
+internal class ASTVisitor {
     fun visitFileInput(ctx: FileInputContext): ScriptNode {
         return ScriptNode(ctx.statement().map(this::visitStatement).flatten())
     }

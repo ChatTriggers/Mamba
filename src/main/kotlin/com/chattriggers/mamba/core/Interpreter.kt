@@ -1,8 +1,7 @@
 package com.chattriggers.mamba.core
 
 import com.chattriggers.mamba.core.values.VObject
-import com.chattriggers.mamba.core.values.unwrap
-import com.chattriggers.mamba.ir.nodes.ScriptNode
+import com.chattriggers.mamba.ast.nodes.ScriptNode
 import java.util.*
 
 class Interpreter private constructor(private val script: ScriptNode) {

@@ -1,8 +1,8 @@
-package com.chattriggers.mamba.ir.nodes.expressions.literals
+package com.chattriggers.mamba.ast.nodes.expressions.literals
 
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.collections.VTuple
-import com.chattriggers.mamba.ir.nodes.expressions.ExpressionNode
+import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
 
 class TupleLiteral(private val elements: List<ExpressionNode>) : ExpressionNode(elements) {
     override fun execute(interp: Interpreter) = when (elements.size) {

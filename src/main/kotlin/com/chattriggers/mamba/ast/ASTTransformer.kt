@@ -1,11 +1,11 @@
-package com.chattriggers.mamba.ir
+package com.chattriggers.mamba.ast
 
 import com.chattriggers.mamba.generated.Python3Parser
-import com.chattriggers.mamba.ir.nodes.ScriptNode
+import com.chattriggers.mamba.ast.nodes.ScriptNode
 
-internal object IRTransformer {
+internal object ASTTransformer {
     fun transform(tree: Python3Parser.FileInputContext): ScriptNode {
-        val visitor = IRVisitor()
+        val visitor = ASTVisitor()
         return visitor.visitFileInput(tree)
     }
 }
