@@ -9,7 +9,8 @@ class AssignmentNode(
 ) : ExpressionNode(listOf(identifier, expr)) {
     override fun execute(interp: Interpreter): VObject {
         val value = expr.execute(interp)
-        return interp.lexicalAssign(identifier.identifier, value)
+        interp.getScope()[identifier.identifier] = value
+        return value
     }
 
     override fun print(indent: Int) {

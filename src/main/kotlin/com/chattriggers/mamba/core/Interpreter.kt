@@ -31,18 +31,6 @@ class Interpreter private constructor(private val script: ScriptNode) {
 
     internal fun getScope() = scopeStack.peek()
 
-    internal fun lexicalAssign(name: String, value: VObject): VObject {
-        for (scope in scopeStack) {
-            val prop = scope.getOrNull(name)
-            if (prop != null)
-                return prop.unwrap()
-        }
-
-        getScope()[name] = value
-
-        return value
-    }
-
     companion object {
         fun execute(node: ScriptNode): Any {
             return Interpreter(node).execute()

@@ -92,6 +92,8 @@ open class VObject(private vararg val _baseTypes: LazyValue<VType>) : Value {
         map[key] = value
     }
 
+    open fun ownContains(key: String) = key in map
+
     open fun containsKey(key: String): Boolean {
         if (key in map)
             return true

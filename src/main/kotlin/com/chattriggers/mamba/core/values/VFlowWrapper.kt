@@ -20,6 +20,10 @@ package com.chattriggers.mamba.core.values
  * value of ReturnNode#execute as an indicator that it
  * should stop looping over it's children.
  */
-sealed class VFlowWrapper(val wrapped: VObject) : VObject()
+sealed class VFlowWrapper : VObject()
 
-class VReturnWrapper(wrapped: VObject) : VFlowWrapper(wrapped)
+class VReturnWrapper(val wrapped: VObject) : VFlowWrapper()
+
+object VBreakWrapper : VFlowWrapper()
+
+object VContinueWrapper : VFlowWrapper()

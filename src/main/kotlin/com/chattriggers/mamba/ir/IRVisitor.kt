@@ -62,6 +62,14 @@ internal class IRVisitor {
             }
         }
 
+        val breakStatement = ctx.breakStatement()
+        if (breakStatement != null)
+            return BreakNode
+
+        val continueStatement = ctx.continueStatement()
+        if (continueStatement != null)
+            return ContinueNode
+
         TODO("Handle other branch possibilities")
     }
 
@@ -74,7 +82,23 @@ internal class IRVisitor {
         if (ifStatement != null)
             return visitIfStatement(ifStatement)
 
-        TODO("Handle other possibilities")
+        val whileStatement = ctx.whileStatement()
+        if (whileStatement != null)
+            return visitWhileStatement(whileStatement)
+
+        TODO()
+    }
+
+    private fun visitWhileStatement(ctx: WhileStatementContext): StatementNode {
+        val test = ctx.test()
+        val body = ctx.suite()
+        val elseBlock = ctx.elseBlock()
+
+        return WhileStatementNode(
+            visitTest(test),
+            visitSuite(body),
+            elseBlock?.let { visitSuite(it.suite()) } ?: emptyList()
+        )
     }
 
     private fun visitIfStatement(ctx: IfStatementContext): StatementNode {
