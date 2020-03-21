@@ -166,7 +166,8 @@ exprStatement: testlistStarExpression (annAssign | augAssignment | annAssignment
 augAssignment: augAssign (yieldExpression | testList);
 annAssignment: '=' (yieldExpression | testlistStarExpression)*;
 annAssign: ':' test ('=' test)?;
-testlistStarExpression: (test | starExpression) (',' (test | starExpression))* (',')?;
+testlistStarExpression: testlistElem (',' testlistElem)* (',')?;
+testlistElem: test | starExpression;
 augAssign: ('+=' | '-=' | '*=' | '@=' | '/=' | '%=' | '&=' | '|=' | '^=' | '<<=' | '>>=' | '**=' | '//=');
 // For normal and annotated assignments, additional restrictions enforced by the interpreter
 delStatement: 'del' expressionList;
@@ -238,7 +239,7 @@ parenAtom: '(' (yieldExpression | testListComp)? ')';
 listAtom: '[' testListComp? ']';
 dictOrSetAtom: '{' (dictMaker | setMaker) '}';
 basicAtom: NAME | number | STRING+ | ELLIPSIS | NONE | TRUE | FALSE;
-testListComp: (test | starExpression) (compFor | (',' (test | starExpression))* (',')?);
+testListComp: testlistElem (compFor | (',' testlistElem)* (',')?);
 trailer: trailerCall | trailerMemberAccess | trailerDotAccess;
 trailerCall: '(' argList? ')';
 trailerMemberAccess: '[' subscriptList ']';
@@ -251,7 +252,7 @@ testList: test (',' test)* (',')?;
 dictMaker: dictTerm (',' dictTerm)* (',')?;
 dictTerm: test ':' test compFor? | '**' expression;
 setMaker: setTerm (',' setTerm)* (',')?;
-setTerm: (test | starExpression) compFor?;
+setTerm: testlistElem compFor?;
 
 classDef: 'class' NAME ('(' (argList)? ')')? ':' suite;
 

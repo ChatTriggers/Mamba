@@ -6,10 +6,7 @@ import com.chattriggers.mamba.api.UnaryOperator
 import com.chattriggers.mamba.generated.Python3Parser.*
 import com.chattriggers.mamba.ir.nodes.*
 import com.chattriggers.mamba.ir.nodes.expressions.*
-import com.chattriggers.mamba.ir.nodes.expressions.literals.ComplexLiteral
-import com.chattriggers.mamba.ir.nodes.expressions.literals.FloatLiteral
-import com.chattriggers.mamba.ir.nodes.expressions.literals.IntegerLiteral
-import com.chattriggers.mamba.ir.nodes.expressions.literals.StringLiteral
+import com.chattriggers.mamba.ir.nodes.expressions.literals.*
 import com.chattriggers.mamba.ir.nodes.statements.*
 import org.antlr.v4.runtime.tree.TerminalNode
 
@@ -205,18 +202,7 @@ internal class IRVisitor {
     }
 
     private fun visitTestListStarExpr(ctx: TestlistStarExpressionContext): List<ExpressionNode> {
-        val starExpr = ctx.starExpression()
-        if (starExpr.isNotEmpty()) {
-            TODO("Handle other possibilities")
-        }
-
-        val testExpr = ctx.test()
-        if (testExpr.size > 1) {
-            TODO("Handle other possibilities")
-        }
-
-        // TODO: CommaNode
-        return listOf(visitTest(testExpr[0]))
+        return ctx.testlistElem().map(::visitTestlistElem)
     }
 
     private fun visitTest(ctx: TestContext): ExpressionNode {
@@ -521,7 +507,19 @@ internal class IRVisitor {
     }
 
     private fun visitListAtom(ctx: ListAtomContext): ExpressionNode {
-        TODO()
+        return ListLiteral(ctx.testListComp()?.let(::visitTestListComp) ?: emptyList())
+    }
+
+    private fun visitTestListComp(ctx: TestListCompContext): List<ExpressionNode> {
+        if (ctx.compFor() != null)
+            TODO()
+        return ctx.testlistElem().map(::visitTestlistElem)
+    }
+
+    private fun visitTestlistElem(ctx: TestlistElemContext): ExpressionNode {
+        if (ctx.starExpression() != null)
+            TODO()
+        return visitTest(ctx.test())
     }
 
     private fun visitDictOrSetAtom(ctx: DictOrSetAtomContext): ExpressionNode {
