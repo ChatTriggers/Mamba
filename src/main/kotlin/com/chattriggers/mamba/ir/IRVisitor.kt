@@ -31,11 +31,7 @@ internal class IRVisitor {
     private fun visitSmallStatement(ctx: SmallStatementContext): StatementNode {
         val exprStatement = ctx.exprStatement()
         if (exprStatement != null) {
-            return StatementNode(
-                visitExprStatement(
-                    exprStatement
-                )
-            )
+            return StatementNode(visitExprStatement(exprStatement))
         }
 
         val flowStatement = ctx.flowStatement()
@@ -159,7 +155,7 @@ internal class IRVisitor {
         return FunctionNode(IdentifierNode(name), statements)
     }
 
-    private fun visitExprStatement(ctx: ExprStatementContext): List<ExpressionNode> {
+    private fun visitExprStatement(ctx: ExprStatementContext): ExpressionNode {
         val testListStarExpr = ctx.testlistStarExpression()
 
         if (ctx.augAssignment() != null || ctx.annAssign() != null)
@@ -172,14 +168,12 @@ internal class IRVisitor {
 
             val testListExprs = visitTestListStarExpr(testListStarExpr)
 
-            if (testListExprs.isEmpty() || testListExprs.size > 2 || testListExprs[0] !is IdentifierNode)
+            if (testListExprs !is IdentifierNode)
                 TODO()
 
-            return listOf(
-                AssignmentNode(
-                    testListExprs[0] as IdentifierNode,
-                    visitAnnAssignment(annAssignment[0])
-                )
+            return AssignmentNode(
+                testListExprs,
+                visitAnnAssignment(annAssignment[0])
             )
         }
 
@@ -194,15 +188,18 @@ internal class IRVisitor {
         if (testListStarExprs.isEmpty() || testListStarExprs.size > 2)
             TODO()
 
-        val result = visitTestListStarExpr(testListStarExprs[0])
-        if (result.size > 1)
-            TODO()
-
-        return result[0]
+        return visitTestListStarExpr(testListStarExprs[0])
     }
 
-    private fun visitTestListStarExpr(ctx: TestlistStarExpressionContext): List<ExpressionNode> {
-        return ctx.testlistElem().map(::visitTestlistElem)
+    private fun visitTestListStarExpr(ctx: TestlistStarExpressionContext): ExpressionNode {
+        val testListElems = ctx.testlistElem()
+
+        return if (testListElems.size == 1) {
+            visitTestlistElem(testListElems[0])
+        } else {
+            // TODO: Is this always a tuple?
+            TupleLiteral(testListElems.map(::visitTestlistElem))
+        }
     }
 
     private fun visitTest(ctx: TestContext): ExpressionNode {
