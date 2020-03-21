@@ -145,7 +145,6 @@ object VObjectType : VType() {
         addMethodDescriptor("__le__") { VNotImplemented }
         addMethodDescriptor("__gt__") { VNotImplemented }
         addMethodDescriptor("__ge__") { VNotImplemented }
-
         addMethodDescriptor("__dir__") {
             assertSelf<VObject>().keys.sorted().toList().map(::VString).toValue()
         }

@@ -92,7 +92,7 @@ class Runtime(val interp: Interpreter) {
         if (args.isEmpty() || args.size > 2)
             TODO()
 
-        return args[0].callProperty(interp, "__dir__")
+        return args[0].callProperty(interp, "__dir__", listOf(args[0]))
     }
 
     companion object {
