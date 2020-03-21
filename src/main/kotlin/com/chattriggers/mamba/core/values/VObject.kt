@@ -48,13 +48,10 @@ open class VObject(private vararg val _baseTypes: LazyValue<VType>) : Value {
 
     private fun bindMethodsFrom(baseTypes: List<VType>) {
         baseTypes.forEach { baseType ->
-            // Bind methods to this object from the base's base types
-            bindMethodsFrom(baseType.evaluatedBaseTypes)
-
             for (key in baseType.ownKeys) {
                 val value = baseType[key]
 
-                if (value is IMethod && !value.isStatic) {
+                if (value is IMethod && !value.isStatic && key !in map) {
                     when (value) {
                         is VNativeFunctionWrapper -> this[key] = value.copy()
                         is VFunctionWrapper -> this[key] = value.copy()
@@ -64,6 +61,9 @@ open class VObject(private vararg val _baseTypes: LazyValue<VType>) : Value {
                     (this[key] as IMethod).bind(this)
                 }
             }
+
+            // Bind methods to this object from the base's base types
+            bindMethodsFrom(baseType.evaluatedBaseTypes)
         }
     }
 
