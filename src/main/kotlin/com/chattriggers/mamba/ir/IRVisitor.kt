@@ -503,7 +503,22 @@ internal class IRVisitor {
     }
 
     private fun visitParenAtom(ctx: ParenAtomContext): ExpressionNode {
-        TODO()
+        if (ctx.yieldExpression() != null)
+            TODO()
+
+        val testListCtx = ctx.testListComp()
+        val numTests = testListCtx.testlistElem().size
+        val numCommas = testListCtx.COMMA().size
+
+        return if (numTests == 0 && numCommas == 0) {
+            TupleLiteral(emptyList())
+        } else if (numTests == 1 && numCommas == 0) {
+            // Parenthesized expression
+            TODO()
+        } else {
+            // numCommas > 0, which implies numTests > 1
+            TupleLiteral(visitTestListComp(testListCtx))
+        }
     }
 
     private fun visitListAtom(ctx: ListAtomContext): ExpressionNode {

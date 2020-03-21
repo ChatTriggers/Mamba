@@ -5,7 +5,7 @@ import com.chattriggers.mamba.core.values.VObject
 import com.chattriggers.mamba.core.values.collections.VList
 import com.chattriggers.mamba.ir.nodes.expressions.ExpressionNode
 
-class ListLiteral(private val elements: List<ExpressionNode>) : Literal() {
+class ListLiteral(private val elements: List<ExpressionNode>) : ExpressionNode(elements) {
     override fun execute(interp: Interpreter): VObject {
         return VList(elements.map { it.execute(interp) }.toMutableList())
     }

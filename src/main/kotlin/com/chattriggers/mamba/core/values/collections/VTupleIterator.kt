@@ -6,27 +6,27 @@ import com.chattriggers.mamba.core.values.VObjectType
 import com.chattriggers.mamba.core.values.VType
 import com.chattriggers.mamba.core.values.singletons.VNotImplemented
 
-class VListIterator(internal val vlist: VList) : VObject(LazyValue("VListIteratorType") { VListIteratorType }) {
+class VTupleIterator(internal val vtuple: VTuple) : VObject(LazyValue("VTupleIteratorType") { VTupleIteratorType }) {
     internal var cursor = 0
 
-    override val className = "list_iterator"
+    override val className = "tuple_iterator"
 
-    override fun toString() = "<list_iterator object>"
+    override fun toString() = "<tuple_iterator object>"
 }
 
-object VListIteratorType : VType(LazyValue("VObjectType") { VObjectType }) {
+object VTupleIteratorType : VType(LazyValue("VObjectType") { VObjectType }) {
     init {
         addMethodDescriptor("__iter__") {
-            assertSelf<VListIterator>()
+            assertSelf<VTupleIterator>()
         }
         addMethodDescriptor("__next__") {
-            val self = assertSelf<VListIterator>()
+            val self = assertSelf<VTupleIterator>()
 
-            if (self.cursor >= self.vlist.list.size) {
+            if (self.cursor >= self.vtuple.items.size) {
                 // TODO: StopIteration exception
                 VNotImplemented
             } else {
-                self.vlist.list[self.cursor++]
+                self.vtuple.items[self.cursor++]
             }
         }
     }

@@ -4,8 +4,9 @@ import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.VObject
 import com.chattriggers.mamba.core.values.numbers.VComplex
 import com.chattriggers.mamba.core.values.numbers.toValue
+import com.chattriggers.mamba.ir.nodes.expressions.ExpressionNode
 
-class IntegerLiteral(private val num: Int) : Literal() {
+class IntegerLiteral(private val num: Int) : ExpressionNode() {
     override fun execute(interp: Interpreter): VObject = num.toValue()
 
     override fun print(indent: Int) {
@@ -14,7 +15,7 @@ class IntegerLiteral(private val num: Int) : Literal() {
     }
 }
 
-class FloatLiteral(private val num: Double) : Literal() {
+class FloatLiteral(private val num: Double) : ExpressionNode() {
     override fun execute(interp: Interpreter) = num.toValue()
 
     override fun print(indent: Int) {
@@ -23,7 +24,7 @@ class FloatLiteral(private val num: Double) : Literal() {
     }
 }
 
-class ComplexLiteral(private val imag: Double) : Literal() {
+class ComplexLiteral(private val imag: Double) : ExpressionNode() {
     override fun execute(interp: Interpreter) = VComplex(0.0, imag)
 
     override fun print(indent: Int) {

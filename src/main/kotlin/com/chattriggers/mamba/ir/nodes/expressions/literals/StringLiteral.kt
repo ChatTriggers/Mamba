@@ -3,8 +3,9 @@ package com.chattriggers.mamba.ir.nodes.expressions.literals
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.VObject
 import com.chattriggers.mamba.core.values.VString
+import com.chattriggers.mamba.ir.nodes.expressions.ExpressionNode
 
-class StringLiteral(private val string: String) : Literal() {
+class StringLiteral(private val string: String) : ExpressionNode() {
     override fun execute(interp: Interpreter): VObject {
         return VString(string)
     }

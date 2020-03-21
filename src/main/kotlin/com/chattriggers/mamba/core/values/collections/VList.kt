@@ -20,4 +20,4 @@ object VListType : VType(LazyValue("VObjectType") { VObjectType }) {
     }
 }
 
-fun <T : VObject> List<T>.toValue() = VList(this.toMutableList())
+fun <T : VObject> MutableList<T>.toValue() = VList(this.toMutableList())
