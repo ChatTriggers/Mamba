@@ -79,7 +79,45 @@ internal class ASTVisitor {
         if (whileStatement != null)
             return visitWhileStatement(whileStatement)
 
+        val forStatement = ctx.forStatement()
+        if (forStatement != null)
+            return visitForStatement(forStatement)
+
         TODO()
+    }
+
+    private fun visitForStatement(ctx: ForStatementContext): StatementNode {
+        val elseBlock = ctx.elseBlock()
+
+        return ForStatementNode(
+            visitExprList(ctx.exprList()),
+            visitTestList(ctx.testList()),
+            visitSuite(ctx.suite()),
+            if (elseBlock == null) emptyList() else visitSuite(elseBlock.suite())
+        )
+    }
+
+    private fun visitExprList(ctx: ExprListContext): ExpressionNode {
+        val elems = ctx.exprListElem()
+        return if (elems.size == 1)
+            visitExprListElem(elems[0])
+        else
+            TupleLiteral(elems.map(::visitExprListElem))
+    }
+
+    private fun visitExprListElem(ctx: ExprListElemContext): ExpressionNode {
+        if (ctx.starExpression() != null)
+            TODO()
+
+        return visitExpression(ctx.expression())
+    }
+
+    private fun visitTestList(ctx: TestListContext): ExpressionNode {
+        val tests = ctx.test()
+        return if (tests.size == 1)
+            visitTest(tests[0])
+        else
+            TupleLiteral(tests.map(::visitTest))
     }
 
     private fun visitWhileStatement(ctx: WhileStatementContext): StatementNode {

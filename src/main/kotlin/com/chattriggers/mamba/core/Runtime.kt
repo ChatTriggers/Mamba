@@ -95,6 +95,14 @@ class Runtime(val interp: Interpreter) {
         return args[0].callProperty(interp, "__dir__", listOf(args[0]))
     }
 
+    fun getIterator(iterable: VObject): VObject {
+        return iterable.callProperty(interp, "__iter__")
+    }
+
+    fun getIteratorNext(iterator: VObject): VObject {
+        return iterator.callProperty(interp, "__next__")
+    }
+
     companion object {
         fun toValue(obj: Any): VObject {
             return when (obj) {
@@ -103,6 +111,14 @@ class Runtime(val interp: Interpreter) {
                 is Boolean -> obj.toValue()
                 else -> throw IllegalArgumentException()
             }
+        }
+
+        fun isIterable(obj: VObject): Boolean {
+            return "__iter__" in obj
+        }
+
+        fun isIterator(obj: VObject): Boolean {
+            return isIterator(obj) && "__next__" in obj
         }
     }
 }

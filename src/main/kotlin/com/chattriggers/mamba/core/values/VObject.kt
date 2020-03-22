@@ -48,7 +48,8 @@ open class VObject(private vararg val _baseTypes: LazyValue<VType>) : Value {
 
     private fun bindMethodsFrom(baseTypes: List<VType>) {
         baseTypes.forEach { baseType ->
-            for (key in baseType.ownKeys) {
+            val keys = baseType.ownKeys.toList()
+            for (key in keys) {
                 val value = baseType[key]
 
                 if (value is IMethod && !value.isStatic && key !in map) {
@@ -58,7 +59,7 @@ open class VObject(private vararg val _baseTypes: LazyValue<VType>) : Value {
                         else -> TODO()
                     }
 
-                    (this[key] as IMethod).bind(this)
+                    (this.map[key] as IMethod).bind(this)
                 }
             }
 
@@ -83,6 +84,9 @@ open class VObject(private vararg val _baseTypes: LazyValue<VType>) : Value {
     open operator fun contains(key: String) = containsKey(key)
 
     open operator fun get(key: String): VObject {
+        // Force an evaluation before we look at our methods
+        evaluatedBaseTypes
+
         if (key in map)
             return map[key].unwrap()
 

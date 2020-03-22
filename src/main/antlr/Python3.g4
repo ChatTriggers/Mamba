@@ -170,7 +170,7 @@ testlistStarExpression: testlistElem (',' testlistElem)* (',')?;
 testlistElem: test | starExpression;
 augAssign: ('+=' | '-=' | '*=' | '@=' | '/=' | '%=' | '&=' | '|=' | '^=' | '<<=' | '>>=' | '**=' | '//=');
 // For normal and annotated assignments, additional restrictions enforced by the interpreter
-delStatement: 'del' expressionList;
+delStatement: 'del' exprList;
 passStatement: 'pass';
 flowStatement: breakStatement | continueStatement | returnStatement | raiseStatement | yieldStatement;
 breakStatement: 'break';
@@ -199,7 +199,7 @@ ifBlock: 'if' test ':' suite;
 elifBlock: 'elif' test ':' suite;
 elseBlock: 'else' ':' suite;
 whileStatement: 'while' test ':' suite elseBlock?;
-forStatement: 'for' expressionList 'in' testList ':' suite elseBlock?;
+forStatement: 'for' exprList 'in' testList ':' suite elseBlock?;
 tryStatement: ('try' ':' suite (tryExceptBlock+ elseBlock tryFinallyBlock? | tryFinallyBlock));
 tryExceptBlock: exceptClause ':' suite;
 tryFinallyBlock: 'finally' ':' suite;
@@ -248,7 +248,8 @@ trailerDotAccess: '.' NAME;
 subscriptList: subscript (',' subscript)* (',')?;
 subscript: test | (start=test)? ':' (stop=test)? (':' (step=test)?)?;
 sliceop: ':' (test)?;
-expressionList: (expression | starExpression) (',' (expression | starExpression))* (',')?;
+exprList: exprListElem (',' exprListElem)* (',')?;
+exprListElem: expression | starExpression;
 testList: test (',' test)* (',')?;
 dictMaker: dictTerm (',' dictTerm)* (',')?;
 dictTerm: id=test ':' value=test compFor? | kstarExpression;
@@ -275,7 +276,7 @@ argumentKwargSpread: '**' test;
 argumentArgSpread: '*' test;
 
 compIter: compFor | compIf;
-compFor: (ASYNC)? 'for' expressionList 'in' orTest (compIter)?;
+compFor: (ASYNC)? 'for' exprList 'in' orTest (compIter)?;
 compIf: 'if' testNoCond (compIter)?;
 
 // not used in grammar, but may appear in "node" passed from Parser to Compiler
