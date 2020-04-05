@@ -1,5 +1,6 @@
 package com.chattriggers.mamba.ast.nodes.expressions
 
+import com.chattriggers.mamba.core.CallFrame
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.VObject
 import com.chattriggers.mamba.core.values.exceptions.MambaException
@@ -12,13 +13,15 @@ class FunctionCallNode(
 ) : ExpressionNode(lineNumber, listOf(target) + args) {
     override fun execute(interp: Interpreter): VObject {
         val targetValue = target.execute(interp)
-
         val mappedArgs = args.map { it.execute(interp) }
+
+        interp.callStack.push(CallFrame(interp.fileName, interp.currentSource, lineNumber))
+        interp.currentSource = interp.runtime.getName(target)
 
         return try {
             interp.runtime.call(targetValue, mappedArgs)
         } catch (e: MambaException) {
-            interp.pushCallStack(interp.fileName, interp.runtime.getName(target), lineNumber)
+            interp.exceptionStack.push(interp.callStack.pop())
             throw e
         }
     }

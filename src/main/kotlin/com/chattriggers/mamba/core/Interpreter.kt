@@ -2,6 +2,9 @@ package com.chattriggers.mamba.core
 
 import com.chattriggers.mamba.core.values.VObject
 import com.chattriggers.mamba.ast.nodes.ScriptNode
+import com.chattriggers.mamba.core.values.collections.VTuple
+import com.chattriggers.mamba.core.values.exceptions.MambaException
+import com.chattriggers.mamba.core.values.exceptions.VBaseException
 import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import java.util.*
 
@@ -11,11 +14,12 @@ class Interpreter private constructor(private val script: ScriptNode, val fileNa
     internal val scopeStack: List<VObject>
         get() = scopeStackBacker.reversed()
 
-    internal val callStack: Stack<CallFrame>
-        get() = callStackBacker
-
     private val scopeStackBacker = Stack<VObject>()
-    private val callStackBacker = Stack<CallFrame>()
+
+    // Stacktrace data
+    internal val callStack = Stack<CallFrame>()
+    internal val exceptionStack = Stack<CallFrame>()
+    internal var currentSource = "<module>"
 
     init {
         scopeStackBacker.push(GlobalScope)
@@ -39,12 +43,12 @@ class Interpreter private constructor(private val script: ScriptNode, val fileNa
 
     internal fun getScope() = scopeStackBacker.peek()
 
-    internal fun pushCallStack(file: String, source: String, lineNumber: Int) {
-        callStackBacker.push(CallFrame(file, source, lineNumber))
-    }
+    internal inline fun <reified T : VBaseException> throwException(lineNumber: Int, vararg args: VObject): Nothing {
+        exceptionStack.push(CallFrame(fileName, currentSource, lineNumber))
 
-    internal fun popCallStack() {
-        callStackBacker.pop()
+        throw MambaException(
+            T::class.java.getDeclaredConstructor(VTuple::class.java).newInstance(VTuple(*args))
+        )
     }
 
     companion object {

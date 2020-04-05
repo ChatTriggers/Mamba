@@ -2,7 +2,8 @@ package com.chattriggers.mamba.ast.nodes.expressions
 
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.VObject
-import com.chattriggers.mamba.core.values.exceptions.notImplemented
+import com.chattriggers.mamba.core.values.exceptions.VNameError
+import com.chattriggers.mamba.core.values.toValue
 
 class IdentifierNode(lineNumber: Int, val identifier: String) : ExpressionNode(lineNumber) {
     override fun execute(interp: Interpreter): VObject {
@@ -12,7 +13,7 @@ class IdentifierNode(lineNumber: Int, val identifier: String) : ExpressionNode(l
                 return prop
         }
 
-        notImplemented("throw NameError")
+        interp.throwException<VNameError>(lineNumber, "name '$identifier' is not defined".toValue())
     }
 
     override fun print(indent: Int) {
