@@ -2,6 +2,7 @@ package com.chattriggers.mamba.core
 
 import com.chattriggers.mamba.core.values.VObject
 import com.chattriggers.mamba.ast.nodes.ScriptNode
+import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import java.util.*
 
 class Interpreter private constructor(private val script: ScriptNode) {
@@ -24,7 +25,7 @@ class Interpreter private constructor(private val script: ScriptNode) {
 
     internal fun popScope(): VObject {
         if (scopeStack.empty()) {
-            TODO("Error")
+            notImplemented("Error")
         }
 
         return scopeStack.pop()

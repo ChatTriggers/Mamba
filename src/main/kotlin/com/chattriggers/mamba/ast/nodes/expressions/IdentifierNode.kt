@@ -2,6 +2,7 @@ package com.chattriggers.mamba.ast.nodes.expressions
 
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.VObject
+import com.chattriggers.mamba.core.values.exceptions.notImplemented
 
 class IdentifierNode(val identifier: String) : ExpressionNode() {
     override fun execute(interp: Interpreter): VObject {
@@ -11,7 +12,7 @@ class IdentifierNode(val identifier: String) : ExpressionNode() {
                 return prop
         }
 
-        TODO("throw NameError")
+        notImplemented("throw NameError")
     }
 
     override fun print(indent: Int) {

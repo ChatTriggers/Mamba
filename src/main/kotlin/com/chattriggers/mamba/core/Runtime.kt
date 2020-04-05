@@ -3,6 +3,7 @@ package com.chattriggers.mamba.core
 import com.chattriggers.mamba.core.values.*
 import com.chattriggers.mamba.core.values.collections.VDict
 import com.chattriggers.mamba.core.values.collections.VList
+import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import com.chattriggers.mamba.core.values.functions.ICallable
 import com.chattriggers.mamba.core.values.functions.IMethod
 import com.chattriggers.mamba.core.values.numbers.*
@@ -27,7 +28,7 @@ class Runtime(val interp: Interpreter) {
     }
 
     fun toInt(value: VObject): Int {
-        TODO()
+        notImplemented()
     }
 
     fun widen(left: VObject, right: VObject): Pair<VObject, VObject> {
@@ -36,10 +37,10 @@ class Runtime(val interp: Interpreter) {
 
     private fun widenHelper(self: VObject, other: VObject): VObject {
         if (self !is VInt && self !is VFloat && self !is VComplex)
-            TODO()
+            notImplemented()
 
         if (other !is VInt && other !is VFloat && other !is VComplex)
-            TODO()
+            notImplemented()
 
         return when (other) {
             is VComplex -> when (self) {
@@ -52,17 +53,17 @@ class Runtime(val interp: Interpreter) {
                     self.int.toDouble(),
                     0.0
                 )
-                else -> TODO()
+                else -> notImplemented()
             }
             is VFloat -> when (self) {
                 is VComplex, is VFloat -> self
                 is VInt -> VFloat(
                     self.int.toDouble()
                 )
-                else -> TODO()
+                else -> notImplemented()
             }
             is VInt -> self
-            else -> TODO()
+            else -> notImplemented()
         }
     }
 
@@ -96,7 +97,7 @@ class Runtime(val interp: Interpreter) {
 
     fun dir(args: List<VObject>): VObject {
         if (args.isEmpty() || args.size > 2)
-            TODO()
+            notImplemented()
 
         return args[0].callProperty(interp, "__dir__", listOf(args[0]))
     }

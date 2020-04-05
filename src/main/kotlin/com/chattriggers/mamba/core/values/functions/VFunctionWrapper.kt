@@ -6,6 +6,7 @@ import com.chattriggers.mamba.core.values.VObject
 import com.chattriggers.mamba.core.values.VObjectType
 import com.chattriggers.mamba.core.values.VType
 import com.chattriggers.mamba.ast.nodes.statements.FunctionNode
+import com.chattriggers.mamba.core.values.exceptions.notImplemented
 
 /**
  * VObject type for user-defined functions.
@@ -27,7 +28,7 @@ data class VFunctionWrapper(
 
     override fun bind(newSelf: VObject) {
         if (self != null)
-            TODO()
+            notImplemented()
         self = newSelf
     }
 

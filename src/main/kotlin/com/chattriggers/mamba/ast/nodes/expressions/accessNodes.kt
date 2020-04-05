@@ -3,13 +3,14 @@ package com.chattriggers.mamba.ast.nodes.expressions
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.VObject
+import com.chattriggers.mamba.core.values.exceptions.notImplemented
 
 class MemberAccessNode(
     private val target: ExpressionNode,
     private val members: List<ExpressionNode>)
     : ExpressionNode(listOf(target) + members) {
     override fun execute(interp: Interpreter): VObject {
-        TODO()
+        notImplemented()
     }
 
     override fun print(indent: Int) {

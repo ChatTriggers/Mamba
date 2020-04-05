@@ -7,6 +7,9 @@ import com.chattriggers.mamba.core.values.VBreakWrapper
 import com.chattriggers.mamba.core.values.VContinueWrapper
 import com.chattriggers.mamba.core.values.VObject
 import com.chattriggers.mamba.core.values.VReturnWrapper
+import com.chattriggers.mamba.core.values.exceptions.MambaException
+import com.chattriggers.mamba.core.values.exceptions.VStopIteration
+import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.singletons.VNotImplemented
 
@@ -20,7 +23,7 @@ class ForStatementNode(
         val iterator = interp.runtime.getIterator(iterableNode.execute(interp))
 
         if (targetNode !is IdentifierNode)
-            TODO()
+            notImplemented()
 
         val targetName = targetNode.identifier
 
@@ -33,17 +36,18 @@ class ForStatementNode(
             while (true) {
                 val nextValue = interp.runtime.getIteratorNext(iterator)
 
-                // TODO: This is a placeholder for a StopIteration exception
-                if (nextValue is VNotImplemented) {
-                    break
-                }
-
                 scope[targetName] = nextValue
 
                 when (val execResult = executeStatements(interp, body)) {
                     VBreakWrapper -> didBreak = true
                     is VReturnWrapper -> return execResult
                 }
+            }
+        } catch (e: MambaException) {
+            val reason = e.reason
+
+            if (reason !is VStopIteration) {
+                throw e
             }
         } finally {
             interp.popScope()

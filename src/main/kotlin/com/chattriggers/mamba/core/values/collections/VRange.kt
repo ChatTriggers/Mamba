@@ -1,6 +1,8 @@
 package com.chattriggers.mamba.core.values.collections
 
 import com.chattriggers.mamba.core.values.*
+import com.chattriggers.mamba.core.values.exceptions.MambaException
+import com.chattriggers.mamba.core.values.exceptions.VValueError
 import com.chattriggers.mamba.core.values.numbers.VInt
 import java.lang.IllegalArgumentException
 
@@ -12,7 +14,7 @@ class VRange(val start: Int, val stop: Int, val step: Int = 1) : VObject(LazyVal
     init {
         // TODO: ValueError
         if (step == 0) {
-            throw IllegalArgumentException()
+            throw MambaException(VValueError(VTuple("range() arg 3 must not be 0".toValue())))
         }
     }
 

@@ -8,7 +8,12 @@ import com.chattriggers.mamba.core.values.VType
 class VTuple(val items: List<VObject>) : VObject(LazyValue("VTupleType") { VTupleType }) {
     override val className = "tuple"
 
+    constructor() : this(emptyList())
+
+    constructor(vararg items: VObject) : this(items.toList())
+
     override fun toString() = when (items.size) {
+        0 -> "()"
         1 -> "(${items[0]},)"
         else -> "(${items.joinToString()})"
     }

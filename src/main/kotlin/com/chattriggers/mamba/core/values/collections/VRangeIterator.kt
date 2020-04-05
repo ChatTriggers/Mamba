@@ -1,6 +1,8 @@
 package com.chattriggers.mamba.core.values.collections
 
 import com.chattriggers.mamba.core.values.*
+import com.chattriggers.mamba.core.values.exceptions.MambaException
+import com.chattriggers.mamba.core.values.exceptions.VStopIteration
 import com.chattriggers.mamba.core.values.numbers.toValue
 import com.chattriggers.mamba.core.values.singletons.VNotImplemented
 
@@ -18,16 +20,17 @@ object VRangeIteratorType : VType(LazyValue { VObjectType }) {
         }
         addMethodDescriptor("__next__") {
             val self = assertSelfAs<VRangeIterator>()
-            // TODO: StopIteration exception
 
             val (start, stop, step) = self.vrange
             val current = self.vrange.current
 
-            when {
-                step < 0 && current < stop -> return@addMethodDescriptor VNotImplemented
-                step > 0 && current > stop -> return@addMethodDescriptor VNotImplemented
-                start < stop && step < 0 -> return@addMethodDescriptor VNotImplemented
-                start > stop && step > 0 -> return@addMethodDescriptor VNotImplemented
+            val shouldThrow = step < 0 && current < stop ||
+                    step > 0 && current > stop ||
+                    start < stop && step < 0 ||
+                    start > stop && step > 0
+
+            if (shouldThrow) {
+                throw MambaException(VStopIteration())
             }
 
             self.vrange.current += step

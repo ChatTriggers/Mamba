@@ -6,6 +6,7 @@ import com.chattriggers.mamba.core.values.VString
 import com.chattriggers.mamba.core.values.collections.VDict
 import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
 import com.chattriggers.mamba.ast.nodes.expressions.IdentifierNode
+import com.chattriggers.mamba.core.values.exceptions.notImplemented
 
 class DictLiteral(
     private val dict: Map<ExpressionNode, ExpressionNode>
@@ -14,7 +15,7 @@ class DictLiteral(
         return VDict(
             dict.mapKeys { (key) ->
                 if (key !is IdentifierNode && key !is StringLiteral)
-                    TODO()
+                    notImplemented()
 
                 (key.execute(interp) as VString).string
             }.mapValues { (_, value) ->

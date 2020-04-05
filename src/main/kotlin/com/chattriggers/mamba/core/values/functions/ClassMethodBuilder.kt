@@ -3,6 +3,7 @@ package com.chattriggers.mamba.core.values.functions
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.Runtime
 import com.chattriggers.mamba.core.values.VObject
+import com.chattriggers.mamba.core.values.exceptions.notImplemented
 
 class ClassMethodBuilder(val interp: Interpreter, private val args: List<VObject>) {
     val runtime: Runtime
@@ -10,7 +11,7 @@ class ClassMethodBuilder(val interp: Interpreter, private val args: List<VObject
 
     fun argument(index: Int): VObject {
         if (index >= args.size)
-            TODO()
+            notImplemented()
         return args[index]
     }
 
@@ -33,7 +34,7 @@ class ClassMethodBuilder(val interp: Interpreter, private val args: List<VObject
     inline fun <reified T : VObject> assertArgAs(index: Int): T {
         val arg = argument(index)
         if (arg !is T)
-            TODO()
+            notImplemented()
         return arg
     }
 

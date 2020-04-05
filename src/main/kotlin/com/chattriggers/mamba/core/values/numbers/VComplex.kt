@@ -1,6 +1,7 @@
 package com.chattriggers.mamba.core.values.numbers
 
 import com.chattriggers.mamba.core.values.*
+import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import com.chattriggers.mamba.core.values.singletons.VFalse
 import com.chattriggers.mamba.core.values.singletons.VTrue
 import com.chattriggers.mamba.core.values.singletons.toValue
@@ -35,7 +36,7 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
             when (val self = argument(0)) {
                 is VComplex -> VComplex(self.real, -self.imag)
                 is VFloat, is VInt -> self
-                else -> TODO()
+                else -> notImplemented()
             }
         }
 
@@ -45,7 +46,7 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
                 is VComplex -> sqrt(self.real.pow(2.0) + self.imag.pow(2.0))
                 is VFloat -> self.double
                 is VInt -> self.int.toDouble()
-                else -> TODO()
+                else -> notImplemented()
             }.toValue()
         }
         addMethodDescriptor("__add__") {
@@ -84,7 +85,7 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
         }
         addMethodDescriptor("__float__") {
             when (val self = argument(0)) {
-                is VComplex -> TODO("TypeError")
+                is VComplex -> notImplemented("TypeError")
                 is VFloat -> self
                 is VInt -> VFloat(self.int.toDouble())
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
@@ -94,7 +95,7 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {
-                selfWide is VComplex && otherWide is VComplex -> TODO("TypeError")
+                selfWide is VComplex && otherWide is VComplex -> notImplemented("TypeError")
                 selfWide is VFloat && otherWide is VFloat -> VFloat(floor(selfWide.double / otherWide.double))
                 selfWide is VInt && otherWide is VInt -> VInt(selfWide.int / otherWide.int)
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
@@ -104,7 +105,7 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {
-                selfWide is VComplex && otherWide is VComplex -> TODO("TypeError")
+                selfWide is VComplex && otherWide is VComplex -> notImplemented("TypeError")
                 selfWide is VFloat && otherWide is VFloat ->
                     (selfWide.double >= otherWide.double).toValue()
                 selfWide is VInt && otherWide is VInt ->
@@ -116,7 +117,7 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {
-                selfWide is VComplex && otherWide is VComplex -> TODO("TypeError")
+                selfWide is VComplex && otherWide is VComplex -> notImplemented("TypeError")
                 selfWide is VFloat && otherWide is VFloat ->
                     (selfWide.double > otherWide.double).toValue()
                 selfWide is VInt && otherWide is VInt ->
@@ -126,7 +127,7 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
         }
         addMethodDescriptor("__int__") {
             when (val self = argument(0)) {
-                is VComplex -> TODO("TypeError")
+                is VComplex -> notImplemented("TypeError")
                 is VFloat -> self.double.toInt().toValue()
                 is VInt -> self
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
@@ -136,7 +137,7 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {
-                selfWide is VComplex && otherWide is VComplex -> TODO("TypeError")
+                selfWide is VComplex && otherWide is VComplex -> notImplemented("TypeError")
                 selfWide is VFloat && otherWide is VFloat ->
                     (selfWide.double <= otherWide.double).toValue()
                 selfWide is VInt && otherWide is VInt ->
@@ -148,7 +149,7 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {
-                selfWide is VComplex && otherWide is VComplex -> TODO("TypeError")
+                selfWide is VComplex && otherWide is VComplex -> notImplemented("TypeError")
                 selfWide is VFloat && otherWide is VFloat ->
                     (selfWide.double < otherWide.double).toValue()
                 selfWide is VInt && otherWide is VInt ->
@@ -160,7 +161,7 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {
-                selfWide is VComplex && otherWide is VComplex -> TODO("TypeError")
+                selfWide is VComplex && otherWide is VComplex -> notImplemented("TypeError")
                 selfWide is VFloat && otherWide is VFloat ->
                     (selfWide.double % otherWide.double).toValue()
                 selfWide is VInt && otherWide is VInt ->
@@ -215,7 +216,7 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {
-                selfWide is VComplex && otherWide is VComplex -> TODO("Not Implemented")
+                selfWide is VComplex && otherWide is VComplex -> notImplemented("Not Implemented")
                 selfWide is VFloat && otherWide is VFloat ->
                     selfWide.double.pow(otherWide.double).toValue()
                 selfWide is VInt && otherWide is VInt ->

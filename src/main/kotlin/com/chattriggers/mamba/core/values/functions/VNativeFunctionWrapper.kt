@@ -2,6 +2,8 @@ package com.chattriggers.mamba.core.values.functions
 
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.*
+import com.chattriggers.mamba.core.values.exceptions.notImplemented
+
 /**
  * VObject type for native functions
  *
@@ -22,7 +24,7 @@ data class VNativeFunctionWrapper(
 
     override fun bind(newSelf: VObject) {
         if (self != null)
-            TODO()
+            notImplemented()
         self = newSelf
     }
 

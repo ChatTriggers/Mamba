@@ -2,6 +2,7 @@ package com.chattriggers.mamba.core.values
 
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.collections.toValue
+import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import com.chattriggers.mamba.core.values.functions.IMethod
 import com.chattriggers.mamba.core.values.functions.VFunctionWrapper
 import com.chattriggers.mamba.core.values.functions.VNativeFunctionWrapper
@@ -56,7 +57,7 @@ open class VObject(private vararg val _baseTypes: LazyValue<VType>) : Value {
                     when (value) {
                         is VNativeFunctionWrapper -> this[key] = value.copy()
                         is VFunctionWrapper -> this[key] = value.copy()
-                        else -> TODO()
+                        else -> notImplemented()
                     }
 
                     (this.map[key] as IMethod).bind(this)
@@ -98,7 +99,7 @@ open class VObject(private vararg val _baseTypes: LazyValue<VType>) : Value {
             if (key in baseType)
                 return baseType[key].unwrap()
 
-        TODO("AttributeError: $key")
+        notImplemented("AttributeError: $key")
     }
 
     open operator fun set(key: String, value: VObject) {
@@ -164,6 +165,6 @@ fun Value?.unwrap(): VObject {
     return when (this) {
         is LazyValue<*> -> valueProducer()
         is VObject -> this
-        else -> TODO()
+        else -> notImplemented()
     }
 }

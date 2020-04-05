@@ -7,6 +7,7 @@ import com.chattriggers.mamba.core.values.functions.ICallable
 import com.chattriggers.mamba.core.values.functions.VFunctionWrapper
 import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.ast.nodes.expressions.IdentifierNode
+import com.chattriggers.mamba.core.values.exceptions.notImplemented
 
 data class ParameterNode(
     val identifier: IdentifierNode,
@@ -24,7 +25,7 @@ data class FunctionNode(
         }
 
         if (args.size < requiredArgs)
-            TODO()
+            notImplemented()
 
         try {
             val scope = VObject()
@@ -38,7 +39,7 @@ data class FunctionNode(
 
             return when (val returned = executeStatements(interp, statements)) {
                 is VReturnWrapper -> returned.wrapped
-                is VFlowWrapper -> TODO() // Should have been handled by an enclosing node
+                is VFlowWrapper -> notImplemented() // Should have been handled by an enclosing node
                 else -> VNone
             }
         } finally {
