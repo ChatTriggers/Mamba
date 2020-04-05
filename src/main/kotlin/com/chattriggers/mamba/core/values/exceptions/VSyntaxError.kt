@@ -4,6 +4,7 @@ import com.chattriggers.mamba.core.values.LazyValue
 import com.chattriggers.mamba.core.values.VObject
 import com.chattriggers.mamba.core.values.VType
 import com.chattriggers.mamba.core.values.collections.VTuple
+import com.chattriggers.mamba.core.values.collections.toValue
 
 class VSyntaxError(args: VTuple) : VException(args) {
     override val className = "SyntaxError"
@@ -11,4 +12,10 @@ class VSyntaxError(args: VTuple) : VException(args) {
     constructor() : this(VTuple())
 }
 
-object VSyntaxErrorType : VType(LazyValue("VExceptionType") { VExceptionType })
+object VSyntaxErrorType : VType(LazyValue("VExceptionType") { VExceptionType }) {
+    init {
+        addMethodDescriptor("__call__") {
+            VSyntaxError(arguments().toValue())
+        }
+    }
+}

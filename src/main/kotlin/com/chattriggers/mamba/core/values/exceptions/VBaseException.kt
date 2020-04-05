@@ -5,6 +5,7 @@ import com.chattriggers.mamba.core.values.VObject
 import com.chattriggers.mamba.core.values.VObjectType
 import com.chattriggers.mamba.core.values.VType
 import com.chattriggers.mamba.core.values.collections.VTuple
+import com.chattriggers.mamba.core.values.collections.toValue
 
 open class VBaseException(val args: VTuple) : VObject() {
     override val className = "BaseException"
@@ -27,4 +28,10 @@ open class VBaseException(val args: VTuple) : VObject() {
     }.toString()
 }
 
-object VBaseExceptionType : VType(LazyValue("VObjectType") { VObjectType })
+object VBaseExceptionType : VType(LazyValue("VObjectType") { VObjectType }) {
+    init {
+        addMethodDescriptor("__call__") {
+            VBaseException(arguments().toValue())
+        }
+    }
+}

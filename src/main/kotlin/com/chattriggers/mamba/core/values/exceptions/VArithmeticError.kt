@@ -4,6 +4,7 @@ import com.chattriggers.mamba.core.values.LazyValue
 import com.chattriggers.mamba.core.values.VObject
 import com.chattriggers.mamba.core.values.VType
 import com.chattriggers.mamba.core.values.collections.VTuple
+import com.chattriggers.mamba.core.values.collections.toValue
 
 class VArithmeticError(args: VTuple) : VException(args) {
     override val className = "ArithmeticError"
@@ -11,4 +12,10 @@ class VArithmeticError(args: VTuple) : VException(args) {
     constructor() : this(VTuple())
 }
 
-object VArithmeticErrorType : VType(LazyValue("VExceptionType") { VExceptionType })
+object VArithmeticErrorType : VType(LazyValue("VExceptionType") { VExceptionType }) {
+    init {
+        addMethodDescriptor("__call__") {
+            VArithmeticError(arguments().toValue())
+        }
+    }
+}

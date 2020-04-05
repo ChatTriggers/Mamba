@@ -67,6 +67,14 @@ internal class ASTVisitor {
         if (continueStatement != null)
             return ContinueNode(ctx.lineNumber())
 
+        val raiseStatement = ctx.raiseStatement()
+        if (raiseStatement != null) {
+            if (raiseStatement.test().isEmpty() || raiseStatement.test().size > 1)
+                notImplemented()
+
+            return RaiseNode(raiseStatement.lineNumber(), visitTest(raiseStatement.test().first()))
+        }
+
         notImplemented("Handle other branch possibilities")
     }
 

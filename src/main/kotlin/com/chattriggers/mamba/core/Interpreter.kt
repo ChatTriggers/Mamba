@@ -52,6 +52,11 @@ class Interpreter private constructor(private val script: ScriptNode, val fileNa
         )
     }
 
+    internal fun throwException(exception: VBaseException, lineNumber: Int): Nothing {
+        exceptionStack.push(CallFrame(fileName, sourceStack.pop(), lineNumber))
+        throw MambaException(exception)
+    }
+
     companion object {
         fun execute(node: ScriptNode, fileName: String, lines: List<String>): Any {
             return Interpreter(node, fileName, lines).execute()
