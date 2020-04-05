@@ -1,7 +1,6 @@
 package com.chattriggers.mamba.core.values
 
 import com.chattriggers.mamba.core.Interpreter
-import com.chattriggers.mamba.core.values.collections.VDict
 import com.chattriggers.mamba.core.values.collections.toValue
 import com.chattriggers.mamba.core.values.functions.IMethod
 import com.chattriggers.mamba.core.values.functions.VFunctionWrapper
@@ -138,13 +137,13 @@ open class VObject(private vararg val _baseTypes: LazyValue<VType>) : Value {
 object VObjectType : VType() {
     init {
         addMethodDescriptor("__eq__") {
-            val self = assertSelf<VObject>()
-            val other = assertArg<VObject>(1)
+            val self = assertSelfAs<VObject>()
+            val other = assertArgAs<VObject>(1)
             (self == other).toValue()
         }
         addMethodDescriptor("__ne__") {
-            val self = assertSelf<VObject>()
-            val other = assertArg<VObject>(1)
+            val self = assertSelfAs<VObject>()
+            val other = assertArgAs<VObject>(1)
             val eq = self.callProperty(interp, "__eq__", listOf(other))
             (!runtime.toBoolean(eq)).toValue()
         }
@@ -153,10 +152,10 @@ object VObjectType : VType() {
         addMethodDescriptor("__gt__") { VNotImplemented }
         addMethodDescriptor("__ge__") { VNotImplemented }
         addMethodDescriptor("__dir__") {
-            assertSelf<VObject>().keys.sorted().toList().map(::VString).toValue()
+            assertSelfAs<VObject>().keys.sorted().toList().map(::VString).toValue()
         }
         addMethodDescriptor("__str__") {
-            assertArg<VObject>(0).toString().toValue()
+            assertArgAs<VObject>(0).toString().toValue()
         }
     }
 }

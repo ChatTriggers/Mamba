@@ -18,20 +18,27 @@ class ClassMethodBuilder(val interp: Interpreter, private val args: List<VObject
         return args
     }
 
+    fun argumentsCount() = args.size
+
     // Used by number classes
     fun widenFirstArgs(): Pair<VObject, VObject> {
         return runtime.widen(argument(0), argument(1))
     }
 
-    inline fun <reified T : VObject> assertArg(index: Int): T {
+    inline fun <reified T : VObject> argAs(index: Int): T? {
+        if (index >= argumentsCount()) return null
+        return assertArgAs<T>(index)
+    }
+
+    inline fun <reified T : VObject> assertArgAs(index: Int): T {
         val arg = argument(index)
         if (arg !is T)
             TODO()
         return arg
     }
 
-    inline fun <reified T : VObject> assertSelf(): T {
-        return assertArg(0)
+    inline fun <reified T : VObject> assertSelfAs(): T {
+        return assertArgAs(0)
     }
 }
 

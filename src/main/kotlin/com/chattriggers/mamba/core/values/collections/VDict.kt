@@ -24,7 +24,7 @@ class VDict(val dict: MutableMap<String, Value>) : VObject(LazyValue("VDictType"
 object VDictType : VType(LazyValue("VObjectType") { VObjectType }) {
     init {
         addMethodDescriptor("__iter__") {
-            VDictIterator(assertSelf())
+            VDictIterator(assertSelfAs())
         }
     }
 }

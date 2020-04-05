@@ -3,6 +3,7 @@ package com.chattriggers.mamba.core
 import com.chattriggers.mamba.core.values.*
 import com.chattriggers.mamba.core.values.collections.VDictType
 import com.chattriggers.mamba.core.values.collections.VListType
+import com.chattriggers.mamba.core.values.collections.VRangeType
 import com.chattriggers.mamba.core.values.numbers.VComplexType
 import com.chattriggers.mamba.core.values.numbers.VFloatType
 import com.chattriggers.mamba.core.values.numbers.VIntType
@@ -26,9 +27,10 @@ object GlobalScopeType : VType() {
         addFieldDescriptor("str", VStringType)
         addFieldDescriptor("list", VListType)
         addFieldDescriptor("dict", VDictType)
+        addFieldDescriptor("range", VRangeType)
 
         addStaticMethodDescriptor("abs") {
-            assertArg<VObject>(0).callProperty(interp, "__abs__")
+            assertArgAs<VObject>(0).callProperty(interp, "__abs__")
         }
 
         addStaticMethodDescriptor("dir") {

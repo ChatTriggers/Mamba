@@ -17,10 +17,10 @@ class VTupleIterator(internal val vtuple: VTuple) : VObject(LazyValue("VTupleIte
 object VTupleIteratorType : VType(LazyValue("VObjectType") { VObjectType }) {
     init {
         addMethodDescriptor("__iter__") {
-            assertSelf<VTupleIterator>()
+            assertSelfAs<VTupleIterator>()
         }
         addMethodDescriptor("__next__") {
-            val self = assertSelf<VTupleIterator>()
+            val self = assertSelfAs<VTupleIterator>()
 
             if (self.cursor >= self.vtuple.items.size) {
                 // TODO: StopIteration exception

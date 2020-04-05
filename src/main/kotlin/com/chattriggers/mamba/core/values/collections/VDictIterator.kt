@@ -16,10 +16,10 @@ class VDictIterator(val vdict: VDict) : VObject(LazyValue { VDictIteratorType })
 object VDictIteratorType : VType(LazyValue { VObjectType }) {
     init {
         addMethodDescriptor("__iter__") {
-            assertSelf<VDictIterator>()
+            assertSelfAs<VDictIterator>()
         }
         addMethodDescriptor("__next__") {
-            val self = assertSelf<VDictIterator>()
+            val self = assertSelfAs<VDictIterator>()
             // TODO: StopIteration exception
 
             when {

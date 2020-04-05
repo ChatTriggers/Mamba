@@ -4,7 +4,6 @@ import com.chattriggers.mamba.core.values.LazyValue
 import com.chattriggers.mamba.core.values.VObject
 import com.chattriggers.mamba.core.values.VObjectType
 import com.chattriggers.mamba.core.values.VType
-import com.chattriggers.mamba.core.values.singletons.VNone
 
 class VList(val list: MutableList<VObject>) : VObject(LazyValue("VListType") { VListType }) {
     override val className = "list"
@@ -15,7 +14,7 @@ class VList(val list: MutableList<VObject>) : VObject(LazyValue("VListType") { V
 object VListType : VType(LazyValue("VObjectType") { VObjectType }) {
     init {
         addMethodDescriptor("__iter__") {
-            VListIterator(assertSelf())
+            VListIterator(assertSelfAs())
         }
     }
 }

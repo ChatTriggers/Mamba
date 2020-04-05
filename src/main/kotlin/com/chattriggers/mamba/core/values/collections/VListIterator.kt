@@ -17,10 +17,10 @@ class VListIterator(internal val vlist: VList) : VObject(LazyValue("VListIterato
 object VListIteratorType : VType(LazyValue("VObjectType") { VObjectType }) {
     init {
         addMethodDescriptor("__iter__") {
-            assertSelf<VListIterator>()
+            assertSelfAs<VListIterator>()
         }
         addMethodDescriptor("__next__") {
-            val self = assertSelf<VListIterator>()
+            val self = assertSelfAs<VListIterator>()
 
             if (self.cursor >= self.vlist.list.size) {
                 // TODO: StopIteration exception

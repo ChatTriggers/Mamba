@@ -21,7 +21,7 @@ class VTuple(val items: List<VObject>) : VObject(LazyValue("VTupleType") { VTupl
 object VTupleType : VType(LazyValue("VObjectType") { VObjectType }) {
     init {
         addMethodDescriptor("__iter__") {
-            VTupleIterator(assertSelf())
+            VTupleIterator(assertSelfAs())
         }
     }
 }

@@ -15,14 +15,14 @@ open class VInt(val int: Int, type: LazyValue<VType> = LazyValue("VIntType") { V
 object VIntType : VType(LazyValue("VComplexType") { VComplexType }) {
     init {
         addMethodDescriptor("bit_length") {
-            val self = assertSelf<VInt>()
+            val self = assertSelfAs<VInt>()
             ceil(ln(self.int.toDouble()) / ln(2.toDouble())).toInt().toValue()
         }
 
         // Magic methods
         addMethodDescriptor("__and__") {
-            val self = assertSelf<VInt>()
-            val other = assertArg<VInt>(1)
+            val self = assertSelfAs<VInt>()
+            val other = assertArgAs<VInt>(1)
 
             VInt(self.int and other.int)
         }
@@ -33,12 +33,12 @@ object VIntType : VType(LazyValue("VComplexType") { VComplexType }) {
             argument(0)
         }
         addMethodDescriptor("__invert__") {
-            val self = assertSelf<VInt>()
+            val self = assertSelfAs<VInt>()
             VInt(self.int.inv())
         }
         addMethodDescriptor("__lshift__") {
-            val self = assertSelf<VInt>()
-            val other = assertArg<VInt>(1)
+            val self = assertSelfAs<VInt>()
+            val other = assertArgAs<VInt>(1)
             VInt(self.int shl other.int)
         }
         addMethodDescriptor("__rand__") {
@@ -51,8 +51,8 @@ object VIntType : VType(LazyValue("VComplexType") { VComplexType }) {
             argument(1).callProperty(interp, "__rshift__", listOf(argument(0)))
         }
         addMethodDescriptor("__rshift__") {
-            val self = assertSelf<VInt>()
-            val other = assertArg<VInt>(1)
+            val self = assertSelfAs<VInt>()
+            val other = assertArgAs<VInt>(1)
             VInt(self.int shr other.int)
         }
         addMethodDescriptor("__ror__") {
@@ -62,14 +62,14 @@ object VIntType : VType(LazyValue("VComplexType") { VComplexType }) {
             argument(1).callProperty(interp, "__xor__", listOf(argument(0)))
         }
         addMethodDescriptor("__or__") {
-            val self = assertSelf<VInt>()
-            val other = assertArg<VInt>(1)
+            val self = assertSelfAs<VInt>()
+            val other = assertArgAs<VInt>(1)
 
             VInt(self.int or other.int)
         }
         addMethodDescriptor("__xor__") {
-            val self = assertSelf<VInt>()
-            val other = assertArg<VInt>(1)
+            val self = assertSelfAs<VInt>()
+            val other = assertArgAs<VInt>(1)
 
             VInt(self.int xor other.int)
         }
