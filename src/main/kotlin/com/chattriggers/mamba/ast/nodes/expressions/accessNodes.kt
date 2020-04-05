@@ -24,7 +24,7 @@ class MemberAccessNode(
 class DotAccessNode(
     lineNumber: Int,
     private val target: ExpressionNode,
-    private val property: IdentifierNode
+    internal val property: IdentifierNode
 ) : ExpressionNode(lineNumber, listOf(target, property)) {
     override fun execute(interp: Interpreter): VObject {
         return target.execute(interp).getOrNull(property.identifier) ?: VNone

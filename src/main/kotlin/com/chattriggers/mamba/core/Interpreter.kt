@@ -19,10 +19,11 @@ class Interpreter private constructor(private val script: ScriptNode, val fileNa
     // Stacktrace data
     internal val callStack = Stack<CallFrame>()
     internal val exceptionStack = Stack<CallFrame>()
-    internal var currentSource = "<module>"
+    internal val sourceStack = Stack<String>()
 
     init {
         scopeStackBacker.push(GlobalScope)
+        sourceStack.push("<module>")
     }
 
     private fun execute(): Any {
@@ -44,7 +45,7 @@ class Interpreter private constructor(private val script: ScriptNode, val fileNa
     internal fun getScope() = scopeStackBacker.peek()
 
     internal inline fun <reified T : VBaseException> throwException(lineNumber: Int, vararg args: VObject): Nothing {
-        exceptionStack.push(CallFrame(fileName, currentSource, lineNumber))
+        exceptionStack.push(CallFrame(fileName, sourceStack.pop(), lineNumber))
 
         throw MambaException(
             T::class.java.getDeclaredConstructor(VTuple::class.java).newInstance(VTuple(*args))

@@ -15,14 +15,18 @@ class FunctionCallNode(
         val targetValue = target.execute(interp)
         val mappedArgs = args.map { it.execute(interp) }
 
-        interp.callStack.push(CallFrame(interp.fileName, interp.currentSource, lineNumber))
-        interp.currentSource = interp.runtime.getName(target)
+        interp.callStack.push(CallFrame(interp.fileName, interp.sourceStack.peek(), lineNumber))
+        interp.sourceStack.push(interp.runtime.getName(target))
 
         return try {
-            interp.runtime.call(targetValue, mappedArgs)
+            val v = interp.runtime.call(targetValue, mappedArgs)
+            interp.callStack.pop()
+            v
         } catch (e: MambaException) {
             interp.exceptionStack.push(interp.callStack.pop())
             throw e
+        } finally {
+            interp.sourceStack.pop()
         }
     }
 

@@ -1,7 +1,9 @@
 package com.chattriggers.mamba.core
 
 import com.chattriggers.mamba.ast.nodes.Node
+import com.chattriggers.mamba.ast.nodes.expressions.DotAccessNode
 import com.chattriggers.mamba.ast.nodes.expressions.IdentifierNode
+import com.chattriggers.mamba.ast.nodes.expressions.MemberAccessNode
 import com.chattriggers.mamba.ast.nodes.statements.FunctionNode
 import com.chattriggers.mamba.core.values.*
 import com.chattriggers.mamba.core.values.collections.VDict
@@ -37,6 +39,7 @@ class Runtime(val interp: Interpreter) {
     fun getName(value: Node): String {
         return when (value) {
             is IdentifierNode -> value.identifier
+            is DotAccessNode -> value.property.identifier
             else -> notImplemented()
         }
     }
