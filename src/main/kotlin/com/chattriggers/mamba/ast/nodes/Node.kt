@@ -4,7 +4,7 @@ import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.VObject
 
-abstract class Node(val children: List<Node>) {
+abstract class Node(val lineNumber: Int, val children: List<Node>) {
     internal var parent: Node? = null
 
     init {

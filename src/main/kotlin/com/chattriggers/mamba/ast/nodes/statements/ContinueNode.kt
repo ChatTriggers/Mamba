@@ -3,7 +3,7 @@ package com.chattriggers.mamba.ast.nodes.statements
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.VContinueWrapper
 
-object ContinueNode : StatementNode() {
+class ContinueNode(lineNumber: Int) : StatementNode(lineNumber) {
     override fun execute(interp: Interpreter) = VContinueWrapper
 
     override fun print(indent: Int) {

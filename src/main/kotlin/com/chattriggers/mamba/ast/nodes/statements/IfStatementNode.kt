@@ -17,10 +17,11 @@ data class IfConditionalNode(
 )
 
 class IfStatementNode(
+    lineNumber: Int,
     private val ifBlock: IfConditionalNode,
     private val elifBlocks: List<IfConditionalNode> = emptyList(),
     private val elseBlock: List<StatementNode>
-) : StatementNode() {
+) : StatementNode(lineNumber) {
     init {
         val children = mutableListOf<Node>(ifBlock.condition)
         children.addAll(ifBlock.body.toMutableList())

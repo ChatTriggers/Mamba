@@ -9,9 +9,12 @@ import com.chattriggers.mamba.ast.nodes.expressions.*
 import com.chattriggers.mamba.ast.nodes.expressions.literals.*
 import com.chattriggers.mamba.ast.nodes.statements.*
 import com.chattriggers.mamba.core.values.exceptions.notImplemented
+import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.tree.TerminalNode
 
 internal class ASTVisitor {
+    fun ParserRuleContext.lineNumber() = this.start.line
+
     fun visitFileInput(ctx: FileInputContext): ScriptNode {
         return ScriptNode(ctx.statement().map(this::visitStatement).flatten())
     }
@@ -32,7 +35,7 @@ internal class ASTVisitor {
     private fun visitSmallStatement(ctx: SmallStatementContext): StatementNode {
         val exprStatement = ctx.exprStatement()
         if (exprStatement != null) {
-            return StatementNode(visitExprStatement(exprStatement))
+            return StatementNode(ctx.lineNumber(), visitExprStatement(exprStatement))
         }
 
         val flowStatement = ctx.flowStatement()
@@ -52,17 +55,17 @@ internal class ASTVisitor {
             if (tests.size > 1) {
                 notImplemented("Handle other branch possibilities")
             } else {
-                return ReturnNode(visitTest(tests[0]))
+                return ReturnNode(ctx.lineNumber(), visitTest(tests[0]))
             }
         }
 
         val breakStatement = ctx.breakStatement()
         if (breakStatement != null)
-            return BreakNode
+            return BreakNode(ctx.lineNumber())
 
         val continueStatement = ctx.continueStatement()
         if (continueStatement != null)
-            return ContinueNode
+            return ContinueNode(ctx.lineNumber())
 
         notImplemented("Handle other branch possibilities")
     }
@@ -91,6 +94,7 @@ internal class ASTVisitor {
         val elseBlock = ctx.elseBlock()
 
         return ForStatementNode(
+            ctx.lineNumber(),
             visitExprList(ctx.exprList()),
             visitTestList(ctx.testList()),
             visitSuite(ctx.suite()),
@@ -103,7 +107,7 @@ internal class ASTVisitor {
         return if (elems.size == 1)
             visitExprListElem(elems[0])
         else
-            TupleLiteral(elems.map(::visitExprListElem))
+            TupleLiteral(ctx.lineNumber(), elems.map(::visitExprListElem))
     }
 
     private fun visitExprListElem(ctx: ExprListElemContext): ExpressionNode {
@@ -118,7 +122,7 @@ internal class ASTVisitor {
         return if (tests.size == 1)
             visitTest(tests[0])
         else
-            TupleLiteral(tests.map(::visitTest))
+            TupleLiteral(ctx.lineNumber(), tests.map(::visitTest))
     }
 
     private fun visitWhileStatement(ctx: WhileStatementContext): StatementNode {
@@ -127,6 +131,7 @@ internal class ASTVisitor {
         val elseBlock = ctx.elseBlock()
 
         return WhileStatementNode(
+            ctx.lineNumber(),
             visitTest(test),
             visitSuite(body),
             elseBlock?.let { visitSuite(it.suite()) } ?: emptyList()
@@ -139,6 +144,7 @@ internal class ASTVisitor {
         val elseBlock = ctx.elseBlock()
 
         return IfStatementNode(
+            ctx.lineNumber(),
             IfConditionalNode(
                 IfConditionalNodeType.IF,
                 visitTest(ifBlock.test()),
@@ -190,7 +196,7 @@ internal class ASTVisitor {
             statements.addAll(suite.statement().map(::visitStatement).flatten())
         }
 
-        return FunctionNode(IdentifierNode(name), parameters, statements)
+        return FunctionNode(ctx.lineNumber(), IdentifierNode(ctx.lineNumber(), name), parameters, statements)
     }
 
     private fun visitTypedArgsList(ctx: TypedArgsListContext): List<ParameterNode> {
@@ -215,7 +221,7 @@ internal class ASTVisitor {
     }
 
     private fun visitParameter(ctx: ParameterContext): ParameterNode {
-        val ident = IdentifierNode(ctx.tfpDef().NAME().text)
+        val ident = IdentifierNode(ctx.lineNumber(), ctx.tfpDef().NAME().text)
 
         return ParameterNode(
             ident,
@@ -240,6 +246,7 @@ internal class ASTVisitor {
                 notImplemented()
 
             return AssignmentNode(
+                ctx.lineNumber(),
                 testListExprs,
                 visitAnnAssignment(annAssignment[0])
             )
@@ -266,7 +273,7 @@ internal class ASTVisitor {
             visitTestlistElem(testListElems[0])
         } else {
             // TODO: Is this always a tuple?
-            TupleLiteral(testListElems.map(::visitTestlistElem))
+            TupleLiteral(ctx.lineNumber(), testListElems.map(::visitTestlistElem))
         }
     }
 
@@ -298,7 +305,9 @@ internal class ASTVisitor {
         return if (andTests.size == 1) {
             andTests[0]
         } else {
-            andTests.reduce(::OrExpresionNode)
+            andTests.reduce { prev, curr ->
+                OrExpresionNode(ctx.lineNumber(), prev, curr)
+            }
         }
     }
 
@@ -308,7 +317,9 @@ internal class ASTVisitor {
         return if (notTests.size == 1) {
             notTests[0]
         } else {
-            notTests.reduce(::AndExpressionNode)
+            notTests.reduce { prev, curr ->
+                AndExpressionNode(ctx.lineNumber(), prev, curr)
+            }
         }
     }
 
@@ -316,7 +327,7 @@ internal class ASTVisitor {
         val notTest = ctx.notTest()
 
         return if (notTest != null) {
-            NotExpressionNode(visitNotTest(notTest))
+            NotExpressionNode(ctx.lineNumber(), visitNotTest(notTest))
         } else {
             visitComparison(ctx.comparison())
         }
@@ -337,6 +348,7 @@ internal class ASTVisitor {
             // TODO: Verify this runs in the correct order of precedence
 
             var compNode = ComparisonNode(
+                ctx.lineNumber(),
                 ComparisonOperator.from(operators[0].text),
                 visitExpression(expressions[0]),
                 visitExpression(expressions[1])
@@ -344,6 +356,7 @@ internal class ASTVisitor {
 
             operators.drop(1).forEachIndexed { index, compCtx ->
                 compNode = ComparisonNode(
+                    compCtx.lineNumber(),
                     ComparisonOperator.from(compCtx.text),
                     compNode,
                     visitExpression(expressions[index + 2])
@@ -362,6 +375,7 @@ internal class ASTVisitor {
         } else {
             bitXorNodes.reduce { prev, curr ->
                 ArithmeticExpressionNode(
+                    ctx.lineNumber(),
                     ArithmeticOperator.BIT_OR,
                     prev,
                     curr
@@ -378,6 +392,7 @@ internal class ASTVisitor {
         } else {
             bitAndNodes.reduce { prev, curr ->
                 ArithmeticExpressionNode(
+                    ctx.lineNumber(),
                     ArithmeticOperator.BIT_XOR,
                     prev,
                     curr
@@ -394,6 +409,7 @@ internal class ASTVisitor {
         } else {
             bitShiftNodes.reduce { prev, curr ->
                 ArithmeticExpressionNode(
+                    ctx.lineNumber(),
                     ArithmeticOperator.BIT_AND,
                     prev,
                     curr
@@ -417,6 +433,7 @@ internal class ASTVisitor {
             // TODO: Verify this runs in the correct order of precedence
 
             var bitShiftNode = ArithmeticExpressionNode(
+                ctx.lineNumber(),
                 ArithmeticOperator.from(operators[0].text),
                 visitArithmeticExpr(arithmeticExprs[0]),
                 visitArithmeticExpr(arithmeticExprs[1])
@@ -424,6 +441,7 @@ internal class ASTVisitor {
 
             operators.drop(1).forEachIndexed { index, bitShiftCtx ->
                 bitShiftNode = ArithmeticExpressionNode(
+                    bitShiftCtx.lineNumber(),
                     ArithmeticOperator.from(bitShiftCtx.text),
                     bitShiftNode,
                     visitArithmeticExpr(arithmeticExprs[index + 2])
@@ -449,6 +467,7 @@ internal class ASTVisitor {
             // TODO: Verify this runs in the correct order of precedence
 
             var arithNode = ArithmeticExpressionNode(
+                ctx.lineNumber(),
                 ArithmeticOperator.from(operators[0].text),
                 visitTerm(terms[0]),
                 visitTerm(terms[1])
@@ -456,6 +475,7 @@ internal class ASTVisitor {
 
             operators.drop(1).forEachIndexed { index, arithCtx ->
                 arithNode = ArithmeticExpressionNode(
+                    arithCtx.lineNumber(),
                     ArithmeticOperator.from(arithCtx.text),
                     arithNode,
                     visitTerm(terms[index + 2])
@@ -485,6 +505,7 @@ internal class ASTVisitor {
             // TODO: Verify this runs in the correct order of precedence
 
             var arithNode = ArithmeticExpressionNode(
+                ctx.lineNumber(),
                 ArithmeticOperator.from(operators[0].text),
                 visitFactor(factors[0]),
                 visitFactor(factors[1])
@@ -492,6 +513,7 @@ internal class ASTVisitor {
 
             operators.drop(1).forEachIndexed { index, termCtx ->
                 arithNode = ArithmeticExpressionNode(
+                    termCtx.lineNumber(),
                     ArithmeticOperator.from(termCtx.text),
                     arithNode,
                     visitFactor(factors[index + 2])
@@ -513,6 +535,7 @@ internal class ASTVisitor {
         val op = ctx.factorOperator()
 
         return UnaryExpressionNode(
+            ctx.lineNumber(),
             UnaryOperator.from(op.text),
             visitFactor(factor)
         )
@@ -524,6 +547,7 @@ internal class ASTVisitor {
 
         return if (factor != null) {
             ArithmeticExpressionNode(
+                ctx.lineNumber(),
                 ArithmeticOperator.POWER,
                 visitAtomExpr(atomExpr),
                 visitFactor(factor)
@@ -547,7 +571,7 @@ internal class ASTVisitor {
         return if (trailers.isEmpty()) {
             atomNode
         } else {
-            makeTrailers(atomNode, trailers)
+            makeTrailers(ctx.lineNumber(), atomNode, trailers)
         }
     }
 
@@ -576,17 +600,17 @@ internal class ASTVisitor {
         val numCommas = testListCtx.COMMA().size
 
         return if (numTests == 0 && numCommas == 0) {
-            TupleLiteral(emptyList())
+            TupleLiteral(ctx.lineNumber(), emptyList())
         } else if (numTests == 1 && numCommas == 0) {
             visitTestListComp(testListCtx)[0]
         } else {
             // numCommas > 0, which implies numTests > 1
-            TupleLiteral(visitTestListComp(testListCtx))
+            TupleLiteral(ctx.lineNumber(), visitTestListComp(testListCtx))
         }
     }
 
     private fun visitListAtom(ctx: ListAtomContext): ExpressionNode {
-        return ListLiteral(ctx.testListComp()?.let(::visitTestListComp) ?: emptyList())
+        return ListLiteral(ctx.lineNumber(), ctx.testListComp()?.let(::visitTestListComp) ?: emptyList())
     }
 
     private fun visitTestListComp(ctx: TestListCompContext): List<ExpressionNode> {
@@ -611,6 +635,7 @@ internal class ASTVisitor {
 
     private fun visitDictMaker(ctx: DictMakerContext): ExpressionNode {
         return DictLiteral(
+            ctx.lineNumber(),
             ctx.dictTerm().map {
                 if (it.compFor() != null || it.kstarExpression() != null)
                     notImplemented()
@@ -621,13 +646,13 @@ internal class ASTVisitor {
     }
 
     private fun visitBasicAtom(ctx: BasicAtomContext): ExpressionNode {
-        return ctx.NAME()?.let { IdentifierNode(it.text) } ?:
+        return ctx.NAME()?.let { IdentifierNode(ctx.lineNumber(), it.text) } ?:
                 ctx.number()?.let { visitNumber(it) } ?:
-                ctx.ELLIPSIS()?.let { EllipsisNode } ?:
-                ctx.NONE()?.let { NoneNode } ?:
-                ctx.TRUE()?.let { TrueNode } ?:
-                ctx.FALSE()?.let { FalseNode } ?:
-                ctx.STRING().let(this::makeStrings)
+                ctx.ELLIPSIS()?.let { EllipsisNode(ctx.lineNumber()) } ?:
+                ctx.NONE()?.let { NoneNode(ctx.lineNumber()) } ?:
+                ctx.TRUE()?.let { TrueNode(ctx.lineNumber()) } ?:
+                ctx.FALSE()?.let { FalseNode(ctx.lineNumber()) } ?:
+                makeStrings(ctx.lineNumber(), ctx.STRING())
     }
 
     private fun visitNumber(ctx: NumberContext): ExpressionNode {
@@ -635,47 +660,47 @@ internal class ASTVisitor {
         if (intCtx != null) {
             var token = intCtx.dec
             if (token != null)
-                return IntegerLiteral(Integer.parseInt(token.text, 10))
+                return IntegerLiteral(ctx.lineNumber(), Integer.parseInt(token.text, 10))
 
             token = intCtx.oct
             if (token != null)
-                return IntegerLiteral(Integer.parseInt(token.text.replace("0o", "").replace("0O", ""), 8))
+                return IntegerLiteral(ctx.lineNumber(), Integer.parseInt(token.text.replace("0o", "").replace("0O", ""), 8))
 
             token = intCtx.hex
             if (token != null)
-                return IntegerLiteral(Integer.parseInt(token.text.replace("0x", "").replace("0X", ""), 16))
+                return IntegerLiteral(ctx.lineNumber(), Integer.parseInt(token.text.replace("0x", "").replace("0X", ""), 16))
 
             token = intCtx.bin
-            return IntegerLiteral(Integer.parseInt(token.text.replace("0b", "").replace("0B", ""), 2))
+            return IntegerLiteral(ctx.lineNumber(), Integer.parseInt(token.text.replace("0b", "").replace("0B", ""), 2))
         }
 
         val floatTerm = ctx.FLOAT_NUMBER()
         if (floatTerm != null)
-            return FloatLiteral(java.lang.Double.parseDouble(floatTerm.text))
+            return FloatLiteral(ctx.lineNumber(), java.lang.Double.parseDouble(floatTerm.text))
 
         val imagTerm = ctx.IMAG_NUMBER()
-        return ComplexLiteral(java.lang.Double.parseDouble(imagTerm.text.replace("j", "").replace("J", "")))
+        return ComplexLiteral(ctx.lineNumber(), java.lang.Double.parseDouble(imagTerm.text.replace("j", "").replace("J", "")))
     }
 
-    private fun makeTrailers(atomNode: ExpressionNode, trailers: List<TrailerContext>): ExpressionNode {
+    private fun makeTrailers(lineNumber: Int, atomNode: ExpressionNode, trailers: List<TrailerContext>): ExpressionNode {
         var node = atomNode
 
         for (trailer in trailers) {
             val call = trailer.trailerCall()
 
             if (call != null) {
-                node = FunctionCallNode(node, visitArgList(call.argList()))
+                node = FunctionCallNode(lineNumber, node, visitArgList(call.argList()))
                 continue
             }
 
             val memberAccess = trailer.trailerMemberAccess()
             if (memberAccess != null) {
-                node = MemberAccessNode(node, visitSubscriptList(memberAccess.subscriptList()))
+                node = MemberAccessNode(lineNumber, node, visitSubscriptList(memberAccess.subscriptList()))
                 continue
             }
 
             val dotAccess = trailer.trailerDotAccess()
-            node = DotAccessNode(node, IdentifierNode(dotAccess.NAME().text))
+            node = DotAccessNode(lineNumber, node, IdentifierNode(lineNumber, dotAccess.NAME().text))
         }
 
         return node
@@ -711,13 +736,8 @@ internal class ASTVisitor {
         notImplemented()
     }
 
-    private fun makeNumber(number: String): ExpressionNode {
-        // TODO: Number formatting
-        return IntegerLiteral(number.toInt())
-    }
-
-    private fun makeStrings(strings: List<TerminalNode>): ExpressionNode {
-        return StringLiteral(strings.joinToString(separator = "") {
+    private fun makeStrings(lineNumber: Int, strings: List<TerminalNode>): ExpressionNode {
+        return StringLiteral(lineNumber, strings.joinToString(separator = "") {
             it.text.replace("\"", "").replace("'", "")
         })
     }

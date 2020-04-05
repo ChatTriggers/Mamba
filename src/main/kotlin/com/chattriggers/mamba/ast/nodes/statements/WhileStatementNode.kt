@@ -7,10 +7,11 @@ import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
 
 class WhileStatementNode(
+    lineNumber: Int,
     private val condition: ExpressionNode,
     private val body: List<StatementNode>,
     private val elseBlock: List<StatementNode>
-) : StatementNode(listOf(condition) + body + elseBlock) {
+) : StatementNode(lineNumber, listOf(condition) + body + elseBlock) {
     override fun execute(interp: Interpreter): VObject {
         var broke = false
 

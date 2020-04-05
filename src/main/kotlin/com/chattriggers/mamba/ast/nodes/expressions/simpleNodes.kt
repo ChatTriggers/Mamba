@@ -7,7 +7,7 @@ import com.chattriggers.mamba.core.values.singletons.VFalse
 import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.singletons.VTrue
 
-object EllipsisNode : ExpressionNode() {
+class EllipsisNode(lineNumber: Int) : ExpressionNode(lineNumber) {
     override fun execute(interp: Interpreter): VObject = VEllipsis
 
     override fun print(indent: Int) {
@@ -15,7 +15,7 @@ object EllipsisNode : ExpressionNode() {
     }
 }
 
-object TrueNode : ExpressionNode() {
+class TrueNode(lineNumber: Int) : ExpressionNode(lineNumber) {
     override fun execute(interp: Interpreter): VObject = VTrue
 
     override fun print(indent: Int) {
@@ -23,7 +23,7 @@ object TrueNode : ExpressionNode() {
     }
 }
 
-object FalseNode : ExpressionNode() {
+class FalseNode(lineNumber: Int) : ExpressionNode(lineNumber) {
     override fun execute(interp: Interpreter): VObject = VFalse
 
     override fun print(indent: Int) {
@@ -31,7 +31,7 @@ object FalseNode : ExpressionNode() {
     }
 }
 
-object NoneNode : ExpressionNode() {
+class NoneNode(lineNumber: Int) : ExpressionNode(lineNumber) {
     override fun execute(interp: Interpreter): VObject = VNone
 
     override fun print(indent: Int) {

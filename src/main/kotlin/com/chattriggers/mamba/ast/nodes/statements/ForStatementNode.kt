@@ -14,11 +14,12 @@ import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.singletons.VNotImplemented
 
 class ForStatementNode(
+    lineNumber: Int,
     private val targetNode: ExpressionNode,
     private val iterableNode: ExpressionNode,
     private val body: List<StatementNode>,
     private val elseBlock: List<StatementNode>
-) : StatementNode(listOf(targetNode, iterableNode) + body + elseBlock) {
+) : StatementNode(lineNumber, listOf(targetNode, iterableNode) + body + elseBlock) {
     override fun execute(interp: Interpreter): VObject {
         val iterator = interp.runtime.getIterator(iterableNode.execute(interp))
 

@@ -9,8 +9,9 @@ import com.chattriggers.mamba.ast.nodes.expressions.IdentifierNode
 import com.chattriggers.mamba.core.values.exceptions.notImplemented
 
 class DictLiteral(
+    lineNumber: Int,
     private val dict: Map<ExpressionNode, ExpressionNode>
-) : ExpressionNode((dict.keys + dict.values).toList()) {
+) : ExpressionNode(lineNumber, (dict.keys + dict.values).toList()) {
     override fun execute(interp: Interpreter): VObject {
         return VDict(
             dict.mapKeys { (key) ->

@@ -4,7 +4,7 @@ import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.collections.VTuple
 import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
 
-class TupleLiteral(private val elements: List<ExpressionNode>) : ExpressionNode(elements) {
+class TupleLiteral(lineNumber: Int, private val elements: List<ExpressionNode>) : ExpressionNode(lineNumber, elements) {
     override fun execute(interp: Interpreter) = when (elements.size) {
         0 -> VTuple.EMPTY_TUPLE
         else -> VTuple(elements.map { it.execute(interp) })

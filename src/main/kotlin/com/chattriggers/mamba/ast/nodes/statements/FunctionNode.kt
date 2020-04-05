@@ -14,11 +14,12 @@ data class ParameterNode(
     val defaultValue: ExpressionNode? = null
 )
 
-data class FunctionNode(
+class FunctionNode(
+    lineNumber: Int,
     private val identifier: IdentifierNode,
     private val parameters: List<ParameterNode>,
     internal val statements: List<StatementNode>
-) : StatementNode(listOf(identifier) + statements), ICallable {
+) : StatementNode(lineNumber, listOf(identifier) + statements), ICallable {
     override fun call(interp: Interpreter, args: List<VObject>): VObject {
         val requiredArgs = parameters.indexOfFirst { it.defaultValue != null }.let {
             if (it == -1) args.size else it

@@ -5,7 +5,7 @@ import com.chattriggers.mamba.core.values.VObject
 import com.chattriggers.mamba.core.values.VReturnWrapper
 import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
 
-class ReturnNode(private val child: ExpressionNode) : StatementNode(child) {
+class ReturnNode(lineNumber: Int, private val child: ExpressionNode) : StatementNode(lineNumber, child) {
     override fun execute(interp: Interpreter): VObject {
         return VReturnWrapper(child.execute(interp))
     }

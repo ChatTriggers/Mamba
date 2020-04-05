@@ -4,9 +4,10 @@ import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.VObject
 
 class AssignmentNode(
+    lineNumber: Int,
     private val identifier: IdentifierNode,
     private val expr: ExpressionNode
-) : ExpressionNode(listOf(identifier, expr)) {
+) : ExpressionNode(lineNumber, listOf(identifier, expr)) {
     override fun execute(interp: Interpreter): VObject {
         val value = expr.execute(interp)
         interp.getScope()[identifier.identifier] = value

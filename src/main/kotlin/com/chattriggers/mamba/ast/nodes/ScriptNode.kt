@@ -6,7 +6,7 @@ import com.chattriggers.mamba.core.values.VObject
 import com.chattriggers.mamba.ast.nodes.statements.StatementNode
 import com.chattriggers.mamba.core.values.exceptions.MambaException
 
-class ScriptNode(private val statements: List<StatementNode>) : Node(statements) {
+class ScriptNode(private val statements: List<StatementNode>) : Node(1, statements) {
     override fun execute(interp: Interpreter): VObject {
         try {
             statements.forEach {

@@ -6,9 +6,10 @@ import com.chattriggers.mamba.core.values.VObject
 import com.chattriggers.mamba.core.values.exceptions.notImplemented
 
 class MemberAccessNode(
+    lineNumber: Int,
     private val target: ExpressionNode,
     private val members: List<ExpressionNode>)
-    : ExpressionNode(listOf(target) + members) {
+    : ExpressionNode(lineNumber, listOf(target) + members) {
     override fun execute(interp: Interpreter): VObject {
         notImplemented()
     }
@@ -21,9 +22,10 @@ class MemberAccessNode(
 }
 
 class DotAccessNode(
+    lineNumber: Int,
     private val target: ExpressionNode,
     private val property: IdentifierNode
-) : ExpressionNode(listOf(target, property)) {
+) : ExpressionNode(lineNumber, listOf(target, property)) {
     override fun execute(interp: Interpreter): VObject {
         return target.execute(interp).getOrNull(property.identifier) ?: VNone
     }

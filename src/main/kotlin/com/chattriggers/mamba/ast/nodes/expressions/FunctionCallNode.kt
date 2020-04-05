@@ -4,9 +4,10 @@ import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.VObject
 
 class FunctionCallNode(
+    lineNumber: Int,
     private val target: ExpressionNode,
     private val args: List<ExpressionNode>
-) : ExpressionNode(listOf(target) + args) {
+) : ExpressionNode(lineNumber, listOf(target) + args) {
     override fun execute(interp: Interpreter): VObject {
         val targetValue = target.execute(interp)
         return interp.runtime.call(targetValue, args.map { it.execute(interp) })

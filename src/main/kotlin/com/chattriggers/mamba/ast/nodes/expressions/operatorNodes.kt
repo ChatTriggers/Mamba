@@ -9,9 +9,10 @@ import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import com.chattriggers.mamba.core.values.singletons.toValue
 
 class OrExpresionNode(
+    lineNumber: Int,
     private val left: ExpressionNode,
     private val right: ExpressionNode
-) : ExpressionNode(listOf(left, right)) {
+) : ExpressionNode(lineNumber, listOf(left, right)) {
     override fun print(indent: Int) {
         printNodeHeader(indent, this)
         left.print(indent + 1)
@@ -20,9 +21,10 @@ class OrExpresionNode(
 }
 
 class AndExpressionNode(
+    lineNumber: Int,
     private val left: ExpressionNode,
     private val right: ExpressionNode
-) : ExpressionNode(listOf(left, right)) {
+) : ExpressionNode(lineNumber, listOf(left, right)) {
     override fun print(indent: Int) {
         printNodeHeader(indent, this)
         left.print(indent + 1)
@@ -30,7 +32,7 @@ class AndExpressionNode(
     }
 }
 
-class NotExpressionNode(private val child: ExpressionNode) : ExpressionNode(child) {
+class NotExpressionNode(lineNumber: Int, private val child: ExpressionNode) : ExpressionNode(lineNumber, child) {
     override fun print(indent: Int) {
         printNodeHeader(indent, this)
         child.print(indent + 1)
@@ -38,10 +40,11 @@ class NotExpressionNode(private val child: ExpressionNode) : ExpressionNode(chil
 }
 
 class ComparisonNode(
+    lineNumber: Int,
     private val op: ComparisonOperator,
     private val left: ExpressionNode,
     private val right: ExpressionNode
-) : ExpressionNode(listOf(left, right)) {
+) : ExpressionNode(lineNumber, listOf(left, right)) {
     override fun execute(interp: Interpreter): VObject {
         val rt = interp.runtime
         val leftValue = left.execute(interp)
@@ -72,10 +75,11 @@ class ComparisonNode(
 }
 
 class ArithmeticExpressionNode(
+    lineNumber: Int,
     private val op: ArithmeticOperator,
     private val left: ExpressionNode,
     private val right: ExpressionNode
-) : ExpressionNode(listOf(left, right)) {
+) : ExpressionNode(lineNumber, listOf(left, right)) {
     override fun execute(interp: Interpreter): VObject {
         val rt = interp.runtime
         val leftValue = left.execute(interp)
@@ -107,9 +111,10 @@ class ArithmeticExpressionNode(
 }
 
 class UnaryExpressionNode(
+    lineNumber: Int,
     private val op: UnaryOperator,
     private val child: ExpressionNode
-) : ExpressionNode(child) {
+) : ExpressionNode(lineNumber, child) {
     override fun execute(interp: Interpreter): VObject {
         val value = child.execute(interp)
 
