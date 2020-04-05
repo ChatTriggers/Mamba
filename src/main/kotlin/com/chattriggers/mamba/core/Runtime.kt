@@ -1,5 +1,8 @@
 package com.chattriggers.mamba.core
 
+import com.chattriggers.mamba.ast.nodes.Node
+import com.chattriggers.mamba.ast.nodes.expressions.IdentifierNode
+import com.chattriggers.mamba.ast.nodes.statements.FunctionNode
 import com.chattriggers.mamba.core.values.*
 import com.chattriggers.mamba.core.values.collections.VDict
 import com.chattriggers.mamba.core.values.collections.VList
@@ -29,6 +32,13 @@ class Runtime(val interp: Interpreter) {
 
     fun toInt(value: VObject): Int {
         notImplemented()
+    }
+
+    fun getName(value: Node): String {
+        return when (value) {
+            is IdentifierNode -> value.identifier
+            else -> notImplemented()
+        }
     }
 
     fun widen(left: VObject, right: VObject): Pair<VObject, VObject> {

@@ -12,7 +12,7 @@ fun main() {
 
     val tree = Parser.parseFromFile(mainFile)
     val script = ASTTransformer.transform(tree)
-    script.print(0)
+//    script.print(0)
 
-    Interpreter.execute(script)
+    Interpreter.execute(script, mainFile.name, mainFile.readLines())
 }

@@ -6,7 +6,7 @@ import com.chattriggers.mamba.core.values.exceptions.notImplemented
 
 class IdentifierNode(lineNumber: Int, val identifier: String) : ExpressionNode(lineNumber) {
     override fun execute(interp: Interpreter): VObject {
-        for (scope in interp.scopeStacks) {
+        for (scope in interp.scopeStack) {
             val prop = scope.getOrNull(identifier)
             if (prop != null)
                 return prop

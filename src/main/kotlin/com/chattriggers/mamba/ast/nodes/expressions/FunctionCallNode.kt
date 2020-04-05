@@ -2,6 +2,8 @@ package com.chattriggers.mamba.ast.nodes.expressions
 
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.VObject
+import com.chattriggers.mamba.core.values.exceptions.MambaException
+import com.chattriggers.mamba.core.values.singletons.VNone
 
 class FunctionCallNode(
     lineNumber: Int,
@@ -10,7 +12,15 @@ class FunctionCallNode(
 ) : ExpressionNode(lineNumber, listOf(target) + args) {
     override fun execute(interp: Interpreter): VObject {
         val targetValue = target.execute(interp)
-        return interp.runtime.call(targetValue, args.map { it.execute(interp) })
+
+        val mappedArgs = args.map { it.execute(interp) }
+
+        return try {
+            interp.runtime.call(targetValue, mappedArgs)
+        } catch (e: MambaException) {
+            interp.pushCallStack(interp.fileName, interp.runtime.getName(target), lineNumber)
+            throw e
+        }
     }
 
     override fun print(indent: Int) {
