@@ -148,7 +148,9 @@ kwonlyKwargs: (',' parameter)* (',' kwargs?)?;
 argsKwonlyKwargs: args kwonlyKwargs | kwargs;
 posKeywordArgsKwonlyKwargs: parameters (',' argsKwonlyKwargs?)?;
 typedArgsListNoPosOnly : posKeywordArgsKwonlyKwargs | argsKwonlyKwargs;
-typedArgsList: (parameters ',' '/' (',' typedArgsListNoPosOnly?)?) | (typedArgsListNoPosOnly);
+// TODO: 'normalArgs' is a temp identifier, eventually rename to something meaningful
+// when both sides of the alternation are handled
+typedArgsList: (parameters ',' '/' (',' typedArgsListNoPosOnly?)?) | (normalArgs=typedArgsListNoPosOnly);
 tfpDef: NAME (':' test)?;
 varArgsList: (vfpDef ('=' test)? (',' vfpDef ('=' test)?)* (',' (
         '*' (vfpDef)? (',' vfpDef ('=' test)?)* (',' ('**' vfpDef (',')?)?)?

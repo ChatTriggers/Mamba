@@ -5,7 +5,7 @@ import com.chattriggers.mamba.core.values.VObject
 
 class IdentifierNode(val identifier: String) : ExpressionNode() {
     override fun execute(interp: Interpreter): VObject {
-        for (scope in interp.scopeStack) {
+        for (scope in interp.scopeStacks) {
             val prop = scope.getOrNull(identifier)
             if (prop != null)
                 return prop

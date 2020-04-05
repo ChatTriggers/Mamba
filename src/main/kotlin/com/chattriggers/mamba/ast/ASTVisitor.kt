@@ -173,10 +173,9 @@ internal class ASTVisitor {
         val test = ctx.test() // TODO: What is this?
 
         val suite = ctx.suite()
+        val parameters = if (typedArgsList != null) visitTypedArgsList(typedArgsList) else emptyList()
 
-        if (typedArgsList != null) {
-            TODO("Handle other possibilities")
-        } else if (test != null) {
+        if (test != null) {
             TODO("Handle other possibilities")
         }
 
@@ -190,7 +189,37 @@ internal class ASTVisitor {
             statements.addAll(suite.statement().map(::visitStatement).flatten())
         }
 
-        return FunctionNode(IdentifierNode(name), statements)
+        return FunctionNode(IdentifierNode(name), parameters, statements)
+    }
+
+    private fun visitTypedArgsList(ctx: TypedArgsListContext): List<ParameterNode> {
+        if (ctx.normalArgs == null)
+            TODO()
+
+        return visitTypedArgsListNoPosOnly(ctx.normalArgs)
+    }
+
+    private fun visitTypedArgsListNoPosOnly(ctx: TypedArgsListNoPosOnlyContext): List<ParameterNode> {
+        if (ctx.argsKwonlyKwargs() != null)
+            TODO()
+
+        return visitPosKeywordArgsKwonlyKwargs(ctx.posKeywordArgsKwonlyKwargs())
+    }
+
+    private fun visitPosKeywordArgsKwonlyKwargs(ctx: PosKeywordArgsKwonlyKwargsContext): List<ParameterNode> {
+        if (ctx.argsKwonlyKwargs() != null)
+            TODO()
+
+        return ctx.parameters().parameter().map(::visitParameter)
+    }
+
+    private fun visitParameter(ctx: ParameterContext): ParameterNode {
+        val ident = IdentifierNode(ctx.tfpDef().NAME().text)
+
+        return ParameterNode(
+            ident,
+            if (ctx.test() != null) visitTest(ctx.test()) else null
+        )
     }
 
     private fun visitExprStatement(ctx: ExprStatementContext): ExpressionNode {

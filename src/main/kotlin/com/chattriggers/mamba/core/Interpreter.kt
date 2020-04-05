@@ -5,7 +5,9 @@ import com.chattriggers.mamba.ast.nodes.ScriptNode
 import java.util.*
 
 class Interpreter private constructor(private val script: ScriptNode) {
-    internal val scopeStack = Stack<VObject>()
+    private val scopeStack = Stack<VObject>()
+    internal val scopeStacks: List<VObject>
+        get() = scopeStack.reversed()
     internal val runtime = Runtime(this)
 
     init {

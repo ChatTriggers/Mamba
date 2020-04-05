@@ -67,10 +67,16 @@ class Runtime(val interp: Interpreter) {
     }
 
     fun call(obj: VObject, args: List<VObject>): VObject {
-        if (obj is ICallable)
-            return obj.call(interp, args)
+        interp.pushScope()
 
-        return obj.callProperty(interp, "__call__", args)
+        try {
+            if (obj is ICallable)
+                return obj.call(interp, args)
+
+            return obj.callProperty(interp, "__call__", args)
+        } finally {
+            interp.popScope()
+        }
     }
 
     fun valueCompare(method: String, left: VObject, right: VObject): VObject {
