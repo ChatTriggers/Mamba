@@ -687,12 +687,9 @@ internal class ASTVisitor {
     }
 
     private fun makeStrings(strings: List<TerminalNode>): ExpressionNode {
-        return StringLiteral(
-            strings.joinToString(
-                separator = ""
-            ) {
-                it.text.replace("\"", "").replace("'", "")
-            })
+        return StringLiteral(strings.joinToString(separator = "") {
+            it.text.replace("\"", "").replace("'", "")
+        })
     }
 
     private fun codeBug(): Nothing {

@@ -1,5 +1,6 @@
 package com.chattriggers.mamba.core.values
 
+import com.chattriggers.mamba.core.values.collections.VDict
 import com.chattriggers.mamba.core.values.functions.NativeClassMethod
 import com.chattriggers.mamba.core.values.functions.VNativeFunctionWrapper
 
@@ -18,6 +19,10 @@ open class VType(private val parentType: LazyValue<VType>? = null) : VObject(Laz
 
     override val baseTypes: List<LazyValue<VType>>
         get() = parentType?.let(::listOf) ?: emptyList()
+
+    init {
+        map["__dict__"] = LazyValue { VDict(map) }
+    }
 
     protected fun addFieldDescriptor(name: String, value: VObject) {
         this[name] = value

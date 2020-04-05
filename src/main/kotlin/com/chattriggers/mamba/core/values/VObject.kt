@@ -1,6 +1,7 @@
 package com.chattriggers.mamba.core.values
 
 import com.chattriggers.mamba.core.Interpreter
+import com.chattriggers.mamba.core.values.collections.VDict
 import com.chattriggers.mamba.core.values.collections.toValue
 import com.chattriggers.mamba.core.values.functions.IMethod
 import com.chattriggers.mamba.core.values.functions.VFunctionWrapper
@@ -81,7 +82,11 @@ open class VObject(private vararg val _baseTypes: LazyValue<VType>) : Value {
             return k
         }
 
+    open fun ownContains(key: String) = key in map
+
     open operator fun contains(key: String) = containsKey(key)
+
+    open fun ownGet(key: String) = map[key]
 
     open operator fun get(key: String): VObject {
         // Force an evaluation before we look at our methods
@@ -100,8 +105,6 @@ open class VObject(private vararg val _baseTypes: LazyValue<VType>) : Value {
     open operator fun set(key: String, value: VObject) {
         map[key] = value
     }
-
-    open fun ownContains(key: String) = key in map
 
     open fun containsKey(key: String): Boolean {
         if (key in map)
@@ -159,7 +162,9 @@ object VObjectType : VType() {
 }
 
 fun Value?.unwrap(): VObject {
-    if (this !is VObject)
-        TODO()
-    return this
+    return when (this) {
+        is LazyValue<*> -> valueProducer()
+        is VObject -> this
+        else -> TODO()
+    }
 }

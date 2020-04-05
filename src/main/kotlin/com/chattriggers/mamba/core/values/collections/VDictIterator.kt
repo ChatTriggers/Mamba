@@ -1,9 +1,6 @@
 package com.chattriggers.mamba.core.values.collections
 
-import com.chattriggers.mamba.core.values.LazyValue
-import com.chattriggers.mamba.core.values.VObject
-import com.chattriggers.mamba.core.values.VObjectType
-import com.chattriggers.mamba.core.values.VType
+import com.chattriggers.mamba.core.values.*
 import com.chattriggers.mamba.core.values.singletons.VNotImplemented
 
 class VDictIterator(val vdict: VDict) : VObject(LazyValue { VDictIteratorType }) {
@@ -30,7 +27,7 @@ object VDictIteratorType : VType(LazyValue { VObjectType }) {
                     TODO("RuntimeError: dictionary changed size during iteration")
                 self.cursor >= self.vdictKeys.size -> VNotImplemented
                 else -> self.vdict.dict[self.vdictKeys[self.cursor++]]!!
-            }
+            }.unwrap()
         }
     }
 }

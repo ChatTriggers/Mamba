@@ -1,12 +1,24 @@
 package com.chattriggers.mamba.core.values.collections
 
-import com.chattriggers.mamba.core.values.LazyValue
-import com.chattriggers.mamba.core.values.VObject
-import com.chattriggers.mamba.core.values.VObjectType
-import com.chattriggers.mamba.core.values.VType
+import com.chattriggers.mamba.core.values.*
 
-class VDict(val dict: MutableMap<String, VObject>) : VObject(LazyValue("VDictType") { VDictType }) {
+class VDict(val dict: MutableMap<String, Value>) : VObject(LazyValue("VDictType") { VDictType }) {
     override val className = "dict"
+
+    override fun toString() = StringBuilder().apply {
+        append("{")
+
+        dict.entries.forEachIndexed { index, (key, value) ->
+            append(key)
+            append(": ")
+            append(value)
+
+            if (index < dict.size - 1)
+                append(", ")
+        }
+
+        append("}")
+    }.toString()
 }
 
 object VDictType : VType(LazyValue("VObjectType") { VObjectType }) {
