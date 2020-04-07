@@ -3,7 +3,7 @@ package com.chattriggers.mamba.ast.nodes.statements
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.VFlowWrapper
 import com.chattriggers.mamba.core.values.singletons.VNone
-import com.chattriggers.mamba.core.values.VObject
+import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.ast.nodes.Node
 
 open class StatementNode(lineNumber: Int, children: List<Node>): Node(lineNumber, children) {

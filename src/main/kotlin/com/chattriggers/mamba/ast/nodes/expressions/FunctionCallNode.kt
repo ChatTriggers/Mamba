@@ -2,9 +2,8 @@ package com.chattriggers.mamba.ast.nodes.expressions
 
 import com.chattriggers.mamba.core.CallFrame
 import com.chattriggers.mamba.core.Interpreter
-import com.chattriggers.mamba.core.values.VObject
+import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.exceptions.MambaException
-import com.chattriggers.mamba.core.values.singletons.VNone
 
 class FunctionCallNode(
     lineNumber: Int,

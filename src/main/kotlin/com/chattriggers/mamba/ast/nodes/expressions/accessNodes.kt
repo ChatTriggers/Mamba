@@ -2,7 +2,7 @@ package com.chattriggers.mamba.ast.nodes.expressions
 
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.singletons.VNone
-import com.chattriggers.mamba.core.values.VObject
+import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.exceptions.notImplemented
 
 class MemberAccessNode(
@@ -27,7 +27,10 @@ class DotAccessNode(
     internal val property: IdentifierNode
 ) : ExpressionNode(lineNumber, listOf(target, property)) {
     override fun execute(interp: Interpreter): VObject {
-        return target.execute(interp).getOrNull(property.identifier) ?: VNone
+        val obj = target.execute(interp)
+        return if (obj.containsSlot(property.identifier)) {
+            obj.getValue(property.identifier)
+        } else VNone
     }
 
     override fun print(indent: Int) {

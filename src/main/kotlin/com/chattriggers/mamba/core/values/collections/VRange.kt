@@ -1,10 +1,16 @@
 package com.chattriggers.mamba.core.values.collections
 
+import com.chattriggers.mamba.core.Runtime
 import com.chattriggers.mamba.core.values.*
 import com.chattriggers.mamba.core.values.exceptions.MambaException
 import com.chattriggers.mamba.core.values.exceptions.VValueError
 import com.chattriggers.mamba.core.values.numbers.VInt
-import java.lang.IllegalArgumentException
+import com.chattriggers.mamba.core.values.base.VObject
+import com.chattriggers.mamba.core.values.base.VObjectType
+import com.chattriggers.mamba.core.values.base.VType
+import com.chattriggers.mamba.core.values.exceptions.VStopIteration
+import com.chattriggers.mamba.core.values.exceptions.notImplemented
+import com.chattriggers.mamba.core.values.singletons.VNone
 
 class VRange(val start: Int, val stop: Int, val step: Int = 1) : VObject(LazyValue("VRangeType") { VRangeType }) {
     internal var current = start
@@ -42,10 +48,10 @@ class VRange(val start: Int, val stop: Int, val step: Int = 1) : VObject(LazyVal
 
 object VRangeType : VType(LazyValue("VObjectType") { VObjectType }) {
     init {
-        addMethodDescriptor("__iter__") {
-            VRangeIterator(assertSelfAs())
+        addMethod("__iter__") {
+            runtime.construct(VRangeIteratorType, listOf(assertSelfAs<VRange>()))
         }
-        addMethodDescriptor("__call__") {
+        addMethod("__call__") {
             val first = assertArgAs<VInt>(0)
             val second = argAs<VInt>(1)
             val third = argAs<VInt>(2)
@@ -55,6 +61,29 @@ object VRangeType : VType(LazyValue("VObjectType") { VObjectType }) {
                 third == null -> VRange(first.int, second.int)
                 else -> VRange(first.int, second.int, third.int)
             }
+        }
+        addMethod("__call__") {
+            runtime.construct(VRangeType, arguments())
+        }
+        addMethod("__new__") {
+            val type = assertArgAs<VType>(0)
+
+            if (type !is VRangeType) {
+                notImplemented()
+            }
+
+            val first = assertArgAs<VInt>(1)
+            val second = argAs<VInt>(2)
+            val third = argAs<VInt>(3)
+
+            when {
+                second == null -> VRange(first.int)
+                third == null -> VRange(first.int, second.int)
+                else -> VRange(first.int, second.int, third.int)
+            }
+        }
+        addMethod("__init__") {
+            VNone
         }
     }
 }

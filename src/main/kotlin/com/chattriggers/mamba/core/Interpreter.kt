@@ -1,7 +1,8 @@
 package com.chattriggers.mamba.core
 
-import com.chattriggers.mamba.core.values.VObject
+import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.ast.nodes.ScriptNode
+import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.collections.VTuple
 import com.chattriggers.mamba.core.values.exceptions.MambaException
 import com.chattriggers.mamba.core.values.exceptions.VBaseException
@@ -30,7 +31,7 @@ class Interpreter private constructor(private val script: ScriptNode, val fileNa
         return script.execute(this)
     }
 
-    internal fun pushScope(scope: VObject = VObject()) {
+    internal fun pushScope(scope: VObject = runtime.construct(VObjectType)) {
         scopeStackBacker.push(scope)
     }
 

@@ -3,15 +3,16 @@ package com.chattriggers.mamba.core
 import com.chattriggers.mamba.ast.nodes.Node
 import com.chattriggers.mamba.ast.nodes.expressions.DotAccessNode
 import com.chattriggers.mamba.ast.nodes.expressions.IdentifierNode
-import com.chattriggers.mamba.ast.nodes.expressions.MemberAccessNode
-import com.chattriggers.mamba.ast.nodes.statements.FunctionNode
 import com.chattriggers.mamba.core.values.*
 import com.chattriggers.mamba.core.values.collections.VDict
 import com.chattriggers.mamba.core.values.collections.VList
 import com.chattriggers.mamba.core.values.exceptions.notImplemented
-import com.chattriggers.mamba.core.values.functions.ICallable
-import com.chattriggers.mamba.core.values.functions.IMethod
+import com.chattriggers.mamba.core.values.base.IMethod
 import com.chattriggers.mamba.core.values.numbers.*
+import com.chattriggers.mamba.core.values.base.VObject
+import com.chattriggers.mamba.core.values.base.VType
+import com.chattriggers.mamba.core.values.exceptions.MambaException
+import com.chattriggers.mamba.core.values.exceptions.VTypeError
 import com.chattriggers.mamba.core.values.singletons.VFalse
 import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.singletons.VNotImplemented
@@ -25,14 +26,18 @@ class Runtime(val interp: Interpreter) {
             value is VString -> value.string.isNotEmpty()
             value is VList -> value.list.isNotEmpty()
             value is VDict -> value.dict.isNotEmpty()
-            "__bool__" in value -> toBoolean(value.callProperty(interp, "__bool__"))
-            "__len__" in value -> toInt(value.callProperty(interp, "__len__")) != 0
+            value.containsSlot("__bool__") -> toBoolean(callProperty(value, "__bool__"))
+            value.containsSlot("__len__") -> toInt(callProperty(value, "__len__")) != 0
             else -> true
         }
 
     }
 
     fun toInt(value: VObject): Int {
+        notImplemented()
+    }
+
+    fun toDouble(value: VObject): Double {
         notImplemented()
     }
 
@@ -80,47 +85,59 @@ class Runtime(val interp: Interpreter) {
         }
     }
 
-    fun call(obj: VObject, args: List<VObject>): VObject {
-        interp.pushScope()
+    fun callProperty(obj: VObject, property: String, args: List<Value> = emptyList()): VObject {
+        return callProperty(obj, property.toValue(), args)
+    }
 
-        try {
-            if (obj is ICallable)
-                return obj.call(interp, args)
+    fun callProperty(obj: VObject, property: VObject, args: List<Value> = emptyList()): VObject {
+        val prop = obj.getValue(property)
+        return call(prop, args)
+    }
 
-            return obj.callProperty(interp, "__call__", args)
-        } finally {
-            interp.popScope()
-        }
+    fun call(obj: VObject, args: List<Value>): VObject {
+        if (obj is IMethod)
+            return obj.call(interp, args)
+
+        if (obj.containsSlot("__call__"))
+            return callProperty(obj, "__call__", args)
+
+        throw MambaException(VTypeError("'${obj.className}' object is not callable"))
+    }
+
+    fun construct(type: VType) = construct(type, emptyList())
+
+    fun construct(type: VType, args: List<Value>): VObject {
+        val obj = callProperty(type, "__new__", listOf(type) + args)
+
+        // TODO: May have to pass obj with args depending on implementation
+        // of __new__ and __init__
+        // TODO: Ensure VNone is returned
+        callProperty(obj, "__init__", args)
+
+        return obj
     }
 
     fun valueCompare(method: String, left: VObject, right: VObject): VObject {
-        return when (method) {
-            in left -> left.callProperty(interp, method, listOf(right))
+        return when {
+            left.containsSlot(method) -> callProperty(left, method, listOf(right))
             else -> VNotImplemented
         }
     }
 
     fun valueArithmetic(method: String, reverseMethod: String, left: VObject, right: VObject): VObject {
         return when {
-            method in left -> left.callProperty(interp, method, listOf(right))
-            reverseMethod in right -> right.callProperty(interp, reverseMethod, listOf(left))
+            left.containsSlot(method) -> callProperty(left, method, listOf(right))
+            right.containsSlot(reverseMethod) -> callProperty(right, reverseMethod, listOf(left))
             else -> VNotImplemented
         }
     }
 
-    fun dir(args: List<VObject>): VObject {
-        if (args.isEmpty() || args.size > 2)
-            notImplemented()
-
-        return args[0].callProperty(interp, "__dir__", listOf(args[0]))
-    }
-
     fun getIterator(iterable: VObject): VObject {
-        return iterable.callProperty(interp, "__iter__")
+        return callProperty(iterable, "__iter__")
     }
 
-    fun getIteratorNext(iterator: VObject): VObject {
-        return iterator.callProperty(interp, "__next__")
+    fun getIterableNext(iterator: VObject): VObject {
+        return callProperty(iterator, "__next__")
     }
 
     companion object {
@@ -133,12 +150,8 @@ class Runtime(val interp: Interpreter) {
             }
         }
 
-        fun isIterable(obj: VObject): Boolean {
-            return "__iter__" in obj
-        }
+        fun isIterable(obj: VObject) = obj.containsSlot("__iter__")
 
-        fun isIterator(obj: VObject): Boolean {
-            return isIterator(obj) && "__next__" in obj
-        }
+        fun isIterator(obj: VObject) = isIterable(obj) && obj.containsSlot("__next__")
     }
 }

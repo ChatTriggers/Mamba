@@ -1,5 +1,7 @@
 package com.chattriggers.mamba.core.values
 
+import com.chattriggers.mamba.core.values.base.VObject
+
 /**
  * This class is a way for child nodes to communicate
  * with their parent about flow statements.

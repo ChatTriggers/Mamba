@@ -1,25 +1,21 @@
-package com.chattriggers.mamba.core.values.functions
+package com.chattriggers.mamba.core.values.base
 
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.Runtime
-import com.chattriggers.mamba.core.values.VObject
+import com.chattriggers.mamba.core.values.Value
 import com.chattriggers.mamba.core.values.exceptions.notImplemented
+import com.chattriggers.mamba.core.values.unwrap
 
-class ClassMethodBuilder(val interp: Interpreter, private val args: List<VObject>) {
-    val runtime: Runtime
-        get() = interp.runtime
+class ClassMethodBuilder(val interp: Interpreter, private val _args: List<Value>) {
+    val runtime = interp.runtime
 
-    fun argument(index: Int): VObject {
-        if (index >= args.size)
-            notImplemented()
-        return args[index]
-    }
+    val argSize = _args.size
 
-    fun arguments(): List<VObject> {
-        return args
-    }
+    fun argument(index: Int) = _args[index] as VObject
 
-    fun argumentsCount() = args.size
+    fun argumentRaw(index: Int) = _args[index]
+
+    fun arguments() = _args.map(Value::unwrap)
 
     // Used by number classes
     fun widenFirstArgs(): Pair<VObject, VObject> {
@@ -27,7 +23,7 @@ class ClassMethodBuilder(val interp: Interpreter, private val args: List<VObject
     }
 
     inline fun <reified T : VObject> argAs(index: Int): T? {
-        if (index >= argumentsCount()) return null
+        if (index >= argSize) return null
         return assertArgAs<T>(index)
     }
 

@@ -1,5 +1,9 @@
 package com.chattriggers.mamba.core.values
 
+import com.chattriggers.mamba.core.values.base.VObject
+import com.chattriggers.mamba.core.values.base.Wrapper
+import com.chattriggers.mamba.core.values.exceptions.notImplemented
+
 /**
  * Superclass of every value accessible in the Python runtime.
  *
@@ -17,3 +21,12 @@ package com.chattriggers.mamba.core.values
  * @see LazyValue
  */
 interface Value
+
+fun Value?.unwrap(): VObject {
+    return when (this) {
+        is LazyValue<*> -> valueProducer()
+        is VObject -> this
+        is Wrapper -> notImplemented("Unexpected Wrapper.unwrap()")
+        else -> notImplemented()
+    }
+}

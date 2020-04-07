@@ -1,7 +1,7 @@
 package com.chattriggers.mamba.ast.nodes.expressions
 
 import com.chattriggers.mamba.core.Interpreter
-import com.chattriggers.mamba.core.values.VObject
+import com.chattriggers.mamba.core.values.base.VObject
 
 class AssignmentNode(
     lineNumber: Int,
@@ -10,7 +10,7 @@ class AssignmentNode(
 ) : ExpressionNode(lineNumber, listOf(identifier, expr)) {
     override fun execute(interp: Interpreter): VObject {
         val value = expr.execute(interp)
-        interp.getScope()[identifier.identifier] = value
+        interp.getScope().putSlot(identifier.identifier, value)
         return value
     }
 

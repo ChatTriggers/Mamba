@@ -1,7 +1,7 @@
 package com.chattriggers.mamba.ast.nodes.expressions
 
 import com.chattriggers.mamba.core.Interpreter
-import com.chattriggers.mamba.core.values.*
+import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.singletons.VEllipsis
 import com.chattriggers.mamba.core.values.singletons.VFalse
 import com.chattriggers.mamba.core.values.singletons.VNone

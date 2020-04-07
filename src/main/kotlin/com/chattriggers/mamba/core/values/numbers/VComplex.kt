@@ -2,7 +2,15 @@ package com.chattriggers.mamba.core.values.numbers
 
 import com.chattriggers.mamba.core.values.*
 import com.chattriggers.mamba.core.values.exceptions.notImplemented
+import com.chattriggers.mamba.core.values.base.VObject
+import com.chattriggers.mamba.core.values.base.VObjectType
+import com.chattriggers.mamba.core.values.base.VType
+import com.chattriggers.mamba.core.values.base.Wrapper
+import com.chattriggers.mamba.core.values.collections.toValue
+import com.chattriggers.mamba.core.values.exceptions.VArithmeticError
+import com.chattriggers.mamba.core.values.exceptions.VArithmeticErrorType
 import com.chattriggers.mamba.core.values.singletons.VFalse
+import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.singletons.VTrue
 import com.chattriggers.mamba.core.values.singletons.toValue
 import java.lang.IllegalStateException
@@ -32,16 +40,51 @@ class VComplex(val real: Double, val imag: Double) : VObject(LazyValue("VComplex
 
 object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
     init {
-        addMethodDescriptor("conjugate") {
+        addMethod("__call__") {
+            runtime.construct(VComplexType, arguments())
+        }
+        addMethod("__new__") {
+            val type = assertArgAs<VType>(0)
+
+            if (type !is VComplexType) {
+                notImplemented()
+            }
+
+            var real = 0.0
+            var imag = 0.0
+
+            if (argSize > 0) {
+                real = when (val v = argumentRaw(1)) {
+                    is Wrapper -> v.value as Double
+                    is VObject -> runtime.toDouble(v)
+                    else -> notImplemented("Error")
+                }
+            }
+
+            if (argSize > 1) {
+                imag = when (val v = argumentRaw(2)) {
+                    is Wrapper -> v.value as Double
+                    is VObject -> runtime.toDouble(v)
+                    else -> notImplemented("Error")
+                }
+            }
+
+            VComplex(real, imag)
+        }
+        addMethod("__init__") {
+            VNone
+        }
+
+        addMethod("conjugate") {
             when (val self = argument(0)) {
-                is VComplex -> VComplex(self.real, -self.imag)
+                is VComplex -> runtime.construct(VComplexType, listOf(Wrapper(self.real), Wrapper(-self.imag)))
                 is VFloat, is VInt -> self
                 else -> notImplemented()
             }
         }
 
         // Magic methods
-        addMethodDescriptor("__abs__") {
+        addMethod("__abs__") {
             when (val self = argument(0)) {
                 is VComplex -> sqrt(self.real.pow(2.0) + self.imag.pow(2.0))
                 is VFloat -> self.double
@@ -49,20 +92,24 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
                 else -> notImplemented()
             }.toValue()
         }
-        addMethodDescriptor("__add__") {
+        addMethod("__add__") {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {
-                selfWide is VComplex && otherWide is VComplex -> VComplex(
-                    selfWide.real + otherWide.real,
-                    selfWide.imag + otherWide.imag
-                )
-                selfWide is VFloat && otherWide is VFloat -> VFloat(selfWide.double + otherWide.double)
-                selfWide is VInt && otherWide is VInt -> VInt(selfWide.int + otherWide.int)
+                selfWide is VComplex && otherWide is VComplex -> runtime.construct(VComplexType, listOf(
+                    Wrapper(selfWide.real + otherWide.real),
+                    Wrapper(selfWide.imag + otherWide.imag)
+                ))
+                selfWide is VFloat && otherWide is VFloat -> runtime.construct(VFloatType, listOf(
+                    Wrapper(selfWide.double + otherWide.double)
+                ))
+                selfWide is VInt && otherWide is VInt -> runtime.construct(VIntType, listOf(
+                    Wrapper(selfWide.int + otherWide.int)
+                ))
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addMethodDescriptor("__bool__") {
+        addMethod("__bool__") {
             when (val self = argument(0)) {
                 is VComplex -> if (self.real == 0.0 && self.imag == 0.0) VFalse else VTrue
                 is VFloat -> if (self.double == 0.0) VFalse else VTrue
@@ -70,7 +117,7 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addMethodDescriptor("__eq__") {
+        addMethod("__eq__") {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {
@@ -83,25 +130,29 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addMethodDescriptor("__float__") {
+        addMethod("__float__") {
             when (val self = argument(0)) {
                 is VComplex -> notImplemented("TypeError")
                 is VFloat -> self
-                is VInt -> VFloat(self.int.toDouble())
+                is VInt -> runtime.construct(VFloatType, listOf(Wrapper(self.int.toDouble())))
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addMethodDescriptor("__floordiv__") {
+        addMethod("__floordiv__") {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {
                 selfWide is VComplex && otherWide is VComplex -> notImplemented("TypeError")
-                selfWide is VFloat && otherWide is VFloat -> VFloat(floor(selfWide.double / otherWide.double))
-                selfWide is VInt && otherWide is VInt -> VInt(selfWide.int / otherWide.int)
+                selfWide is VFloat && otherWide is VFloat -> runtime.construct(VFloatType, listOf(
+                    Wrapper(floor(selfWide.double / otherWide.double))
+                ))
+                selfWide is VInt && otherWide is VInt -> runtime.construct(VIntType, listOf(
+                    Wrapper(selfWide.int / otherWide.int)
+                ))
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addMethodDescriptor("__ge__") {
+        addMethod("__ge__") {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {
@@ -113,7 +164,7 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addMethodDescriptor("__gt__") {
+        addMethod("__gt__") {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {
@@ -125,7 +176,7 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addMethodDescriptor("__int__") {
+        addMethod("__int__") {
             when (val self = argument(0)) {
                 is VComplex -> notImplemented("TypeError")
                 is VFloat -> self.double.toInt().toValue()
@@ -133,7 +184,7 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addMethodDescriptor("__le__") {
+        addMethod("__le__") {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {
@@ -145,7 +196,7 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addMethodDescriptor("__lt__") {
+        addMethod("__lt__") {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {
@@ -157,7 +208,7 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addMethodDescriptor("__mod__") {
+        addMethod("__mod__") {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {
@@ -169,15 +220,14 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addMethodDescriptor("__mul__") {
+        addMethod("__mul__") {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {
-                selfWide is VComplex && otherWide is VComplex ->
-                    VComplex(
-                        selfWide.real * otherWide.real - selfWide.imag * otherWide.imag,
-                        selfWide.real * otherWide.imag - selfWide.imag * otherWide.real
-                    )
+                selfWide is VComplex && otherWide is VComplex -> runtime.construct(VComplexType, listOf(
+                    Wrapper(selfWide.real * otherWide.real - selfWide.imag * otherWide.imag),
+                    Wrapper(selfWide.real * otherWide.imag - selfWide.imag * otherWide.real)
+                ))
                 selfWide is VFloat && otherWide is VFloat ->
                     (selfWide.double * otherWide.double).toValue()
                 selfWide is VInt && otherWide is VInt ->
@@ -185,7 +235,7 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addMethodDescriptor("__ne__") {
+        addMethod("__ne__") {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {
@@ -198,21 +248,24 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addMethodDescriptor("__neg__") {
+        addMethod("__neg__") {
             when (val self = argument(0)) {
-                is VComplex -> VComplex(-self.real, -self.imag)
+                is VComplex -> runtime.construct(VComplexType, listOf(
+                    Wrapper(-self.real),
+                    Wrapper(-self.imag)
+                ))
                 is VFloat -> (-self.double.toInt()).toValue()
                 is VInt -> (-self.int).toValue()
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addMethodDescriptor("__pos__") {
+        addMethod("__pos__") {
             when (val self = argument(0)) {
                 is VComplex, is VFloat, is VInt -> self
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addMethodDescriptor("__pow__") {
+        addMethod("__pow__") {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {
@@ -224,53 +277,61 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addMethodDescriptor("__radd__") {
-            argument(1).callProperty(interp, "__add__", listOf(argument(0)))
+        addMethod("__radd__") {
+            runtime.callProperty(argument(1), "__add__", listOf(argument(0)))
         }
-        addMethodDescriptor("__rdivmod__") {
-            argument(1).callProperty(interp, "__divmod__", listOf(argument(0)))
+        addMethod("__rdivmod__") {
+            runtime.callProperty(argument(1), "__divmod__", listOf(argument(0)))
         }
-        addMethodDescriptor("__rfloordiv__") {
-            argument(1).callProperty(interp, "__floordiv__", listOf(argument(0)))
+        addMethod("__rfloordiv__") {
+            runtime.callProperty(argument(1), "__floordiv__", listOf(argument(0)))
         }
-        addMethodDescriptor("__rmod__") {
-            argument(1).callProperty(interp, "__mod__", listOf(argument(0)))
+        addMethod("__rmod__") {
+            runtime.callProperty(argument(1), "__mod__", listOf(argument(0)))
         }
-        addMethodDescriptor("__rmul__") {
-            argument(1).callProperty(interp, "__mul__", listOf(argument(0)))
+        addMethod("__rmul__") {
+            runtime.callProperty(argument(1), "__mul__", listOf(argument(0)))
         }
-        addMethodDescriptor("__rpow__") {
-            argument(1).callProperty(interp, "__pow__", listOf(argument(0)))
+        addMethod("__rpow__") {
+            runtime.callProperty(argument(1), "__pow__", listOf(argument(0)))
         }
-        addMethodDescriptor("__rsub__") {
-            argument(1).callProperty(interp, "__sub__", listOf(argument(0)))
+        addMethod("__rsub__") {
+            runtime.callProperty(argument(1), "__sub__", listOf(argument(0)))
         }
-        addMethodDescriptor("__rtruediv__") {
-            argument(1).callProperty(interp, "__truediv__", listOf(argument(0)))
+        addMethod("__rtruediv__") {
+            runtime.callProperty(argument(1), "__truediv__", listOf(argument(0)))
         }
-        addMethodDescriptor("__sub__") {
+        addMethod("__sub__", id = "complex_sub") {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {
-                selfWide is VComplex && otherWide is VComplex -> VComplex(
-                    selfWide.real - otherWide.real,
-                    selfWide.imag - otherWide.imag
-                )
-                selfWide is VFloat && otherWide is VFloat -> VFloat(selfWide.double - otherWide.double)
-                selfWide is VInt && otherWide is VInt -> VInt(selfWide.int - otherWide.int)
+                selfWide is VComplex && otherWide is VComplex -> runtime.construct(VComplexType, listOf(
+                    Wrapper(selfWide.real - otherWide.real),
+                    Wrapper(selfWide.imag - otherWide.imag)
+                ))
+                selfWide is VFloat && otherWide is VFloat -> runtime.construct(VFloatType, listOf(
+                    Wrapper(selfWide.double - otherWide.double)
+                ))
+                selfWide is VInt && otherWide is VInt -> runtime.construct(VIntType, listOf(
+                    Wrapper(selfWide.int - otherWide.int)
+                ))
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }
-        addMethodDescriptor("__truediv__") {
+        addMethod("__truediv__") {
             val (selfWide, otherWide) = widenFirstArgs()
 
             when {
-                selfWide is VComplex && otherWide is VComplex -> VComplex(
-                    selfWide.real + otherWide.real,
-                    selfWide.imag + otherWide.imag
-                )
-                selfWide is VFloat && otherWide is VFloat -> VFloat(selfWide.double / otherWide.double)
-                selfWide is VInt && otherWide is VInt -> VFloat(selfWide.int.toDouble() / otherWide.int.toDouble())
+                selfWide is VComplex && otherWide is VComplex -> runtime.construct(VComplexType, listOf(
+                    Wrapper(selfWide.real + otherWide.real),
+                    Wrapper(selfWide.imag + otherWide.imag)
+                ))
+                selfWide is VFloat && otherWide is VFloat -> runtime.construct(VFloatType, listOf(
+                    Wrapper(selfWide.double / otherWide.double)
+                ))
+                selfWide is VInt && otherWide is VInt -> runtime.construct(VFloatType, listOf(
+                    Wrapper(selfWide.int.toDouble() / otherWide.int.toDouble())
+                ))
                 else -> throw IllegalStateException("Expected widened numbers to have same type")
             }
         }

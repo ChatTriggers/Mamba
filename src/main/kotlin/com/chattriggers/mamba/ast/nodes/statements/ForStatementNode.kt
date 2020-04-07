@@ -4,14 +4,13 @@ import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
 import com.chattriggers.mamba.ast.nodes.expressions.IdentifierNode
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.VBreakWrapper
-import com.chattriggers.mamba.core.values.VContinueWrapper
-import com.chattriggers.mamba.core.values.VObject
+import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.VReturnWrapper
+import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.exceptions.MambaException
 import com.chattriggers.mamba.core.values.exceptions.VStopIteration
 import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import com.chattriggers.mamba.core.values.singletons.VNone
-import com.chattriggers.mamba.core.values.singletons.VNotImplemented
 
 class ForStatementNode(
     lineNumber: Int,
@@ -28,16 +27,13 @@ class ForStatementNode(
 
         val targetName = targetNode.identifier
 
-        val scope = VObject()
-        interp.pushScope(scope)
-
         var didBreak = false
 
         try {
             while (true) {
-                val nextValue = interp.runtime.getIteratorNext(iterator)
+                val nextValue = interp.runtime.getIterableNext(iterator)
 
-                scope[targetName] = nextValue
+                interp.getScope().putSlot(targetName, nextValue)
 
                 when (val execResult = executeStatements(interp, body)) {
                     VBreakWrapper -> didBreak = true
@@ -50,17 +46,10 @@ class ForStatementNode(
             if (reason !is VStopIteration) {
                 throw e
             }
-        } finally {
-            interp.popScope()
         }
 
         if (!didBreak && elseBlock.isNotEmpty()) {
-            interp.pushScope()
-            try {
-                return executeStatements(interp, elseBlock)
-            } finally {
-                interp.popScope()
-            }
+            return executeStatements(interp, elseBlock)
         }
 
         return VNone

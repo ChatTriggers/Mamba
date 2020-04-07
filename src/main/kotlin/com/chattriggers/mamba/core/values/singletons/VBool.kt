@@ -1,7 +1,7 @@
 package com.chattriggers.mamba.core.values.singletons
 
 import com.chattriggers.mamba.core.values.LazyValue
-import com.chattriggers.mamba.core.values.VType
+import com.chattriggers.mamba.core.values.base.VType
 import com.chattriggers.mamba.core.values.numbers.VInt
 import com.chattriggers.mamba.core.values.numbers.VIntType
 

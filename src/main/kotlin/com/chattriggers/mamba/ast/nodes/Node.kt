@@ -2,7 +2,7 @@ package com.chattriggers.mamba.ast.nodes
 
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.singletons.VNone
-import com.chattriggers.mamba.core.values.VObject
+import com.chattriggers.mamba.core.values.base.VObject
 
 abstract class Node(val lineNumber: Int, val children: List<Node>) {
     internal var parent: Node? = null

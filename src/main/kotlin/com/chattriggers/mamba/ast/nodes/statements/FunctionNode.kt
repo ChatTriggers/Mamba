@@ -3,11 +3,12 @@ package com.chattriggers.mamba.ast.nodes.statements
 import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.*
-import com.chattriggers.mamba.core.values.functions.ICallable
-import com.chattriggers.mamba.core.values.functions.VFunctionWrapper
 import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.ast.nodes.expressions.IdentifierNode
+import com.chattriggers.mamba.core.values.base.VMethod
 import com.chattriggers.mamba.core.values.exceptions.notImplemented
+import com.chattriggers.mamba.core.values.base.VObject
+import com.chattriggers.mamba.core.values.base.VObjectType
 
 data class ParameterNode(
     val identifier: IdentifierNode,
@@ -19,8 +20,8 @@ class FunctionNode(
     private val identifier: IdentifierNode,
     private val parameters: List<ParameterNode>,
     internal val statements: List<StatementNode>
-) : StatementNode(lineNumber, listOf(identifier) + statements), ICallable {
-    override fun call(interp: Interpreter, args: List<VObject>): VObject {
+) : StatementNode(lineNumber, listOf(identifier) + statements) {
+    fun call(interp: Interpreter, args: List<VObject>): VObject {
         val requiredArgs = parameters.indexOfFirst { it.defaultValue != null }.let {
             if (it == -1) args.size else it
         }
@@ -29,11 +30,11 @@ class FunctionNode(
             notImplemented()
 
         try {
-            val scope = VObject()
+            val scope = interp.runtime.construct(VObjectType)
 
             parameters.forEachIndexed { index, node ->
                 val value = if (index < args.size) args[index] else node.defaultValue!!.execute(interp)
-                scope[node.identifier.identifier] = value
+                scope.putSlot(node.identifier.identifier, value)
             }
 
             interp.pushScope(scope)
@@ -50,7 +51,7 @@ class FunctionNode(
 
     override fun execute(interp: Interpreter): VObject {
         val scope = interp.getScope()
-        scope[identifier.identifier] = VFunctionWrapper(identifier.identifier, this)
+        scope.putSlot(identifier.identifier, VMethod(this))
         return VNone
     }
 

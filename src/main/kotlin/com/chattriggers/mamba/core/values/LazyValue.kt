@@ -1,5 +1,7 @@
 package com.chattriggers.mamba.core.values
 
+import com.chattriggers.mamba.core.values.base.VObject
+
 /**
  * This class allowed VObjects to be delegated and handled
  * separately.

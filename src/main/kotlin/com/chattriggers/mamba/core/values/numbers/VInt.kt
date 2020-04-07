@@ -1,8 +1,14 @@
 package com.chattriggers.mamba.core.values.numbers
 
 import com.chattriggers.mamba.core.values.LazyValue
-import com.chattriggers.mamba.core.values.VObject
-import com.chattriggers.mamba.core.values.VType
+import com.chattriggers.mamba.core.values.base.VObject
+import com.chattriggers.mamba.core.values.base.VObjectType
+import com.chattriggers.mamba.core.values.base.VType
+import com.chattriggers.mamba.core.values.base.Wrapper
+import com.chattriggers.mamba.core.values.collections.VTuple
+import com.chattriggers.mamba.core.values.exceptions.notImplemented
+import com.chattriggers.mamba.core.values.singletons.VNone
+import com.chattriggers.mamba.core.values.singletons.toValue
 import kotlin.math.ceil
 import kotlin.math.ln
 
@@ -12,66 +18,126 @@ open class VInt(val int: Int, type: LazyValue<VType> = LazyValue("VIntType") { V
     override fun toString() = int.toString()
 }
 
-object VIntType : VType(LazyValue("VComplexType") { VComplexType }) {
+object VIntType : VType(LazyValue("VObjectType") { VObjectType }) {
     init {
-        addMethodDescriptor("bit_length") {
+        addMethod("bit_length") {
             val self = assertSelfAs<VInt>()
             ceil(ln(self.int.toDouble()) / ln(2.toDouble())).toInt().toValue()
         }
 
-        // Magic methods
-        addMethodDescriptor("__and__") {
+        addMethod("__and__") {
             val self = assertSelfAs<VInt>()
             val other = assertArgAs<VInt>(1)
 
-            VInt(self.int and other.int)
+            runtime.construct(VIntType, listOf(Wrapper(self.int and other.int)))
         }
-        addMethodDescriptor("__ceil__") {
+        addMethod("__ceil__") {
             argument(0)
         }
-        addMethodDescriptor("__floor__") {
+        addMethod("__floor__") {
             argument(0)
         }
-        addMethodDescriptor("__invert__") {
+        addMethod("__invert__") {
             val self = assertSelfAs<VInt>()
-            VInt(self.int.inv())
+            runtime.construct(VIntType, listOf(Wrapper(self.int.inv())))
         }
-        addMethodDescriptor("__lshift__") {
-            val self = assertSelfAs<VInt>()
-            val other = assertArgAs<VInt>(1)
-            VInt(self.int shl other.int)
-        }
-        addMethodDescriptor("__rand__") {
-            argument(1).callProperty(interp, "__and__", listOf(argument(0)))
-        }
-        addMethodDescriptor("__rlshift__") {
-            argument(1).callProperty(interp, "__lshift__", listOf(argument(0)))
-        }
-        addMethodDescriptor("__rrshift__") {
-            argument(1).callProperty(interp, "__rshift__", listOf(argument(0)))
-        }
-        addMethodDescriptor("__rshift__") {
+        addMethod("__lshift__") {
             val self = assertSelfAs<VInt>()
             val other = assertArgAs<VInt>(1)
-            VInt(self.int shr other.int)
+            runtime.construct(VIntType, listOf(Wrapper(self.int shl other.int)))
         }
-        addMethodDescriptor("__ror__") {
-            argument(1).callProperty(interp, "__or__", listOf(argument(0)))
+        addMethod("__neg__") {
+            runtime.construct(VIntType, listOf(Wrapper(-assertSelfAs<VInt>().int)))
         }
-        addMethodDescriptor("__rxor__") {
-            argument(1).callProperty(interp, "__xor__", listOf(argument(0)))
+        addMethod("__rand__") {
+            runtime.callProperty(argument(1), "__and__", listOf(argument(0)))
         }
-        addMethodDescriptor("__or__") {
+        addMethod("__rlshift__") {
+            runtime.callProperty(argument(1), "__lshift__", listOf(argument(0)))
+        }
+        addMethod("__rrshift__") {
+            runtime.callProperty(argument(1), "__rshift__", listOf(argument(0)))
+        }
+        addMethod("__rshift__") {
             val self = assertSelfAs<VInt>()
             val other = assertArgAs<VInt>(1)
+            runtime.construct(VIntType, listOf(Wrapper(self.int shr other.int)))
+        }
+        addMethod("__ror__") {
+            runtime.callProperty(argument(1), "__or__", listOf(argument(0)))
+        }
+        addMethod("__rxor__") {
+            runtime.callProperty(argument(1), "__xor__", listOf(argument(0)))
+        }
+        addMethod("__or__") {
+            val self = assertSelfAs<VInt>()
+            val other = assertArgAs<VInt>(1)
+            runtime.construct(VIntType, listOf(Wrapper(self.int or other.int)))
+        }
+        addMethod("__add__") {
+            val self = assertSelfAs<VInt>()
+            val other = assertArgAs<VInt>(1)
+            runtime.construct(VIntType, listOf(Wrapper(self.int + other.int)))
+        }
+        addMethod("__sub__", id = "int_sub") {
+            val self = assertSelfAs<VInt>()
+            val other = assertArgAs<VInt>(1)
+            runtime.construct(VIntType, listOf(Wrapper(self.int - other.int)))
+        }
+        addMethod("__xor__") {
+            val self = assertSelfAs<VInt>()
+            val other = assertArgAs<VInt>(1)
+            runtime.construct(VIntType, listOf(Wrapper(self.int xor other.int)))
+        }
+        addMethod("__call__") {
+            runtime.construct(VIntType, arguments())
+        }
+        addMethod("__new__") {
+            val type = assertArgAs<VType>(0)
 
-            VInt(self.int or other.int)
-        }
-        addMethodDescriptor("__xor__") {
-            val self = assertSelfAs<VInt>()
-            val other = assertArgAs<VInt>(1)
+            if (type !is VIntType) {
+                notImplemented()
+            }
 
-            VInt(self.int xor other.int)
+            var num = 0
+
+            if (argSize > 0) {
+                num = when (val v = argumentRaw(1)) {
+                    is Wrapper -> v.value as Int
+                    is VObject -> runtime.toInt(v)
+                    else -> notImplemented("Error")
+                }
+            }
+
+            VInt(num)
+        }
+        addMethod("__init__") {
+            VNone
+        }
+        addMethod("__eq__") {
+            val (selfWide, otherWide) = widenFirstArgs()
+
+            when {
+                selfWide is VComplex && otherWide is VComplex ->
+                    (selfWide.real == otherWide.real && selfWide.imag == otherWide.imag).toValue()
+                selfWide is VFloat && otherWide is VFloat ->
+                    (selfWide.double == otherWide.double).toValue()
+                selfWide is VInt && otherWide is VInt ->
+                    (selfWide.int == otherWide.int).toValue()
+                else -> throw IllegalStateException("Expected widened numbers to have same type")
+            }
+        }
+        addMethod("__lt__") {
+            val (selfWide, otherWide) = widenFirstArgs()
+
+            when {
+                selfWide is VComplex && otherWide is VComplex -> notImplemented("TypeError")
+                selfWide is VFloat && otherWide is VFloat ->
+                    (selfWide.double < otherWide.double).toValue()
+                selfWide is VInt && otherWide is VInt ->
+                    (selfWide.int < otherWide.int).toValue()
+                else -> throw IllegalStateException("Expected widened numbers to have same type")
+            }
         }
     }
 }

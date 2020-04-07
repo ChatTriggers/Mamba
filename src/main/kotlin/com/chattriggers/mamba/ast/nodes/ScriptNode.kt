@@ -2,9 +2,8 @@ package com.chattriggers.mamba.ast.nodes
 
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.singletons.VNone
-import com.chattriggers.mamba.core.values.VObject
+import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.ast.nodes.statements.StatementNode
-import com.chattriggers.mamba.core.CallFrame
 import com.chattriggers.mamba.core.values.exceptions.MambaException
 
 class ScriptNode(private val statements: List<StatementNode>) : Node(1, statements) {

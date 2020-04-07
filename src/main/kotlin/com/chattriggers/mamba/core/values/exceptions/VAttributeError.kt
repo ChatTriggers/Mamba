@@ -5,26 +5,29 @@ import com.chattriggers.mamba.core.values.base.VType
 import com.chattriggers.mamba.core.values.collections.VTuple
 import com.chattriggers.mamba.core.values.collections.toValue
 import com.chattriggers.mamba.core.values.singletons.VNone
+import com.chattriggers.mamba.core.values.toValue
 
-class VSyntaxError(args: VTuple) : VException(args, LazyValue("VSyntaxErrorType") { VSyntaxErrorType }) {
-    override val className = "SyntaxError"
+class VAttributeError(args: VTuple) : VException(args, LazyValue("VAttributeErrorType") { VAttributeErrorType }) {
+    override val className = "AttributeError"
 
-    constructor() : this(VTuple())
+    constructor(identifier: String, type: String) : this(VTuple(
+        "'$type' object has no attribute '$identifier'".toValue()
+    ))
 }
 
-object VSyntaxErrorType : VType(LazyValue("VExceptionType") { VExceptionType }) {
+object VAttributeErrorType : VType(LazyValue("VExceptionType") { VExceptionType }) {
     init {
         addMethod("__call__") {
-            runtime.construct(VSyntaxErrorType, arguments())
+            runtime.construct(VAttributeErrorType, arguments())
         }
         addMethod("__new__") {
             val type = assertArgAs<VType>(0)
 
-            if (type !is VSyntaxErrorType) {
+            if (type !is VAttributeErrorType) {
                 notImplemented()
             }
 
-            VSyntaxError(arguments().toValue())
+            VAttributeError(arguments().toValue())
         }
         addMethod("__init__") {
             VNone

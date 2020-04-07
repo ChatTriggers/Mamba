@@ -4,7 +4,7 @@ import com.chattriggers.mamba.api.ArithmeticOperator
 import com.chattriggers.mamba.api.ComparisonOperator
 import com.chattriggers.mamba.api.UnaryOperator
 import com.chattriggers.mamba.core.Interpreter
-import com.chattriggers.mamba.core.values.VObject
+import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import com.chattriggers.mamba.core.values.singletons.toValue
 
@@ -119,9 +119,9 @@ class UnaryExpressionNode(
         val value = child.execute(interp)
 
         return when (op) {
-            UnaryOperator.NEG -> value.callProperty(interp, "__neg__")
-            UnaryOperator.POS -> value.callProperty(interp, "__pos__")
-            UnaryOperator.INVERT -> value.callProperty(interp, "__invert__")
+            UnaryOperator.NEG -> interp.runtime.callProperty(value, "__neg__")
+            UnaryOperator.POS -> interp.runtime.callProperty(value, "__pos__")
+            UnaryOperator.INVERT -> interp.runtime.callProperty(value, "__invert__")
         }
     }
 
