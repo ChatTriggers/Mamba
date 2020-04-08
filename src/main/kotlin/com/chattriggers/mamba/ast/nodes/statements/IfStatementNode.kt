@@ -1,9 +1,9 @@
 package com.chattriggers.mamba.ast.nodes.statements
 
-import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.ast.nodes.Node
 import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
+import com.chattriggers.mamba.core.ThreadContext
 
 enum class IfConditionalNodeType {
     IF,
@@ -38,21 +38,21 @@ class IfStatementNode(
         }
     }
 
-    override fun execute(interp: Interpreter): VObject {
-        val rt = interp.runtime
-        var ifCond = ifBlock.condition.execute(interp)
+    override fun execute(ctx: ThreadContext): VObject {
+        val rt = ctx.runtime
+        var ifCond = ifBlock.condition.execute(ctx)
 
         if (rt.toBoolean(ifCond)) {
-            return executeStatements(interp, ifBlock.body)
+            return executeStatements(ctx, ifBlock.body)
         }
 
         for (elifBlock in elifBlocks) {
-            ifCond = elifBlock.condition.execute(interp)
+            ifCond = elifBlock.condition.execute(ctx)
             if (rt.toBoolean(ifCond))
-                return executeStatements(interp, elifBlock.body)
+                return executeStatements(ctx, elifBlock.body)
         }
 
-        return executeStatements(interp, elseBlock)
+        return executeStatements(ctx, elseBlock)
     }
 
     override fun print(indent: Int) {

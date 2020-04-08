@@ -19,7 +19,7 @@ import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.singletons.VNotImplemented
 import com.chattriggers.mamba.core.values.singletons.toValue
 
-class Runtime(val interp: Interpreter) {
+class Runtime(private val ctx: ThreadContext) {
     fun toBoolean(value: VObject): Boolean {
         return when {
             value is VNone || value is VFalse -> false
@@ -96,7 +96,7 @@ class Runtime(val interp: Interpreter) {
 
     fun call(obj: VObject, args: List<Value>): VObject {
         if (obj is IMethod)
-            return obj.call(interp, args)
+            return obj.call(ctx, args)
 
         if (obj.containsSlot("__call__"))
             return callProperty(obj, "__call__", args)

@@ -2,11 +2,10 @@ package com.chattriggers.mamba.ast.nodes.statements
 
 import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
 import com.chattriggers.mamba.ast.nodes.expressions.IdentifierNode
-import com.chattriggers.mamba.core.Interpreter
+import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.VBreakWrapper
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.VReturnWrapper
-import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.exceptions.MambaException
 import com.chattriggers.mamba.core.values.exceptions.VStopIteration
 import com.chattriggers.mamba.core.values.exceptions.notImplemented
@@ -19,8 +18,8 @@ class ForStatementNode(
     private val body: List<StatementNode>,
     private val elseBlock: List<StatementNode>
 ) : StatementNode(lineNumber, listOf(targetNode, iterableNode) + body + elseBlock) {
-    override fun execute(interp: Interpreter): VObject {
-        val iterator = interp.runtime.getIterator(iterableNode.execute(interp))
+    override fun execute(ctx: ThreadContext): VObject {
+        val iterator = ctx.runtime.getIterator(iterableNode.execute(ctx))
 
         if (targetNode !is IdentifierNode)
             notImplemented()
@@ -31,11 +30,11 @@ class ForStatementNode(
 
         try {
             while (true) {
-                val nextValue = interp.runtime.getIterableNext(iterator)
+                val nextValue = ctx.runtime.getIterableNext(iterator)
 
-                interp.getScope().putSlot(targetName, nextValue)
+                ctx.interp.getScope().putSlot(targetName, nextValue)
 
-                when (val execResult = executeStatements(interp, body)) {
+                when (val execResult = executeStatements(ctx, body)) {
                     VBreakWrapper -> didBreak = true
                     is VReturnWrapper -> return execResult
                 }
@@ -49,7 +48,7 @@ class ForStatementNode(
         }
 
         if (!didBreak && elseBlock.isNotEmpty()) {
-            return executeStatements(interp, elseBlock)
+            return executeStatements(ctx, elseBlock)
         }
 
         return VNone

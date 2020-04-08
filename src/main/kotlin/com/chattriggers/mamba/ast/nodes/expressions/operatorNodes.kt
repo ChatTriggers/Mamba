@@ -3,7 +3,7 @@ package com.chattriggers.mamba.ast.nodes.expressions
 import com.chattriggers.mamba.api.ArithmeticOperator
 import com.chattriggers.mamba.api.ComparisonOperator
 import com.chattriggers.mamba.api.UnaryOperator
-import com.chattriggers.mamba.core.Interpreter
+import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import com.chattriggers.mamba.core.values.singletons.toValue
@@ -45,10 +45,10 @@ class ComparisonNode(
     private val left: ExpressionNode,
     private val right: ExpressionNode
 ) : ExpressionNode(lineNumber, listOf(left, right)) {
-    override fun execute(interp: Interpreter): VObject {
-        val rt = interp.runtime
-        val leftValue = left.execute(interp)
-        val rightValue = right.execute(interp)
+    override fun execute(ctx: ThreadContext): VObject {
+        val rt = ctx.runtime
+        val leftValue = left.execute(ctx)
+        val rightValue = right.execute(ctx)
 
         return when (op) {
             ComparisonOperator.LT -> rt.valueCompare("__lt__", leftValue, rightValue)
@@ -80,10 +80,10 @@ class ArithmeticExpressionNode(
     private val left: ExpressionNode,
     private val right: ExpressionNode
 ) : ExpressionNode(lineNumber, listOf(left, right)) {
-    override fun execute(interp: Interpreter): VObject {
-        val rt = interp.runtime
-        val leftValue = left.execute(interp)
-        val rightValue = right.execute(interp)
+    override fun execute(ctx: ThreadContext): VObject {
+        val rt = ctx.runtime
+        val leftValue = left.execute(ctx)
+        val rightValue = right.execute(ctx)
 
         return when (op) {
             ArithmeticOperator.ADD -> rt.valueArithmetic("__add__", "__radd__", leftValue, rightValue)
@@ -115,13 +115,13 @@ class UnaryExpressionNode(
     private val op: UnaryOperator,
     private val child: ExpressionNode
 ) : ExpressionNode(lineNumber, child) {
-    override fun execute(interp: Interpreter): VObject {
-        val value = child.execute(interp)
+    override fun execute(ctx: ThreadContext): VObject {
+        val value = child.execute(ctx)
 
         return when (op) {
-            UnaryOperator.NEG -> interp.runtime.callProperty(value, "__neg__")
-            UnaryOperator.POS -> interp.runtime.callProperty(value, "__pos__")
-            UnaryOperator.INVERT -> interp.runtime.callProperty(value, "__invert__")
+            UnaryOperator.NEG -> ctx.runtime.callProperty(value, "__neg__")
+            UnaryOperator.POS -> ctx.runtime.callProperty(value, "__pos__")
+            UnaryOperator.INVERT -> ctx.runtime.callProperty(value, "__invert__")
         }
     }
 

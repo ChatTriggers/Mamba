@@ -1,6 +1,6 @@
 package com.chattriggers.mamba.core.values.base
 
-import com.chattriggers.mamba.core.Interpreter
+import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.Value
 
 /**
@@ -11,7 +11,7 @@ import com.chattriggers.mamba.core.values.Value
 interface IMethod {
     var self: VObject?
 
-    fun call(interp: Interpreter, args: List<Value>): VObject
+    fun call(ctx: ThreadContext, args: List<Value>): VObject
 
     fun bind(newSelf: VObject): VObject
 }

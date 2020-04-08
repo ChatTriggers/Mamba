@@ -1,13 +1,13 @@
 package com.chattriggers.mamba.ast.nodes.expressions.literals
 
-import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.collections.VTuple
 import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
+import com.chattriggers.mamba.core.ThreadContext
 
 class TupleLiteral(lineNumber: Int, private val elements: List<ExpressionNode>) : ExpressionNode(lineNumber, elements) {
-    override fun execute(interp: Interpreter) = when (elements.size) {
+    override fun execute(ctx: ThreadContext) = when (elements.size) {
         0 -> VTuple.EMPTY_TUPLE
-        else -> VTuple(elements.map { it.execute(interp) })
+        else -> VTuple(elements.map { it.execute(ctx) })
     }
 
     override fun print(indent: Int) {

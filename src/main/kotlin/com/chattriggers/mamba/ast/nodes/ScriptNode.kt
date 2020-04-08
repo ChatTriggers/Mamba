@@ -1,24 +1,24 @@
 package com.chattriggers.mamba.ast.nodes
 
-import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.ast.nodes.statements.StatementNode
+import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.exceptions.MambaException
 
 class ScriptNode(private val statements: List<StatementNode>) : Node(1, statements) {
-    override fun execute(interp: Interpreter): VObject {
+    override fun execute(ctx: ThreadContext): VObject {
         try {
             statements.forEach {
-                it.execute(interp)
+                it.execute(ctx)
             }
         } catch (e: MambaException) {
             println("Traceback (most recent call last):")
 
-            interp.exceptionStack.reversed().forEach {
+            ctx.interp.exceptionStack.reversed().forEach {
                 println(
                     "  File \"${it.file}\", line ${it.lineNumber}, in ${it.source}\n" +
-                    "    ${interp.lines[it.lineNumber - 1].trim()}"
+                    "    ${ctx.interp.lines[it.lineNumber - 1].trim()}"
                 )
             }
 

@@ -1,10 +1,10 @@
 package com.chattriggers.mamba.ast.nodes.statements
 
-import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.VBreakWrapper
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
+import com.chattriggers.mamba.core.ThreadContext
 
 class WhileStatementNode(
     lineNumber: Int,
@@ -12,21 +12,21 @@ class WhileStatementNode(
     private val body: List<StatementNode>,
     private val elseBlock: List<StatementNode>
 ) : StatementNode(lineNumber, listOf(condition) + body + elseBlock) {
-    override fun execute(interp: Interpreter): VObject {
+    override fun execute(ctx: ThreadContext): VObject {
         var broke = false
 
         loop@
-        while (interp.runtime.toBoolean(condition.execute(interp))) {
+        while (ctx.runtime.toBoolean(condition.execute(ctx))) {
             // We don't really need to check for VContinueWrapper
             // here, since it's already the last statement
-            if (executeStatements(interp, body) is VBreakWrapper) {
+            if (executeStatements(ctx, body) is VBreakWrapper) {
                 broke = true
                 break@loop
             }
         }
 
         if (!broke)
-            executeStatements(interp, elseBlock)
+            executeStatements(ctx, elseBlock)
 
         return VNone
     }

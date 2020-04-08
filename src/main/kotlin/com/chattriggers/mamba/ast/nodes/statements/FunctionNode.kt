@@ -1,10 +1,10 @@
 package com.chattriggers.mamba.ast.nodes.statements
 
 import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
-import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.*
 import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.ast.nodes.expressions.IdentifierNode
+import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.base.VMethod
 import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import com.chattriggers.mamba.core.values.base.VObject
@@ -21,7 +21,7 @@ class FunctionNode(
     private val parameters: List<ParameterNode>,
     internal val statements: List<StatementNode>
 ) : StatementNode(lineNumber, listOf(identifier) + statements) {
-    fun call(interp: Interpreter, args: List<VObject>): VObject {
+    fun call(ctx: ThreadContext, args: List<VObject>): VObject {
         val requiredArgs = parameters.indexOfFirst { it.defaultValue != null }.let {
             if (it == -1) args.size else it
         }
@@ -30,27 +30,27 @@ class FunctionNode(
             notImplemented()
 
         try {
-            val scope = interp.runtime.construct(VObjectType)
+            val scope = ctx.runtime.construct(VObjectType)
 
             parameters.forEachIndexed { index, node ->
-                val value = if (index < args.size) args[index] else node.defaultValue!!.execute(interp)
+                val value = if (index < args.size) args[index] else node.defaultValue!!.execute(ctx)
                 scope.putSlot(node.identifier.identifier, value)
             }
 
-            interp.pushScope(scope)
+            ctx.interp.pushScope(scope)
 
-            return when (val returned = executeStatements(interp, statements)) {
+            return when (val returned = executeStatements(ctx, statements)) {
                 is VReturnWrapper -> returned.wrapped
                 is VFlowWrapper -> notImplemented() // Should have been handled by an enclosing node
                 else -> VNone
             }
         } finally {
-            interp.popScope()
+            ctx.interp.popScope()
         }
     }
 
-    override fun execute(interp: Interpreter): VObject {
-        val scope = interp.getScope()
+    override fun execute(ctx: ThreadContext): VObject {
+        val scope = ctx.interp.getScope()
         scope.putSlot(identifier.identifier, VMethod(this))
         return VNone
     }

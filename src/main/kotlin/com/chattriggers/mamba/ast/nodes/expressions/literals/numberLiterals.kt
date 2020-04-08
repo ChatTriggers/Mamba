@@ -1,14 +1,14 @@
 package com.chattriggers.mamba.ast.nodes.expressions.literals
 
-import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.numbers.VComplex
 import com.chattriggers.mamba.core.values.numbers.toValue
 import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
+import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.numbers.VFloatType
 
 class IntegerLiteral(lineNumber: Int, private val num: Int) : ExpressionNode(lineNumber) {
-    override fun execute(interp: Interpreter): VObject = num.toValue()
+    override fun execute(ctx: ThreadContext): VObject = num.toValue()
 
     override fun print(indent: Int) {
         printNodeHeader(indent, this, newLine = false)
@@ -17,7 +17,7 @@ class IntegerLiteral(lineNumber: Int, private val num: Int) : ExpressionNode(lin
 }
 
 class FloatLiteral(lineNumber: Int, private val num: Double) : ExpressionNode(lineNumber) {
-    override fun execute(interp: Interpreter) = interp.runtime.construct(VFloatType, listOf(num))
+    override fun execute(ctx: ThreadContext) = ctx.runtime.construct(VFloatType, listOf(num))
 
     override fun print(indent: Int) {
         printNodeHeader(indent, this, newLine = false)
@@ -26,7 +26,7 @@ class FloatLiteral(lineNumber: Int, private val num: Double) : ExpressionNode(li
 }
 
 class ComplexLiteral(lineNumber: Int, private val imag: Double) : ExpressionNode(lineNumber) {
-    override fun execute(interp: Interpreter) = VComplex(0.0, imag)
+    override fun execute(ctx: ThreadContext) = VComplex(0.0, imag)
 
     override fun print(indent: Int) {
         printNodeHeader(indent, this, newLine = false)

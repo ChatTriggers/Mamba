@@ -9,9 +9,7 @@ import com.chattriggers.mamba.core.values.exceptions.VBaseException
 import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import java.util.*
 
-class Interpreter private constructor(private val script: ScriptNode, val fileName: String, val lines: List<String>) {
-    internal val runtime = Runtime(this)
-
+class Interpreter(val fileName: String, val lines: List<String>) {
     internal val scopeStack: List<VObject>
         get() = scopeStackBacker.reversed()
 
@@ -27,11 +25,11 @@ class Interpreter private constructor(private val script: ScriptNode, val fileNa
         sourceStack.push("<module>")
     }
 
-    private fun execute(): Any {
-        return script.execute(this)
+    fun execute(script: ScriptNode): Any {
+        return script.execute(ThreadContext.currentContext)
     }
 
-    internal fun pushScope(scope: VObject = runtime.construct(VObjectType)) {
+    internal fun pushScope(scope: VObject = ThreadContext.currentContext.runtime.construct(VObjectType)) {
         scopeStackBacker.push(scope)
     }
 
@@ -56,11 +54,5 @@ class Interpreter private constructor(private val script: ScriptNode, val fileNa
     internal fun throwException(exception: VBaseException, lineNumber: Int): Nothing {
         exceptionStack.push(CallFrame(fileName, sourceStack.pop(), lineNumber))
         throw MambaException(exception)
-    }
-
-    companion object {
-        fun execute(node: ScriptNode, fileName: String, lines: List<String>): Any {
-            return Interpreter(node, fileName, lines).execute()
-        }
     }
 }

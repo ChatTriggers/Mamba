@@ -2,12 +2,13 @@ package com.chattriggers.mamba.core.values.base
 
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.Runtime
+import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.Value
 import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import com.chattriggers.mamba.core.values.unwrap
 
-class ClassMethodBuilder(val interp: Interpreter, private val _args: List<Value>) {
-    val runtime = interp.runtime
+class ClassMethodBuilder(val ctx: ThreadContext, private val _args: List<Value>) {
+    val runtime = ctx.runtime
 
     val argSize = _args.size
 

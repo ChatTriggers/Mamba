@@ -5,14 +5,15 @@ import com.chattriggers.mamba.core.values.VFlowWrapper
 import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.ast.nodes.Node
+import com.chattriggers.mamba.core.ThreadContext
 
 open class StatementNode(lineNumber: Int, children: List<Node>): Node(lineNumber, children) {
     constructor(lineNumber: Int, child: Node) : this(lineNumber, listOf(child))
 
     constructor(lineNumber: Int) : this(lineNumber, emptyList())
 
-    override fun execute(interp: Interpreter): VObject {
-        children.forEach { it.execute(interp) }
+    override fun execute(ctx: ThreadContext): VObject {
+        children.forEach { it.execute(ctx) }
         return VNone
     }
 
@@ -22,9 +23,9 @@ open class StatementNode(lineNumber: Int, children: List<Node>): Node(lineNumber
     }
 
     companion object {
-        fun executeStatements(interp: Interpreter, statements: List<StatementNode>): VObject {
+        fun executeStatements(ctx: ThreadContext, statements: List<StatementNode>): VObject {
             for (statement in statements) {
-                val returned = statement.execute(interp)
+                val returned = statement.execute(ctx)
                 if (returned is VFlowWrapper)
                     return returned
             }

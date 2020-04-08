@@ -1,7 +1,7 @@
 package com.chattriggers.mamba.core.values.base
 
 import com.chattriggers.mamba.ast.nodes.statements.FunctionNode
-import com.chattriggers.mamba.core.Interpreter
+import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.LazyValue
 import com.chattriggers.mamba.core.values.Value
 import com.chattriggers.mamba.core.values.exceptions.MambaException
@@ -34,10 +34,10 @@ class VNativeMethod(
         return VNativeMethod(method, newSelf)
     }
 
-    override fun call(interp: Interpreter, args: List<Value>): VObject {
+    override fun call(ctx: ThreadContext, args: List<Value>): VObject {
         return when (val s = self) {
-            null -> method(ClassMethodBuilder(interp, args))
-            else -> method(ClassMethodBuilder(interp, listOf(s) + args))
+            null -> method(ClassMethodBuilder(ctx, args))
+            else -> method(ClassMethodBuilder(ctx, listOf(s) + args))
         }
     }
 }
@@ -45,7 +45,7 @@ class VNativeMethod(
 object VNativeMethodType : VType(LazyValue("VObjectType") { VObjectType }) {
     init {
         addMethod("__call__") {
-            assertSelfAs<VNativeMethod>().call(interp, arguments())
+            assertSelfAs<VNativeMethod>().call(ctx, arguments())
         }
     }
 }
@@ -59,10 +59,10 @@ class VMethod(
         return VMethod(method, newSelf)
     }
 
-    override fun call(interp: Interpreter, args: List<Value>): VObject {
+    override fun call(ctx: ThreadContext, args: List<Value>): VObject {
         return when (val s = self) {
-            null -> method.call(interp, args.map(Value::unwrap))
-            else -> method.call(interp, listOf(s) + args.map(Value::unwrap))
+            null -> method.call(ctx, args.map(Value::unwrap))
+            else -> method.call(ctx, listOf(s) + args.map(Value::unwrap))
         }
     }
 }
@@ -70,7 +70,7 @@ class VMethod(
 object VMethodType: VType(LazyValue("VObjectType") { VObjectType }) {
     init {
         addMethod("__call__") {
-            assertSelfAs<VMethod>().method.call(interp, arguments())
+            assertSelfAs<VMethod>().method.call(ctx, arguments())
         }
     }
 }
