@@ -1,6 +1,7 @@
 package com.chattriggers.mamba.core.values.collections
 
 import com.chattriggers.mamba.core.Runtime
+import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.LazyValue
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
@@ -9,6 +10,8 @@ import com.chattriggers.mamba.core.values.exceptions.MambaException
 import com.chattriggers.mamba.core.values.exceptions.VStopIteration
 import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import com.chattriggers.mamba.core.values.singletons.VNone
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 class VList(val list: MutableList<VObject>) : VObject(LazyValue("VListType") { VListType }) {
     override val className = "list"
@@ -31,7 +34,7 @@ object VListType : VType(LazyValue("VObjectType") { VObjectType }) {
                 notImplemented()
             }
 
-            val iterable = if (argSize > 0) argument(0) else /* VList.EMPTY_LIST */ VTuple()
+            val iterable = if (argSize > 0) argument(0) else VList(mutableListOf())
 
             if (!Runtime.isIterable(iterable)) {
                 notImplemented("Error")
@@ -57,4 +60,6 @@ object VListType : VType(LazyValue("VObjectType") { VObjectType }) {
     }
 }
 
-fun <T : VObject> MutableList<T>.toValue() = VList(this.toMutableList())
+fun <T : VObject> MutableList<T>.toValue(): VList {
+    return ThreadContext.currentContext.runtime.construct(VListType, listOf(this)) as VList
+}

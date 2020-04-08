@@ -49,42 +49,6 @@ class Runtime(private val ctx: ThreadContext) {
         }
     }
 
-    fun widen(left: VObject, right: VObject): Pair<VObject, VObject> {
-        return widenHelper(left, right) to widenHelper(right, left)
-    }
-
-    private fun widenHelper(self: VObject, other: VObject): VObject {
-        if (self !is VInt && self !is VFloat && self !is VComplex)
-            notImplemented()
-
-        if (other !is VInt && other !is VFloat && other !is VComplex)
-            notImplemented()
-
-        return when (other) {
-            is VComplex -> when (self) {
-                is VComplex -> self
-                is VFloat -> VComplex(
-                    self.double,
-                    0.0
-                )
-                is VInt -> VComplex(
-                    self.int.toDouble(),
-                    0.0
-                )
-                else -> notImplemented()
-            }
-            is VFloat -> when (self) {
-                is VComplex, is VFloat -> self
-                is VInt -> VFloat(
-                    self.int.toDouble()
-                )
-                else -> notImplemented()
-            }
-            is VInt -> self
-            else -> notImplemented()
-        }
-    }
-
     fun callProperty(obj: VObject, property: String, args: List<Value> = emptyList()): VObject {
         return callProperty(obj, property.toValue(), args)
     }

@@ -1,6 +1,7 @@
 package com.chattriggers.mamba.core.values.collections
 
 import com.chattriggers.mamba.core.Runtime
+import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.*
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
@@ -44,7 +45,7 @@ object VDictType : VType(LazyValue("VObjectType") { VObjectType }) {
                 notImplemented()
             }
 
-            val iterable = if (argSize > 0) argument(0) else /* VList.EMPTY_LIST */ VTuple()
+            val iterable = if (argSize > 0) argument(0) else VDict(mutableMapOf())
 
             if (!Runtime.isIterable(iterable)) {
                 notImplemented("Error")
@@ -95,4 +96,5 @@ object VDictType : VType(LazyValue("VObjectType") { VObjectType }) {
     }
 }
 
-fun Map<String, VObject>.toValue() = VDict(this.toMutableMap())
+fun Map<String, VObject>.toValue() =
+    ThreadContext.currentContext.runtime.construct(VDictType, listOf(this.toMutableMap()))

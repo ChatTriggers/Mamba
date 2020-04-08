@@ -1,6 +1,7 @@
 package com.chattriggers.mamba.core.values.base
 
 import com.chattriggers.mamba.ast.nodes.statements.FunctionNode
+import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.LazyValue
 import com.chattriggers.mamba.core.values.toValue
 
@@ -38,11 +39,23 @@ open class VType : VObject {
     }
 
     protected fun addMethod(key: VObject, isStatic: Boolean = false, isWritable: Boolean = false, id: String? = null, method: NativeClassMethod) {
-        slotMap[key] = Slot(key, VNativeMethod(method), isStatic, isWritable, id)
+        slotMap[key] = Slot(
+            key,
+            ThreadContext.currentContext.runtime.construct(VNativeMethodType, listOf(method)),
+            isStatic,
+            isWritable,
+            id
+        )
     }
 
     protected fun addMethod(key: VObject, method: FunctionNode, isStatic: Boolean = false, isWritable: Boolean = false, id: String? = null) {
-        slotMap[key] = Slot(key, VMethod(method), isStatic, isWritable, id)
+        slotMap[key] = Slot(
+            key,
+            ThreadContext.currentContext.runtime.construct(VMethodType, listOf(method)),
+            isStatic,
+            isWritable,
+            id
+        )
     }
 }
 

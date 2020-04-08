@@ -1,5 +1,6 @@
 package com.chattriggers.mamba.core.values.numbers
 
+import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.LazyValue
 import com.chattriggers.mamba.core.values.VStringType
 import com.chattriggers.mamba.core.values.base.VObject
@@ -288,4 +289,4 @@ object VIntType : VType(LazyValue("VObjectType") { VObjectType }) {
     }
 }
 
-fun Int.toValue() = VInt(this)
+fun Int.toValue() = ThreadContext.currentContext.runtime.construct(VIntType, listOf(this))

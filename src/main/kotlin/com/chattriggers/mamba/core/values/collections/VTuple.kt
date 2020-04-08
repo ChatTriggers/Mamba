@@ -1,6 +1,7 @@
 package com.chattriggers.mamba.core.values.collections
 
 import com.chattriggers.mamba.core.Runtime
+import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.LazyValue
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
@@ -24,7 +25,7 @@ class VTuple(val items: List<VObject>) : VObject(LazyValue("VTupleType") { VTupl
     }
 
     companion object {
-        val EMPTY_TUPLE = VTuple(emptyList())
+        val EMPTY_TUPLE = ThreadContext.currentContext.runtime.construct(VTupleType, emptyList())
     }
 }
 
@@ -43,7 +44,11 @@ object VTupleType : VType(LazyValue("VObjectType") { VObjectType }) {
                 notImplemented()
             }
 
-            val iterable = if (argSize > 0) argument(0) else /* VTuple.EMPTY_TUPLE */ VTuple()
+            if (argSize == 0) {
+                return@addMethod VTuple.EMPTY_TUPLE
+            }
+
+            val iterable = argument(0)
 
             if (!Runtime.isIterable(iterable)) {
                 notImplemented("Error")
@@ -69,4 +74,4 @@ object VTupleType : VType(LazyValue("VObjectType") { VObjectType }) {
     }
 }
 
-fun <T : VObject> List<T>.toValue() = VTuple(this)
+fun <T : VObject> List<T>.toValue() = ThreadContext.currentContext.runtime.construct(VTupleType, listOf(this)) as VTuple

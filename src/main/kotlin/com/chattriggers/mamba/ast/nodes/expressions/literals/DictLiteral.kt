@@ -6,6 +6,7 @@ import com.chattriggers.mamba.core.values.collections.VDict
 import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
 import com.chattriggers.mamba.ast.nodes.expressions.IdentifierNode
 import com.chattriggers.mamba.core.ThreadContext
+import com.chattriggers.mamba.core.values.collections.VDictType
 import com.chattriggers.mamba.core.values.exceptions.notImplemented
 
 class DictLiteral(
@@ -13,16 +14,16 @@ class DictLiteral(
     private val dict: Map<ExpressionNode, ExpressionNode>
 ) : ExpressionNode(lineNumber, (dict.keys + dict.values).toList()) {
     override fun execute(ctx: ThreadContext): VObject {
-        return VDict(
-            dict.mapKeys { (key) ->
-                if (key !is IdentifierNode && key !is StringLiteral)
-                    notImplemented()
+        val map = dict.mapKeys { (key) ->
+            if (key !is IdentifierNode && key !is StringLiteral)
+                notImplemented()
 
-                (key.execute(ctx) as VString).string
-            }.mapValues { (_, value) ->
-                value.execute(ctx)
-            }.toMutableMap()
-        )
+            (key.execute(ctx) as VString).string
+        }.mapValues { (_, value) ->
+            value.execute(ctx)
+        }.toMutableMap()
+
+        return ctx.runtime.construct(VDictType, listOf(map))
     }
 
     override fun print(indent: Int) {

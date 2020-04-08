@@ -52,17 +52,6 @@ object VRangeType : VType(LazyValue("VObjectType") { VObjectType }) {
             runtime.construct(VRangeIteratorType, listOf(assertSelfAs<VRange>()))
         }
         addMethod("__call__") {
-            val first = assertArgAs<VInt>(0)
-            val second = argAs<VInt>(1)
-            val third = argAs<VInt>(2)
-
-            when {
-                second == null -> VRange(first.int)
-                third == null -> VRange(first.int, second.int)
-                else -> VRange(first.int, second.int, third.int)
-            }
-        }
-        addMethod("__call__") {
             runtime.construct(VRangeType, arguments())
         }
         addMethod("__new__") {
@@ -87,5 +76,3 @@ object VRangeType : VType(LazyValue("VObjectType") { VObjectType }) {
         }
     }
 }
-
-//fun ClosedRange = VRange(this.toMutableMap())
