@@ -37,6 +37,12 @@ class ClassMethodBuilder(val interp: Interpreter, private val _args: List<Value>
     inline fun <reified T : VObject> assertSelfAs(): T {
         return assertArgAs(0)
     }
+
+    fun construct(type: VType, vararg args: Any): VObject {
+        return runtime.construct(type, args.map {
+            if (it !is VObject) Wrapper(it) else it
+        })
+    }
 }
 
 typealias NativeClassMethod = ClassMethodBuilder.() -> VObject

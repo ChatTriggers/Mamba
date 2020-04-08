@@ -1,19 +1,12 @@
 package com.chattriggers.mamba.core.values.numbers
 
 import com.chattriggers.mamba.core.values.*
-import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.base.VType
 import com.chattriggers.mamba.core.values.base.Wrapper
-import com.chattriggers.mamba.core.values.collections.toValue
-import com.chattriggers.mamba.core.values.exceptions.VArithmeticError
-import com.chattriggers.mamba.core.values.exceptions.VArithmeticErrorType
-import com.chattriggers.mamba.core.values.singletons.VFalse
-import com.chattriggers.mamba.core.values.singletons.VNone
-import com.chattriggers.mamba.core.values.singletons.VTrue
-import com.chattriggers.mamba.core.values.singletons.toValue
-import java.lang.IllegalStateException
+import com.chattriggers.mamba.core.values.exceptions.*
+import com.chattriggers.mamba.core.values.singletons.*
 import kotlin.math.floor
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -36,12 +29,15 @@ class VComplex(val real: Double, val imag: Double) : VObject(LazyValue("VComplex
 
         return "$r$op${i}j"
     }
+
+    operator fun component1() = real
+    operator fun component2() = imag
 }
 
 object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
     init {
         addMethod("__call__") {
-            runtime.construct(VComplexType, arguments())
+            construct(VComplexType, *arguments().toTypedArray())
         }
         addMethod("__new__") {
             val type = assertArgAs<VType>(0)
@@ -77,7 +73,7 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
 
         addMethod("conjugate") {
             when (val self = argument(0)) {
-                is VComplex -> runtime.construct(VComplexType, listOf(Wrapper(self.real), Wrapper(-self.imag)))
+                is VComplex -> construct(VComplexType, self.real, -self.imag)
                 is VFloat, is VInt -> self
                 else -> notImplemented()
             }
@@ -85,197 +81,83 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
 
         // Magic methods
         addMethod("__abs__") {
-            when (val self = argument(0)) {
-                is VComplex -> sqrt(self.real.pow(2.0) + self.imag.pow(2.0))
-                is VFloat -> self.double
-                is VInt -> self.int.toDouble()
-                else -> notImplemented()
-            }.toValue()
+            assertSelfAs<VComplex>().let { self ->
+                sqrt(self.real.pow(2.0) + self.imag.pow(2.0))
+            }.let {
+                construct(VFloatType, it)
+            }
         }
         addMethod("__add__") {
-            val (selfWide, otherWide) = widenFirstArgs()
+            val (real, imag) = assertSelfAs<VComplex>()
 
-            when {
-                selfWide is VComplex && otherWide is VComplex -> runtime.construct(VComplexType, listOf(
-                    Wrapper(selfWide.real + otherWide.real),
-                    Wrapper(selfWide.imag + otherWide.imag)
-                ))
-                selfWide is VFloat && otherWide is VFloat -> runtime.construct(VFloatType, listOf(
-                    Wrapper(selfWide.double + otherWide.double)
-                ))
-                selfWide is VInt && otherWide is VInt -> runtime.construct(VIntType, listOf(
-                    Wrapper(selfWide.int + otherWide.int)
-                ))
-                else -> throw IllegalStateException("Expected widened numbers to have same type")
+            when (val other = assertArgAs<VObject>(1)) {
+                is VInt -> real + other.int to imag
+                is VFloat -> real + other.double to imag
+                is VComplex -> real + other.real to imag + other.imag
+                else -> notImplemented("Error")
+            }.let {
+                construct(VComplexType, it.first, it.second)
             }
         }
         addMethod("__bool__") {
-            when (val self = argument(0)) {
-                is VComplex -> if (self.real == 0.0 && self.imag == 0.0) VFalse else VTrue
-                is VFloat -> if (self.double == 0.0) VFalse else VTrue
-                is VInt -> if (self.int == 0) VFalse else VTrue
-                else -> throw IllegalStateException("Expected widened numbers to have same type")
+            assertSelfAs<VComplex>().let { self ->
+                if (self.real == 0.0 && self.imag == 0.0) VFalse else VTrue
             }
         }
+        addMethod("__divmod__") {
+            throw MambaException(VTypeError("TODO: Error"))
+        }
         addMethod("__eq__") {
-            val (selfWide, otherWide) = widenFirstArgs()
+            val (real, imag) = assertSelfAs<VComplex>()
 
-            when {
-                selfWide is VComplex && otherWide is VComplex ->
-                    (selfWide.real == otherWide.real && selfWide.imag == otherWide.imag).toValue()
-                selfWide is VFloat && otherWide is VFloat ->
-                    (selfWide.double == otherWide.double).toValue()
-                selfWide is VInt && otherWide is VInt ->
-                    (selfWide.int == otherWide.int).toValue()
-                else -> throw IllegalStateException("Expected widened numbers to have same type")
+            when (val other = assertArgAs<VObject>(1)) {
+                is VInt -> real == other.int.toDouble() && imag == 0.0
+                is VFloat -> real == other.double && imag == 0.0
+                is VComplex -> real == other.real && imag == other.imag
+                else -> notImplemented("Error")
+            }.let {
+                construct(VBoolType, it)
             }
         }
         addMethod("__float__") {
-            when (val self = argument(0)) {
-                is VComplex -> notImplemented("TypeError")
-                is VFloat -> self
-                is VInt -> runtime.construct(VFloatType, listOf(Wrapper(self.int.toDouble())))
-                else -> throw IllegalStateException("Expected widened numbers to have same type")
-            }
+            throw MambaException(VTypeError("can't convert complex to float"))
         }
         addMethod("__floordiv__") {
-            val (selfWide, otherWide) = widenFirstArgs()
-
-            when {
-                selfWide is VComplex && otherWide is VComplex -> notImplemented("TypeError")
-                selfWide is VFloat && otherWide is VFloat -> runtime.construct(VFloatType, listOf(
-                    Wrapper(floor(selfWide.double / otherWide.double))
-                ))
-                selfWide is VInt && otherWide is VInt -> runtime.construct(VIntType, listOf(
-                    Wrapper(selfWide.int / otherWide.int)
-                ))
-                else -> throw IllegalStateException("Expected widened numbers to have same type")
-            }
+            throw MambaException(VTypeError("can't take floor of complex number"))
         }
         addMethod("__ge__") {
-            val (selfWide, otherWide) = widenFirstArgs()
-
-            when {
-                selfWide is VComplex && otherWide is VComplex -> notImplemented("TypeError")
-                selfWide is VFloat && otherWide is VFloat ->
-                    (selfWide.double >= otherWide.double).toValue()
-                selfWide is VInt && otherWide is VInt ->
-                    (selfWide.int >= otherWide.int).toValue()
-                else -> throw IllegalStateException("Expected widened numbers to have same type")
-            }
+            throw MambaException(VTypeError("TODO: Error"))
         }
         addMethod("__gt__") {
-            val (selfWide, otherWide) = widenFirstArgs()
-
-            when {
-                selfWide is VComplex && otherWide is VComplex -> notImplemented("TypeError")
-                selfWide is VFloat && otherWide is VFloat ->
-                    (selfWide.double > otherWide.double).toValue()
-                selfWide is VInt && otherWide is VInt ->
-                    (selfWide.int > otherWide.int).toValue()
-                else -> throw IllegalStateException("Expected widened numbers to have same type")
-            }
+            throw MambaException(VTypeError("TODO: Error"))
         }
         addMethod("__int__") {
-            when (val self = argument(0)) {
-                is VComplex -> notImplemented("TypeError")
-                is VFloat -> self.double.toInt().toValue()
-                is VInt -> self
-                else -> throw IllegalStateException("Expected widened numbers to have same type")
-            }
+            throw MambaException(VTypeError("can't convert complex to int"))
         }
         addMethod("__le__") {
-            val (selfWide, otherWide) = widenFirstArgs()
-
-            when {
-                selfWide is VComplex && otherWide is VComplex -> notImplemented("TypeError")
-                selfWide is VFloat && otherWide is VFloat ->
-                    (selfWide.double <= otherWide.double).toValue()
-                selfWide is VInt && otherWide is VInt ->
-                    (selfWide.int <= otherWide.int).toValue()
-                else -> throw IllegalStateException("Expected widened numbers to have same type")
-            }
+            throw MambaException(VTypeError("TODO: Error"))
         }
         addMethod("__lt__") {
-            val (selfWide, otherWide) = widenFirstArgs()
-
-            when {
-                selfWide is VComplex && otherWide is VComplex -> notImplemented("TypeError")
-                selfWide is VFloat && otherWide is VFloat ->
-                    (selfWide.double < otherWide.double).toValue()
-                selfWide is VInt && otherWide is VInt ->
-                    (selfWide.int < otherWide.int).toValue()
-                else -> throw IllegalStateException("Expected widened numbers to have same type")
-            }
+            throw MambaException(VTypeError("TODO: Error"))
         }
         addMethod("__mod__") {
-            val (selfWide, otherWide) = widenFirstArgs()
-
-            when {
-                selfWide is VComplex && otherWide is VComplex -> notImplemented("TypeError")
-                selfWide is VFloat && otherWide is VFloat ->
-                    (selfWide.double % otherWide.double).toValue()
-                selfWide is VInt && otherWide is VInt ->
-                    (selfWide.int % otherWide.int).toValue()
-                else -> throw IllegalStateException("Expected widened numbers to have same type")
-            }
+            throw MambaException(VTypeError("TODO: Error"))
         }
         addMethod("__mul__") {
-            val (selfWide, otherWide) = widenFirstArgs()
-
-            when {
-                selfWide is VComplex && otherWide is VComplex -> runtime.construct(VComplexType, listOf(
-                    Wrapper(selfWide.real * otherWide.real - selfWide.imag * otherWide.imag),
-                    Wrapper(selfWide.real * otherWide.imag - selfWide.imag * otherWide.real)
-                ))
-                selfWide is VFloat && otherWide is VFloat ->
-                    (selfWide.double * otherWide.double).toValue()
-                selfWide is VInt && otherWide is VInt ->
-                    (selfWide.int * otherWide.int).toValue()
-                else -> throw IllegalStateException("Expected widened numbers to have same type")
-            }
+            throw MambaException(VTypeError("TODO: Error"))
         }
         addMethod("__ne__") {
-            val (selfWide, otherWide) = widenFirstArgs()
-
-            when {
-                selfWide is VComplex && otherWide is VComplex ->
-                    (selfWide.real != otherWide.real || selfWide.imag != otherWide.imag).toValue()
-                selfWide is VFloat && otherWide is VFloat ->
-                    (selfWide.double != otherWide.double).toValue()
-                selfWide is VInt && otherWide is VInt ->
-                    (selfWide.int != otherWide.int).toValue()
-                else -> throw IllegalStateException("Expected widened numbers to have same type")
-            }
+            throw MambaException(VTypeError("TODO: Error"))
         }
         addMethod("__neg__") {
-            when (val self = argument(0)) {
-                is VComplex -> runtime.construct(VComplexType, listOf(
-                    Wrapper(-self.real),
-                    Wrapper(-self.imag)
-                ))
-                is VFloat -> (-self.double.toInt()).toValue()
-                is VInt -> (-self.int).toValue()
-                else -> throw IllegalStateException("Expected widened numbers to have same type")
-            }
+            val (real, imag) = assertSelfAs<VComplex>()
+            construct(VComplexType, -real, -imag)
         }
         addMethod("__pos__") {
-            when (val self = argument(0)) {
-                is VComplex, is VFloat, is VInt -> self
-                else -> throw IllegalStateException("Expected widened numbers to have same type")
-            }
+            assertSelfAs<VComplex>()
         }
         addMethod("__pow__") {
-            val (selfWide, otherWide) = widenFirstArgs()
-
-            when {
-                selfWide is VComplex && otherWide is VComplex -> notImplemented("Not Implemented")
-                selfWide is VFloat && otherWide is VFloat ->
-                    selfWide.double.pow(otherWide.double).toValue()
-                selfWide is VInt && otherWide is VInt ->
-                    selfWide.int.toDouble().pow(otherWide.int).toInt().toValue()
-                else -> throw IllegalStateException("Expected widened numbers to have same type")
-            }
+            notImplemented("Implement complex power algorithm")
         }
         addMethod("__radd__") {
             runtime.callProperty(argument(1), "__add__", listOf(argument(0)))
@@ -301,38 +183,33 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
         addMethod("__rtruediv__") {
             runtime.callProperty(argument(1), "__truediv__", listOf(argument(0)))
         }
-        addMethod("__sub__", id = "complex_sub") {
-            val (selfWide, otherWide) = widenFirstArgs()
+        addMethod("__sub__") {
+            val (real, imag) = assertSelfAs<VComplex>()
 
-            when {
-                selfWide is VComplex && otherWide is VComplex -> runtime.construct(VComplexType, listOf(
-                    Wrapper(selfWide.real - otherWide.real),
-                    Wrapper(selfWide.imag - otherWide.imag)
-                ))
-                selfWide is VFloat && otherWide is VFloat -> runtime.construct(VFloatType, listOf(
-                    Wrapper(selfWide.double - otherWide.double)
-                ))
-                selfWide is VInt && otherWide is VInt -> runtime.construct(VIntType, listOf(
-                    Wrapper(selfWide.int - otherWide.int)
-                ))
-                else -> throw IllegalStateException("Expected widened numbers to have same type")
+            when (val other = assertArgAs<VObject>(1)) {
+                is VInt -> real - other.int to imag
+                is VFloat -> real - other.double to imag
+                is VComplex -> real - other.real to imag - other.imag
+                else -> notImplemented("Error")
+            }.let {
+                construct(VComplexType, it.first, it.second)
             }
         }
         addMethod("__truediv__") {
-            val (selfWide, otherWide) = widenFirstArgs()
+            val (real, imag) = assertSelfAs<VComplex>()
 
-            when {
-                selfWide is VComplex && otherWide is VComplex -> runtime.construct(VComplexType, listOf(
-                    Wrapper(selfWide.real + otherWide.real),
-                    Wrapper(selfWide.imag + otherWide.imag)
-                ))
-                selfWide is VFloat && otherWide is VFloat -> runtime.construct(VFloatType, listOf(
-                    Wrapper(selfWide.double / otherWide.double)
-                ))
-                selfWide is VInt && otherWide is VInt -> runtime.construct(VFloatType, listOf(
-                    Wrapper(selfWide.int.toDouble() / otherWide.int.toDouble())
-                ))
-                else -> throw IllegalStateException("Expected widened numbers to have same type")
+            when (val other = assertArgAs<VObject>(1)) {
+                is VInt -> real / other.int to imag / other.int
+                is VFloat -> real / other.double to imag / other.double
+                is VComplex -> {
+                    val d = other.real.pow(2.0) + other.imag.pow(2.0)
+                    val r = (real * other.real + imag * other.imag) / d
+                    val i = (imag * other.real - real * other.imag) / d
+                    r to i
+                }
+                else -> notImplemented("Error")
+            }.let {
+                construct(VComplexType, it.first, it.second)
             }
         }
     }

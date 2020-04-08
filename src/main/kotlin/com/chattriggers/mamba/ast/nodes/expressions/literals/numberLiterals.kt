@@ -5,6 +5,7 @@ import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.numbers.VComplex
 import com.chattriggers.mamba.core.values.numbers.toValue
 import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
+import com.chattriggers.mamba.core.values.numbers.VFloatType
 
 class IntegerLiteral(lineNumber: Int, private val num: Int) : ExpressionNode(lineNumber) {
     override fun execute(interp: Interpreter): VObject = num.toValue()
@@ -16,7 +17,7 @@ class IntegerLiteral(lineNumber: Int, private val num: Int) : ExpressionNode(lin
 }
 
 class FloatLiteral(lineNumber: Int, private val num: Double) : ExpressionNode(lineNumber) {
-    override fun execute(interp: Interpreter) = num.toValue()
+    override fun execute(interp: Interpreter) = interp.runtime.construct(VFloatType, listOf(num))
 
     override fun print(indent: Int) {
         printNodeHeader(indent, this, newLine = false)

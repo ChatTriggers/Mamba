@@ -11,6 +11,7 @@ import com.chattriggers.mamba.core.values.base.IMethod
 import com.chattriggers.mamba.core.values.numbers.*
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VType
+import com.chattriggers.mamba.core.values.base.Wrapper
 import com.chattriggers.mamba.core.values.exceptions.MambaException
 import com.chattriggers.mamba.core.values.exceptions.VTypeError
 import com.chattriggers.mamba.core.values.singletons.VFalse
@@ -30,7 +31,6 @@ class Runtime(val interp: Interpreter) {
             value.containsSlot("__len__") -> toInt(callProperty(value, "__len__")) != 0
             else -> true
         }
-
     }
 
     fun toInt(value: VObject): Int {
@@ -106,13 +106,16 @@ class Runtime(val interp: Interpreter) {
 
     fun construct(type: VType) = construct(type, emptyList())
 
-    fun construct(type: VType, args: List<Value>): VObject {
-        val obj = callProperty(type, "__new__", listOf(type) + args)
+    fun construct(type: VType, args: List<Any>): VObject {
+        val mappedArgs = args.map {
+            if (it !is Value) Wrapper(it) else it
+        }
+        val obj = callProperty(type, "__new__", listOf(type) + mappedArgs)
 
         // TODO: May have to pass obj with args depending on implementation
         // of __new__ and __init__
         // TODO: Ensure VNone is returned
-        callProperty(obj, "__init__", args)
+        callProperty(obj, "__init__", mappedArgs)
 
         return obj
     }
