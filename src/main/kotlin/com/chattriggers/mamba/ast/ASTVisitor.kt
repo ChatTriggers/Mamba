@@ -249,9 +249,6 @@ internal class ASTVisitor {
 
             val testListExprs = visitTestListStarExpr(testListStarExpr)
 
-            if (testListExprs !is IdentifierNode)
-                TODO()
-
             return AssignmentNode(
                 ctx.lineNumber(),
                 testListExprs,
@@ -739,6 +736,13 @@ internal class ASTVisitor {
     private fun visitSubscriptList(ctx: SubscriptListContext?): List<ExpressionNode> {
         if (ctx == null)
             return emptyList()
+
+        return ctx.subscript().map(::visitSubscript)
+    }
+
+    private fun visitSubscript(ctx: SubscriptContext): ExpressionNode {
+        if (ctx.element != null)
+            return visitTest(ctx.element)
 
         TODO()
     }

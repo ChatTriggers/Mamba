@@ -248,7 +248,7 @@ trailerCall: '(' argList? ')';
 trailerMemberAccess: '[' subscriptList ']';
 trailerDotAccess: '.' NAME;
 subscriptList: subscript (',' subscript)* (',')?;
-subscript: test | (start=test)? ':' (stop=test)? (':' (step=test)?)?;
+subscript: element=test | (start=test)? ':' (stop=test)? (':' (step=test)?)?;
 sliceop: ':' (test)?;
 exprList: exprListElem (',' exprListElem)* (',')?;
 exprListElem: expression | starExpression;

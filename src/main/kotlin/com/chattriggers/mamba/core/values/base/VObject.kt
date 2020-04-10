@@ -58,7 +58,7 @@ open class VObject(private vararg val baseTypes: LazyValue<VType>) : Value {
             }
         }
 
-        throw IllegalStateException()
+        throw IllegalStateException("Object $className has no slot with name $key")
     }
 
     fun containsSlot(key: String) = containsSlot(Wrapper(key))

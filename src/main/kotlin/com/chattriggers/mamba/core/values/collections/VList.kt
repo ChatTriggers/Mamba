@@ -1,15 +1,13 @@
 package com.chattriggers.mamba.core.values.collections
 
 import com.chattriggers.mamba.core.ThreadContext
-import com.chattriggers.mamba.core.values.LazyValue
-import com.chattriggers.mamba.core.values.VExceptionWrapper
-import com.chattriggers.mamba.core.values.Wrapper
+import com.chattriggers.mamba.core.values.*
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.base.VType
 import com.chattriggers.mamba.core.values.exceptions.VStopIteration
+import com.chattriggers.mamba.core.values.numbers.VInt
 import com.chattriggers.mamba.core.values.singletons.VNone
-import com.chattriggers.mamba.core.values.unwrap
 
 class VList(val list: MutableList<VObject>) : VObject(LazyValue("VListType") { VListType }) {
     override val className = "list"
@@ -19,9 +17,6 @@ class VList(val list: MutableList<VObject>) : VObject(LazyValue("VListType") { V
 
 object VListType : VType(LazyValue("VObjectType") { VObjectType }) {
     init {
-        addMethod("__iter__") {
-            runtime.construct(VListIteratorType, listOf(assertSelfAs<VList>()))
-        }
         addMethod("__call__") {
             runtime.construct(VListType, arguments())
         }
@@ -75,6 +70,23 @@ object VListType : VType(LazyValue("VObjectType") { VObjectType }) {
             VList(list)
         }
         addMethod("__init__") {
+            VNone
+        }
+
+        addMethod("__iter__") {
+            runtime.construct(VListIteratorType, listOf(assertSelfAs<VList>()))
+        }
+        addMethod("__getitem__") {
+            val self = assertSelfAs<VList>()
+            val index = assertArgAs<VInt>(1)
+            self.list[index.int]
+        }
+        addMethod("__setitem__") {
+            val self = assertSelfAs<VList>()
+            val index = assertArgAs<VInt>(1)
+            val obj = assertArgAs<VObject>(2)
+            self.list[index.int] = obj
+
             VNone
         }
     }

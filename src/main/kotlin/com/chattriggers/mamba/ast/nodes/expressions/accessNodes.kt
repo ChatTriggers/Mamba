@@ -6,13 +6,26 @@ import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.unwrap
 
+
+
 class MemberAccessNode(
     lineNumber: Int,
-    private val target: ExpressionNode,
-    private val members: List<ExpressionNode>)
+    val target: ExpressionNode,
+    val members: List<ExpressionNode>)
     : ExpressionNode(lineNumber, listOf(target) + members) {
     override fun execute(ctx: ThreadContext): VObject {
-        TODO()
+        // Note: Currently, members is guaranteed to be a singleton list
+        // containing only a regular VObject (i.e. no slices)
+
+        val value = target.execute(ctx)
+        if (value is VExceptionWrapper)
+            return value
+
+        val member = members[0].execute(ctx)
+        if (member is VExceptionWrapper)
+            return member
+
+        return ctx.runtime.callProperty(value, "__getitem__", listOf(member))
     }
 
     override fun print(indent: Int) {
@@ -24,7 +37,7 @@ class MemberAccessNode(
 
 class DotAccessNode(
     lineNumber: Int,
-    private val target: ExpressionNode,
+    val target: ExpressionNode,
     internal val property: IdentifierNode
 ) : ExpressionNode(lineNumber, listOf(target, property)) {
     override fun execute(ctx: ThreadContext): VObject {
