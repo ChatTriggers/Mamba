@@ -31,7 +31,7 @@ object VStringType : VType(LazyValue("VObjectType") { VObjectType }) {
         addMethod("__call__", id = "str_call") {
             runtime.construct(VStringType, arguments())
         }
-        addMethod("__new__") {
+        addMethod("__new__", isStatic = true) {
             val type = assertArgAs<VType>(0)
 
             if (type !is VStringType) {

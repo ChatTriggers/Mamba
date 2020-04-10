@@ -33,7 +33,7 @@ object VTupleIteratorType : VType(LazyValue("VObjectType") { VObjectType }) {
         addMethod("__call__") {
             runtime.construct(VTupleIteratorType, arguments())
         }
-        addMethod("__new__") {
+        addMethod("__new__", isStatic = true) {
             val type = assertArgAs<VType>(0)
 
             if (type !is VTupleIteratorType) {

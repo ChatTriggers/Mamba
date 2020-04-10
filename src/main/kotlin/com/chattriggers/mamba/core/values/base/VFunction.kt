@@ -19,7 +19,7 @@ object VFunctionType: VType(LazyValue("VObjectType") { VObjectType }) {
             val method = self.function
             method.call(ctx, arguments())
         }
-        addMethod("__new__") {
+        addMethod("__new__", isStatic = true) {
             assertArgAs<VFunctionType>(0)
             VFunction(assertArgAs(1))
         }

@@ -30,7 +30,7 @@ object VStopIterationType : VType(LazyValue("VExceptionType") { VExceptionType }
         addMethod("__call__") {
             runtime.construct(VStopIterationType, arguments())
         }
-        addMethod("__new__") {
+        addMethod("__new__", isStatic = true) {
             val type = assertArgAs<VType>(0)
 
             if (type !is VStopIterationType) {

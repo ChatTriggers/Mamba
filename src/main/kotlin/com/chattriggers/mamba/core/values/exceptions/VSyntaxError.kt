@@ -15,7 +15,7 @@ object VSyntaxErrorType : VType(LazyValue("VExceptionType") { VExceptionType }) 
         addMethod("__call__") {
             runtime.construct(VSyntaxErrorType, arguments())
         }
-        addMethod("__new__") {
+        addMethod("__new__", isStatic = true) {
             val type = assertArgAs<VType>(0)
 
             if (type !is VSyntaxErrorType) {

@@ -41,6 +41,7 @@ class FunctionNode(
 
             return when (val returned = executeStatements(ctx, statements)) {
                 is VReturnWrapper -> returned.wrapped
+                is VExceptionWrapper -> return ctx.interp.throwException(returned.exception, lineNumber)
                 is VFlowWrapper -> TODO() // Should have been handled by an enclosing node
                 else -> VNone
             }

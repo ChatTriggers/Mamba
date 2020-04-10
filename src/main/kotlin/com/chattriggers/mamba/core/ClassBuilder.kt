@@ -37,11 +37,7 @@ class ClassMethodBuilder(val ctx: ThreadContext, private val _args: List<Value>)
     }
 
     fun construct(type: VType, vararg args: Any): VObject {
-        return runtime.construct(type, args.map {
-            if (it !is VObject) Wrapper(
-                it
-            ) else it
-        })
+        return runtime.construct(type, args.toList())
     }
 }
 

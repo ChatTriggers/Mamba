@@ -21,7 +21,7 @@ object VBuiltinMethodType : VType(LazyValue("VObjectType") { VObjectType }) {
             val method = self.method
             method.call(ctx, arguments().let { it.subList(1, it.size) })
         }
-        addMethod("__new__") {
+        addMethod("__new__", isStatic = true) {
             assertArgAs<VBuiltinMethodType>(0)
             VBuiltinMethod(assertArgAs(1))
         }
