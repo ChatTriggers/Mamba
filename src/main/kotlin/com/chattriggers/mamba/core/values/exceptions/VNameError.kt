@@ -7,6 +7,7 @@ import com.chattriggers.mamba.core.values.collections.VTuple
 import com.chattriggers.mamba.core.values.collections.VTupleType
 import com.chattriggers.mamba.core.values.collections.toValue
 import com.chattriggers.mamba.core.values.singletons.VNone
+import com.chattriggers.mamba.core.values.toValue
 
 class VNameError(args: VTuple) : VException(args, LazyValue("VNameErrorType") { VNameErrorType }) {
     override val className = "NameError"
@@ -16,7 +17,7 @@ class VNameError(args: VTuple) : VException(args, LazyValue("VNameErrorType") { 
             val rt = ThreadContext.currentContext.runtime
 
             return rt.construct(VNameErrorType, listOf(
-                rt.construct(VTupleType, listOf(listOf("name '$name' is not defined")))
+                rt.construct(VTupleType, listOf(listOf("name '$name' is not defined".toValue())))
             )) as VNameError
         }
     }

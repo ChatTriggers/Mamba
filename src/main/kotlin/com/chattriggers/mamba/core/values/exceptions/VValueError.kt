@@ -7,6 +7,7 @@ import com.chattriggers.mamba.core.values.collections.VTuple
 import com.chattriggers.mamba.core.values.collections.VTupleType
 import com.chattriggers.mamba.core.values.collections.toValue
 import com.chattriggers.mamba.core.values.singletons.VNone
+import com.chattriggers.mamba.core.values.toValue
 
 class VValueError(args: VTuple) : VException(args, LazyValue("VValueErrorType") { VValueErrorType }) {
     override val className = "ValueError"
@@ -16,7 +17,7 @@ class VValueError(args: VTuple) : VException(args, LazyValue("VValueErrorType") 
             val rt = ThreadContext.currentContext.runtime
 
             return rt.construct(VValueErrorType, listOf(
-                rt.construct(VTupleType, listOf(listOf(message)))
+                rt.construct(VTupleType, listOf(listOf(message.toValue())))
             )) as VValueError
         }
     }

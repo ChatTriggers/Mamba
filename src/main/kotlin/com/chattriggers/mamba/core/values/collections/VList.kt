@@ -27,44 +27,47 @@ object VListType : VType(LazyValue("VObjectType") { VObjectType }) {
                 TODO()
             }
 
-            val iterable = when (argSize) {
-                1 -> return@addMethod VList(mutableListOf())
-                2 -> when (val arg = argumentValueRaw(1)) {
-                    is Wrapper -> {
-                        val value = arg.value
-
-                        if (value is MutableList<*>) {
-                            if (value.isEmpty()) {
-                                return@addMethod VList(mutableListOf())
-                            } else if (value.isNotEmpty() && value.all { it is VObject }) {
-                                @Suppress("UNCHECKED_CAST")
-                                return@addMethod VList(value as MutableList<VObject>)
-                            }
-                        }
-
-                        arg.unwrap()
-                    }
-                    else -> arg.unwrap()
-                }
-                else -> TODO()
+            if (argSize == 1) {
+                return@addMethod VList(mutableListOf())
+            } else if (argSize > 2) {
+                TODO()
             }
 
-            if (!runtime.isIterable(iterable)) {
-                TODO("Error")
-            }
-
-            val iterator = runtime.getIterator(iterable)
             val list = mutableListOf<VObject>()
 
-            while (true) {
-                val result = runtime.getIteratorNext(iterator)
+            val iterable = when (val arg = argumentValueRaw(1)) {
+                is Wrapper -> {
+                    val value = arg.value
 
-                if (result is VExceptionWrapper) {
-                    if (result.exception is VStopIteration) break
-                    else return@addMethod result
+                    if (value is List<*>) {
+                        if (value.isNotEmpty()) {
+                            @Suppress("UNCHECKED_CAST")
+                            list.addAll(value as List<VObject>)
+                        }
+
+                        null
+                    } else arg.unwrap()
+                }
+                else -> arg.unwrap()
+            }
+
+            if (iterable != null) {
+                if (!runtime.isIterable(iterable)) {
+                    TODO("Error")
                 }
 
-                list.add(result)
+                val iterator = runtime.getIterator(iterable)
+
+                while (true) {
+                    val result = runtime.getIteratorNext(iterator)
+
+                    if (result is VExceptionWrapper) {
+                        if (result.exception is VStopIteration) break
+                        else return@addMethod result
+                    }
+
+                    list.add(result)
+                }
             }
 
             VList(list)

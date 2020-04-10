@@ -59,9 +59,7 @@ object VDictType : VType(LazyValue("VObjectType") { VObjectType }) {
                             map.putAll(value as MutableMap<String, VObject>)
                         }
                         null
-                    } else {
-                        wrapper.unwrap()
-                    }
+                    } else wrapper.unwrap()
                 }
                 else -> arg1.value.unwrap()
             }

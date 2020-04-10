@@ -17,7 +17,7 @@ class VTypeError(args: VTuple) : VException(args, LazyValue("VTypeErrorType") { 
             val rt = ThreadContext.currentContext.runtime
 
             return rt.construct(VTypeErrorType, listOf(
-                rt.construct(VTupleType, listOf(listOf(message)))
+                rt.construct(VTupleType, listOf(listOf(message.toValue())))
             )) as VTypeError
         }
     }
