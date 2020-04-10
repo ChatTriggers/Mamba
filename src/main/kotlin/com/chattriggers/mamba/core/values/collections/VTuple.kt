@@ -65,7 +65,7 @@ object VTupleType : VType(LazyValue("VObjectType") { VObjectType }) {
             val list = mutableListOf<VObject>()
 
             while (true) {
-                val next = runtime.getIterableNext(iterable)
+                val next = runtime.getIteratorNext(iterable)
                 if (next !is VExceptionWrapper) {
                     list.add(next)
                 } else {

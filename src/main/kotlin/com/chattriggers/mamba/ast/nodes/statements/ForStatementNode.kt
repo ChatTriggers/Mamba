@@ -2,7 +2,6 @@ package com.chattriggers.mamba.ast.nodes.statements
 
 import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
 import com.chattriggers.mamba.ast.nodes.expressions.IdentifierNode
-import com.chattriggers.mamba.core.Runtime
 import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.VBreakWrapper
 import com.chattriggers.mamba.core.values.VExceptionWrapper
@@ -34,7 +33,7 @@ class ForStatementNode(
 
         outer@
         while (true) {
-            val nextValue = ctx.runtime.getIterableNext(iterator)
+            val nextValue = ctx.runtime.getIteratorNext(iterator)
 
             if (nextValue is VExceptionWrapper) {
                 if (nextValue.exception is VStopIteration) break

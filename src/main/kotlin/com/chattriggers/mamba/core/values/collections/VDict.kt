@@ -71,7 +71,7 @@ object VDictType : VType(LazyValue("VObjectType") { VObjectType }) {
             val map = mutableMapOf<String, Value>()
 
             while (true) {
-                val it = runtime.getIterableNext(iterable)
+                val it = runtime.getIteratorNext(iterable)
 
                 if (it is VExceptionWrapper) {
                     if (it.exception is VStopIteration) break
@@ -82,8 +82,8 @@ object VDictType : VType(LazyValue("VObjectType") { VObjectType }) {
                     TODO("Error")
                 }
 
-                val key = runtime.getIterableNext(it)
-                val value = runtime.getIterableNext(it)
+                val key = runtime.getIteratorNext(it)
+                val value = runtime.getIteratorNext(it)
 
                 if (key is VExceptionWrapper)
                     return@addMethod key
@@ -94,7 +94,7 @@ object VDictType : VType(LazyValue("VObjectType") { VObjectType }) {
                 map[key.toString()] = value
 
                 // Sub-iterable can only have two elements
-                val next = runtime.getIterableNext(it)
+                val next = runtime.getIteratorNext(it)
                 if (next !is VExceptionWrapper) {
                     TODO("ValueError")
                 }

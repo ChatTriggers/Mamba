@@ -62,7 +62,7 @@ object VListType : VType(LazyValue("VObjectType") { VObjectType }) {
             val list = mutableListOf<VObject>()
 
             while (true) {
-                val result = runtime.getIterableNext(iterator)
+                val result = runtime.getIteratorNext(iterator)
 
                 if (result is VExceptionWrapper) {
                     if (result.exception is VStopIteration) break

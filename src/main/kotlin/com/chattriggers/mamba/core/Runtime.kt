@@ -10,6 +10,7 @@ import com.chattriggers.mamba.core.values.collections.VList
 import com.chattriggers.mamba.core.values.collections.VListType
 import com.chattriggers.mamba.core.values.collections.VTupleType
 import com.chattriggers.mamba.core.values.exceptions.VBaseException
+import com.chattriggers.mamba.core.values.exceptions.VStopIteration
 import com.chattriggers.mamba.core.values.numbers.*
 import com.chattriggers.mamba.core.values.exceptions.VTypeError
 import com.chattriggers.mamba.core.values.singletons.*
@@ -118,13 +119,31 @@ class Runtime(private val ctx: ThreadContext) {
         return callProperty(iterable, "__iter__")
     }
 
-    fun getIterableNext(iterator: VObject): VObject {
+    fun getIteratorNext(iterator: VObject): VObject {
         return callProperty(iterator, "__next__")
     }
 
     fun isIterable(obj: VObject) = obj.containsSlot("__iter__")
 
     fun isIterator(obj: VObject) = isIterable(obj) && obj.containsSlot("__next__")
+
+    fun iterableToList(iterable: VObject): Value {
+        if (!isIterable(iterable)) TODO()
+
+        val iterator = getIterator(iterable)
+        val list = mutableListOf<VObject>()
+
+        while (true) {
+            val next = getIteratorNext(iterator)
+            if (next is VExceptionWrapper) {
+                if (next.exception is VStopIteration) {
+                    return Wrapper(list)
+                }
+                return next
+            }
+            list.add(next)
+        }
+    }
 
     companion object {
         inline fun <reified T : VBaseException> isException(obj: VObject): Boolean {

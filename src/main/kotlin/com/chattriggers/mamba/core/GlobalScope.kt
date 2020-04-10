@@ -12,6 +12,7 @@ import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.base.VType
 import com.chattriggers.mamba.core.values.base.VTypeType
+import com.chattriggers.mamba.core.values.collections.toValue
 import com.chattriggers.mamba.core.values.singletons.*
 
 object GlobalScope : VObject(LazyValue("GlobalScopeType") { GlobalScopeType })
@@ -47,6 +48,20 @@ object GlobalScopeType : VType(LazyValue("VObjectType") { VObjectType }) {
 
         addMethod("abs", isStatic = true) {
             runtime.callProperty(argument(0), "__abs__")
+        }
+
+        addMethod("all", isStatic = true) {
+            val iterable = assertArgAs<VObject>(0)
+            val returnList = runtime.iterableToList(iterable)
+
+            if (returnList is VExceptionWrapper) {
+                returnList
+            } else {
+                @Suppress("UNCHECKED_CAST")
+                val list = (returnList as Wrapper).value as List<VObject>
+
+                if (list.all { runtime.toBoolean(it) }) VTrue else VFalse
+            }
         }
 
         addMethod("dir", isStatic = true) {
