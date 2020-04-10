@@ -9,7 +9,6 @@ import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.base.VType
 import com.chattriggers.mamba.core.values.exceptions.VStopIteration
-import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import com.chattriggers.mamba.core.values.singletons.VNone
 
 class VRange(val start: Int, val stop: Int, val step: Int = 1) : VObject(LazyValue("VRangeType") { VRangeType }) {
@@ -20,7 +19,7 @@ class VRange(val start: Int, val stop: Int, val step: Int = 1) : VObject(LazyVal
     init {
         // TODO: ValueError
         if (step == 0) {
-            throw MambaException(VValueError(VTuple("range() arg 3 must not be 0".toValue())))
+            throw MambaException(VValueError.construct("range() arg 3 must not be 0"))
         }
     }
 
@@ -58,7 +57,7 @@ object VRangeType : VType(LazyValue("VObjectType") { VObjectType }) {
             val type = assertArgAs<VType>(0)
 
             if (type !is VRangeType) {
-                notImplemented()
+                TODO()
             }
 
             val first = assertArgAs<VInt>(1)

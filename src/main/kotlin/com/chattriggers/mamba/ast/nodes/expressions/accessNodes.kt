@@ -3,7 +3,6 @@ package com.chattriggers.mamba.ast.nodes.expressions
 import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.base.VObject
-import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import com.chattriggers.mamba.core.values.unwrap
 
 class MemberAccessNode(
@@ -12,7 +11,7 @@ class MemberAccessNode(
     private val members: List<ExpressionNode>)
     : ExpressionNode(lineNumber, listOf(target) + members) {
     override fun execute(ctx: ThreadContext): VObject {
-        notImplemented()
+        TODO()
     }
 
     override fun print(indent: Int) {

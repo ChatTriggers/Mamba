@@ -5,7 +5,6 @@ import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.base.VType
 import com.chattriggers.mamba.core.values.Wrapper
-import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import com.chattriggers.mamba.core.values.singletons.VBoolType
 import com.chattriggers.mamba.core.values.singletons.VFalse
 import com.chattriggers.mamba.core.values.singletons.VNone
@@ -29,7 +28,7 @@ object VFloatType : VType(LazyValue("VObjectType") { VObjectType }) {
             val type = assertArgAs<VType>(0)
 
             if (type !is VFloatType) {
-                notImplemented()
+                TODO()
             }
 
             var num = 0.0
@@ -40,9 +39,9 @@ object VFloatType : VType(LazyValue("VObjectType") { VObjectType }) {
                     is Wrapper -> when (val wrapped = v.value) {
                         is String -> java.lang.Double.parseDouble(wrapped)
                         is Double -> wrapped
-                        else -> notImplemented("Error")
+                        else -> TODO("Error")
                     }
-                    else -> notImplemented("Error")
+                    else -> TODO("Error")
                 }
             }
 
@@ -62,14 +61,14 @@ object VFloatType : VType(LazyValue("VObjectType") { VObjectType }) {
                 is VInt -> construct(VFloatType, self.double + other.int.toDouble())
                 is VFloat -> construct(VFloatType, self.double + other.double)
                 is VComplex -> construct(VComplexType, self.double + other.real, other.imag)
-                else -> notImplemented("Error")
+                else -> TODO("Error")
             }
         }
         addMethod("__bool__") {
             if (assertSelfAs<VFloat>().double == 0.0) VFalse else VTrue
         }
         addMethod("__divmod__") {
-            notImplemented()
+            TODO()
         }
         addMethod("__eq__") {
             val self = assertSelfAs<VFloat>()
@@ -78,7 +77,7 @@ object VFloatType : VType(LazyValue("VObjectType") { VObjectType }) {
                 is VInt -> construct(VBoolType, self.double == other.int.toDouble())
                 is VFloat -> construct(VBoolType, self.double == other.double)
                 is VComplex -> construct(VBoolType, self.double == other.real && other.imag == 0.0)
-                else -> notImplemented("Error")
+                else -> TODO("Error")
             }
         }
         addMethod("__float__") {
@@ -96,7 +95,7 @@ object VFloatType : VType(LazyValue("VObjectType") { VObjectType }) {
                     val i = floor(-(self.double * other.imag) / d)
                     construct(VComplexType, r, i)
                 }
-                else -> notImplemented("Error")
+                else -> TODO("Error")
             }
         }
         addMethod("__ge__") {
@@ -105,7 +104,7 @@ object VFloatType : VType(LazyValue("VObjectType") { VObjectType }) {
             when (val other = assertArgAs<VObject>(1)) {
                 is VInt -> construct(VBoolType, self.double >= other.int.toDouble())
                 is VFloat -> construct(VBoolType, self.double >= other.double)
-                else -> notImplemented()
+                else -> TODO()
             }
         }
         addMethod("__gt__") {
@@ -114,7 +113,7 @@ object VFloatType : VType(LazyValue("VObjectType") { VObjectType }) {
             when (val other = assertArgAs<VObject>(1)) {
                 is VInt -> construct(VBoolType, self.double > other.int)
                 is VFloat -> construct(VBoolType, self.double > other.double)
-                else -> notImplemented()
+                else -> TODO()
             }
         }
         addMethod("__int__") {
@@ -126,7 +125,7 @@ object VFloatType : VType(LazyValue("VObjectType") { VObjectType }) {
             when (val other = assertArgAs<VObject>(1)) {
                 is VInt -> construct(VBoolType, self.double <= other.int.toDouble())
                 is VFloat -> construct(VBoolType, self.double <= other.double)
-                else -> notImplemented()
+                else -> TODO()
             }
         }
         addMethod("__lt__") {
@@ -135,7 +134,7 @@ object VFloatType : VType(LazyValue("VObjectType") { VObjectType }) {
             when (val other = assertArgAs<VObject>(1)) {
                 is VInt -> construct(VBoolType, self.double < other.int.toDouble())
                 is VFloat -> construct(VBoolType, self.double < other.double)
-                else -> notImplemented()
+                else -> TODO()
             }
         }
         addMethod("__mod__") {
@@ -144,7 +143,7 @@ object VFloatType : VType(LazyValue("VObjectType") { VObjectType }) {
             when (val other = assertArgAs<VObject>(1)) {
                 is VInt -> construct(VIntType, self.double.rem(other.int).toInt())
                 is VFloat -> construct(VFloatType, self.double.rem(other.double))
-                else -> notImplemented()
+                else -> TODO()
             }
         }
         addMethod("__mul__") {
@@ -154,7 +153,7 @@ object VFloatType : VType(LazyValue("VObjectType") { VObjectType }) {
                 is VInt -> construct(VIntType, (self.double * other.int).toInt())
                 is VFloat -> construct(VFloatType, self.double * other.double)
                 is VComplex -> construct(VComplexType, self.double * other.real, self.double * other.imag)
-                else -> notImplemented()
+                else -> TODO()
             }
         }
         addMethod("__ne__") {
@@ -164,7 +163,7 @@ object VFloatType : VType(LazyValue("VObjectType") { VObjectType }) {
                 is VInt -> construct(VBoolType, self.double != other.int.toDouble())
                 is VFloat -> construct(VBoolType, self.double != other.double)
                 is VComplex -> construct(VBoolType, self.double != other.real || other.imag == 0.0)
-                else -> notImplemented("Error")
+                else -> TODO("Error")
             }
         }
         addMethod("__neg__") {
@@ -176,8 +175,8 @@ object VFloatType : VType(LazyValue("VObjectType") { VObjectType }) {
             when (val other = assertArgAs<VObject>(1)) {
                 is VInt -> construct(VIntType, self.double.pow(other.int).toInt())
                 is VFloat -> construct(VFloatType, self.double.pow(other.double))
-                is VComplex -> notImplemented("TODO")
-                else -> notImplemented()
+                is VComplex -> TODO("TODO")
+                else -> TODO()
             }
         }
         addMethod("__radd__") {
@@ -196,7 +195,7 @@ object VFloatType : VType(LazyValue("VObjectType") { VObjectType }) {
             runtime.callProperty(argument(1), "__mul__", listOf(argument(0)))
         }
         addMethod("__round__") {
-            notImplemented()
+            TODO()
         }
         addMethod("__rpow__") {
             runtime.callProperty(argument(1), "__pow__", listOf(argument(0)))
@@ -217,7 +216,7 @@ object VFloatType : VType(LazyValue("VObjectType") { VObjectType }) {
                 is VInt -> construct(VIntType, (self.double - other.int.toDouble()).toInt())
                 is VFloat -> construct(VFloatType, self.double - other.double)
                 is VComplex -> construct(VComplexType, self.double - other.real, -other.imag)
-                else -> notImplemented("Error")
+                else -> TODO("Error")
             }
         }
         addMethod("__truediv__") {
@@ -232,7 +231,7 @@ object VFloatType : VType(LazyValue("VObjectType") { VObjectType }) {
                     val i = -(self.double * other.imag) / d
                     construct(VComplexType, r, i)
                 }
-                else -> notImplemented()
+                else -> TODO()
             }
         }
     }

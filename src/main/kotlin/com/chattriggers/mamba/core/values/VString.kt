@@ -37,7 +37,7 @@ object VStringType : VType(LazyValue("VObjectType") { VObjectType }) {
 
             if (type !is VStringType) {
                 val name = type.className
-                throw MambaException(VTypeError("string.__new__($name) is not safe, use $name.__new__()"))
+                throw MambaException(VTypeError.construct("string.__new__($name) is not safe, use $name.__new__()"))
             }
 
             when (val arg = argumentRaw(1)) {

@@ -3,7 +3,6 @@ package com.chattriggers.mamba.core.values.collections
 import com.chattriggers.mamba.core.values.*
 import com.chattriggers.mamba.core.values.exceptions.MambaException
 import com.chattriggers.mamba.core.values.exceptions.VStopIteration
-import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.base.VType
@@ -29,8 +28,8 @@ object VDictIteratorType : VType(LazyValue("VObjectType") { VObjectType }) {
 
             when {
                 self.vdict.dict.size != self.vdictKeys.size ->
-                    notImplemented("RuntimeError: dictionary changed size during iteration")
-                self.cursor >= self.vdictKeys.size -> throw MambaException(VStopIteration())
+                    TODO("RuntimeError: dictionary changed size during iteration")
+                self.cursor >= self.vdictKeys.size -> throw MambaException(VStopIteration.construct())
                 else -> self.vdict.dict[self.vdictKeys[self.cursor++]]!!
             }.unwrap()
         }
@@ -41,7 +40,7 @@ object VDictIteratorType : VType(LazyValue("VObjectType") { VObjectType }) {
             val type = assertArgAs<VType>(0)
 
             if (type !is VDictIteratorType) {
-                notImplemented()
+                TODO()
             }
 
             VDictIterator(assertArgAs(1))

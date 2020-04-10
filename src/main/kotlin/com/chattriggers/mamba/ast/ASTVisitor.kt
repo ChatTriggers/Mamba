@@ -8,7 +8,6 @@ import com.chattriggers.mamba.ast.nodes.*
 import com.chattriggers.mamba.ast.nodes.expressions.*
 import com.chattriggers.mamba.ast.nodes.expressions.literals.*
 import com.chattriggers.mamba.ast.nodes.statements.*
-import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.tree.TerminalNode
 
@@ -42,7 +41,7 @@ internal class ASTVisitor {
         if (flowStatement != null)
             return visitFlowStatement(flowStatement)
 
-        notImplemented("Handle other branch possibilities")
+        TODO("Handle other branch possibilities")
     }
 
     private fun visitFlowStatement(ctx: FlowStatementContext): StatementNode {
@@ -53,7 +52,7 @@ internal class ASTVisitor {
             val tests = testList.test()
 
             if (tests.size > 1) {
-                notImplemented("Handle other branch possibilities")
+                TODO("Handle other branch possibilities")
             } else {
                 return ReturnNode(ctx.lineNumber(), visitTest(tests[0]))
             }
@@ -70,12 +69,12 @@ internal class ASTVisitor {
         val raiseStatement = ctx.raiseStatement()
         if (raiseStatement != null) {
             if (raiseStatement.test().isEmpty() || raiseStatement.test().size > 1)
-                notImplemented()
+                TODO()
 
             return RaiseNode(raiseStatement.lineNumber(), visitTest(raiseStatement.test().first()))
         }
 
-        notImplemented("Handle other branch possibilities")
+        TODO("Handle other branch possibilities")
     }
 
     private fun visitCompoundStatement(ctx: CompoundStatementContext): StatementNode {
@@ -95,7 +94,7 @@ internal class ASTVisitor {
         if (forStatement != null)
             return visitForStatement(forStatement)
 
-        notImplemented()
+        TODO()
     }
 
     private fun visitForStatement(ctx: ForStatementContext): StatementNode {
@@ -120,7 +119,7 @@ internal class ASTVisitor {
 
     private fun visitExprListElem(ctx: ExprListElemContext): ExpressionNode {
         if (ctx.starExpression() != null)
-            notImplemented()
+            TODO()
 
         return visitExpression(ctx.expression())
     }
@@ -191,7 +190,7 @@ internal class ASTVisitor {
         val parameters = if (typedArgsList != null) visitTypedArgsList(typedArgsList) else emptyList()
 
         if (test != null) {
-            notImplemented("Handle other possibilities")
+            TODO("Handle other possibilities")
         }
 
         val statements = mutableListOf<StatementNode>()
@@ -209,21 +208,21 @@ internal class ASTVisitor {
 
     private fun visitTypedArgsList(ctx: TypedArgsListContext): List<ParameterNode> {
         if (ctx.normalArgs == null)
-            notImplemented()
+            TODO()
 
         return visitTypedArgsListNoPosOnly(ctx.normalArgs)
     }
 
     private fun visitTypedArgsListNoPosOnly(ctx: TypedArgsListNoPosOnlyContext): List<ParameterNode> {
         if (ctx.argsKwonlyKwargs() != null)
-            notImplemented()
+            TODO()
 
         return visitPosKeywordArgsKwonlyKwargs(ctx.posKeywordArgsKwonlyKwargs())
     }
 
     private fun visitPosKeywordArgsKwonlyKwargs(ctx: PosKeywordArgsKwonlyKwargsContext): List<ParameterNode> {
         if (ctx.argsKwonlyKwargs() != null)
-            notImplemented()
+            TODO()
 
         return ctx.parameters().parameter().map(::visitParameter)
     }
@@ -241,17 +240,17 @@ internal class ASTVisitor {
         val testListStarExpr = ctx.testlistStarExpression()
 
         if (ctx.augAssignment() != null || ctx.annAssign() != null)
-            notImplemented()
+            TODO()
 
         val annAssignment = ctx.annAssignment()
         if (annAssignment.isNotEmpty()) {
             if (annAssignment.size > 1)
-                notImplemented()
+                TODO()
 
             val testListExprs = visitTestListStarExpr(testListStarExpr)
 
             if (testListExprs !is IdentifierNode)
-                notImplemented()
+                TODO()
 
             return AssignmentNode(
                 ctx.lineNumber(),
@@ -265,11 +264,11 @@ internal class ASTVisitor {
 
     private fun visitAnnAssignment(ctx: AnnAssignmentContext): ExpressionNode {
         if (ctx.yieldExpression().isNotEmpty())
-            notImplemented()
+            TODO()
 
         val testListStarExprs = ctx.testlistStarExpression()
         if (testListStarExprs.isEmpty() || testListStarExprs.size > 2)
-            notImplemented()
+            TODO()
 
         return visitTestListStarExpr(testListStarExprs[0])
     }
@@ -289,7 +288,7 @@ internal class ASTVisitor {
         val lambdaDef = ctx.lambdaDef()
 
         if (lambdaDef != null) {
-            notImplemented("Handle other possibilities")
+            TODO("Handle other possibilities")
         }
 
         val orTest = ctx.orTest()
@@ -298,7 +297,7 @@ internal class ASTVisitor {
             return visitOrTest(orTest[0])
         } else {
             // Ternary statement
-            notImplemented("Handle other possibilities")
+            TODO("Handle other possibilities")
         }
     }
 
@@ -503,7 +502,7 @@ internal class ASTVisitor {
             val operators = ctx.termOperator()
 
             if (operators.any { it.text == "@" }) {
-                notImplemented()
+                TODO()
             }
 
             if (operators.size != factors.size - 1) {
@@ -571,7 +570,7 @@ internal class ASTVisitor {
         val trailers = ctx.trailer()
 
         if (await != null) {
-            notImplemented()
+            TODO()
         }
 
         val atomNode = visitAtom(atom)
@@ -601,7 +600,7 @@ internal class ASTVisitor {
 
     private fun visitParenAtom(ctx: ParenAtomContext): ExpressionNode {
         if (ctx.yieldExpression() != null)
-            notImplemented()
+            TODO()
 
         val testListCtx = ctx.testListComp()
         val numTests = testListCtx.testlistElem().size
@@ -623,13 +622,13 @@ internal class ASTVisitor {
 
     private fun visitTestListComp(ctx: TestListCompContext): List<ExpressionNode> {
         if (ctx.compFor() != null)
-            notImplemented()
+            TODO()
         return ctx.testlistElem().map(::visitTestlistElem)
     }
 
     private fun visitTestlistElem(ctx: TestlistElemContext): ExpressionNode {
         if (ctx.starExpression() != null)
-            notImplemented()
+            TODO()
         return visitTest(ctx.test())
     }
 
@@ -638,7 +637,7 @@ internal class ASTVisitor {
         if (dictMaker != null)
             return visitDictMaker(dictMaker)
 
-        notImplemented()
+        TODO()
     }
 
     private fun visitDictMaker(ctx: DictMakerContext): ExpressionNode {
@@ -646,7 +645,7 @@ internal class ASTVisitor {
             ctx.lineNumber(),
             ctx.dictTerm().map {
                 if (it.compFor() != null || it.kstarExpression() != null)
-                    notImplemented()
+                    TODO()
 
                 visitTest(it.id) to visitTest(it.value)
             }.toMap()
@@ -727,12 +726,12 @@ internal class ASTVisitor {
 
     private fun visitArgument(ctx: ArgumentContext): ExpressionNode {
         if (ctx.argumentNamed() != null || ctx.argumentKwargSpread() != null || ctx.argumentArgSpread() != null)
-            notImplemented()
+            TODO()
 
         val arg = ctx.argumentCompFor()
 
         if (arg.compFor() != null)
-            notImplemented()
+            TODO()
 
         return visitTest(arg.test())
     }
@@ -741,7 +740,7 @@ internal class ASTVisitor {
         if (ctx == null)
             return emptyList()
 
-        notImplemented()
+        TODO()
     }
 
     private fun makeStrings(lineNumber: Int, strings: List<TerminalNode>): ExpressionNode {

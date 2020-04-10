@@ -8,7 +8,6 @@ import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.base.VType
 import com.chattriggers.mamba.core.values.exceptions.MambaException
 import com.chattriggers.mamba.core.values.exceptions.VStopIteration
-import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import com.chattriggers.mamba.core.values.singletons.VNone
 
 class VDict(val dict: MutableMap<String, Value>) : VObject(LazyValue("VDictType") { VDictType }) {
@@ -42,13 +41,13 @@ object VDictType : VType(LazyValue("VObjectType") { VObjectType }) {
             val type = assertArgAs<VType>(0)
 
             if (type !is VDictType) {
-                notImplemented()
+                TODO()
             }
 
             val iterable = if (argSize > 0) argument(0) else VDict(mutableMapOf())
 
             if (!runtime.isIterable(iterable)) {
-                notImplemented("Error")
+                TODO("Error")
             }
 
             val map = mutableMapOf<String, Value>()
@@ -58,7 +57,7 @@ object VDictType : VType(LazyValue("VObjectType") { VObjectType }) {
                     val it = runtime.getIterableNext(iterable)
 
                     if (!runtime.isIterable(it)) {
-                        notImplemented("Error")
+                        TODO("Error")
                     }
 
                     try {
@@ -68,14 +67,14 @@ object VDictType : VType(LazyValue("VObjectType") { VObjectType }) {
                         map[key] = value
                     } catch (e: MambaException) {
                         if (e.reason is VStopIteration) {
-                            notImplemented("TypeError")
+                            TODO("TypeError")
                         }
                     }
 
                     try {
                         // Sub-iterable can only have two elements
                         runtime.getIterableNext(it)
-                        notImplemented("ValueError")
+                        TODO("ValueError")
                     } catch (e: MambaException) {
                         if (e.reason !is VStopIteration) {
                             throw e

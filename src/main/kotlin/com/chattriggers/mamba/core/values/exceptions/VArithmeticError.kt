@@ -12,8 +12,6 @@ import com.chattriggers.mamba.core.values.singletons.VNone
 
 class VArithmeticError(args: VTuple) : VException(args, LazyValue("VArithmeticErrorType") { VArithmeticErrorType }) {
     override val className = "ArithmeticError"
-
-    constructor() : this(VTuple())
 }
 
 object VArithmeticErrorType : VType(LazyValue("VExceptionType") { VExceptionType }) {
@@ -25,7 +23,7 @@ object VArithmeticErrorType : VType(LazyValue("VExceptionType") { VExceptionType
             val type = assertArgAs<VType>(0)
 
             if (type !is VArithmeticErrorType) {
-                notImplemented()
+                TODO()
             }
 
             VArithmeticError(arguments().toValue())

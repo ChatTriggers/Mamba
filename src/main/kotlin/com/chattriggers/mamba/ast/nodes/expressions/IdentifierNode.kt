@@ -3,6 +3,7 @@ package com.chattriggers.mamba.ast.nodes.expressions
 import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.exceptions.VNameError
+import com.chattriggers.mamba.core.values.exceptions.VNameErrorType
 import com.chattriggers.mamba.core.values.toValue
 import com.chattriggers.mamba.core.values.unwrap
 
@@ -14,7 +15,7 @@ class IdentifierNode(lineNumber: Int, val identifier: String) : ExpressionNode(l
             }
         }
 
-        ctx.interp.throwException<VNameError>(lineNumber, "name '$identifier' is not defined".toValue())
+        ctx.interp.throwException(VNameError.construct(identifier), lineNumber)
     }
 
     override fun print(indent: Int) {

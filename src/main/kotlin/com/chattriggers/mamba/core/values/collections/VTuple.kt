@@ -1,22 +1,18 @@
 package com.chattriggers.mamba.core.values.collections
 
-import com.chattriggers.mamba.core.Runtime
 import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.LazyValue
+import com.chattriggers.mamba.core.values.Wrapper
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.base.VType
 import com.chattriggers.mamba.core.values.exceptions.MambaException
 import com.chattriggers.mamba.core.values.exceptions.VStopIteration
-import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import com.chattriggers.mamba.core.values.singletons.VNone
+import com.chattriggers.mamba.core.values.unwrap
 
 class VTuple(val items: List<VObject>) : VObject(LazyValue("VTupleType") { VTupleType }) {
     override val className = "tuple"
-
-    constructor() : this(emptyList())
-
-    constructor(vararg items: VObject) : this(items.toList())
 
     override fun toString() = when (items.size) {
         0 -> "()"
@@ -25,7 +21,16 @@ class VTuple(val items: List<VObject>) : VObject(LazyValue("VTupleType") { VTupl
     }
 
     companion object {
-        val EMPTY_TUPLE = ThreadContext.currentContext.runtime.construct(VTupleType, emptyList())
+        private var emptyTupleBacker: VTuple? = null
+
+        val EMPTY_TUPLE: VTuple
+            get() {
+                if (emptyTupleBacker == null) {
+                    emptyTupleBacker = ThreadContext.currentContext.runtime.construct(VTupleType, emptyList()) as VTuple
+                }
+
+                return emptyTupleBacker!!
+            }
     }
 }
 
@@ -41,17 +46,29 @@ object VTupleType : VType(LazyValue("VObjectType") { VObjectType }) {
             val type = assertArgAs<VType>(0)
 
             if (type !is VTupleType) {
-                notImplemented()
+                TODO()
             }
 
-            if (argSize == 0) {
-                return@addMethod VTuple.EMPTY_TUPLE
-            }
+            val iterable = when (argSize) {
+                1 -> VTuple.EMPTY_TUPLE
+                2 -> when (val arg = argumentRaw(1)) {
+                    is Wrapper -> {
+                        val value = arg.value
 
-            val iterable = argument(0)
+                        if (value !is List<*> || value.size == 0 || value[0] !is VObject) {
+                            TODO()
+                        }
+
+                        @Suppress("UNCHECKED_CAST")
+                        return@addMethod VTuple(value as List<VObject>)
+                    }
+                    else -> arg.unwrap()
+                }
+                else -> TODO()
+            }
 
             if (!runtime.isIterable(iterable)) {
-                notImplemented("Error")
+                TODO("Error")
             }
 
             val list = mutableListOf<VObject>()

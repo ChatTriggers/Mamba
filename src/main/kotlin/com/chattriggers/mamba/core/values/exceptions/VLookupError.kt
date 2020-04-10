@@ -8,8 +8,6 @@ import com.chattriggers.mamba.core.values.singletons.VNone
 
 class VLookupError(args: VTuple) : VException(args, LazyValue("VLookupErrorType") { VLookupErrorType }) {
     override val className = "LookupError"
-
-    constructor() : this(VTuple())
 }
 
 object VLookupErrorType : VType(LazyValue("VExceptionType") { VExceptionType }) {
@@ -21,7 +19,7 @@ object VLookupErrorType : VType(LazyValue("VExceptionType") { VExceptionType }) 
             val type = assertArgAs<VType>(0)
 
             if (type !is VLookupErrorType) {
-                notImplemented()
+                TODO()
             }
 
             VLookupError(arguments().toValue())

@@ -14,8 +14,6 @@ open class VBaseException(
 ) : VObject(type) {
     override val className = "BaseException"
 
-    constructor() : this(VTuple())
-
     override fun toString() = StringBuilder().apply {
         append(className)
         append(": ")
@@ -41,7 +39,7 @@ object VBaseExceptionType : VType(LazyValue("VObjectType") { VObjectType }) {
             val type = assertArgAs<VType>(0)
 
             if (type !is VBaseExceptionType) {
-                notImplemented()
+                TODO()
             }
 
             VBaseException(arguments().toValue())

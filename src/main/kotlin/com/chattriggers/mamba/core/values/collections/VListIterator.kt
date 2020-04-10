@@ -6,7 +6,6 @@ import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.base.VType
 import com.chattriggers.mamba.core.values.exceptions.MambaException
 import com.chattriggers.mamba.core.values.exceptions.VStopIteration
-import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import com.chattriggers.mamba.core.values.singletons.VNone
 
 class VListIterator(internal val vlist: VList) : VObject(LazyValue("VListIteratorType") { VListIteratorType }) {
@@ -26,7 +25,7 @@ object VListIteratorType : VType(LazyValue("VObjectType") { VObjectType }) {
             val self = assertSelfAs<VListIterator>()
 
             if (self.cursor >= self.vlist.list.size) {
-                throw MambaException(VStopIteration())
+                throw MambaException(VStopIteration.construct())
             } else {
                 self.vlist.list[self.cursor++]
             }
@@ -38,7 +37,7 @@ object VListIteratorType : VType(LazyValue("VObjectType") { VObjectType }) {
             val type = assertArgAs<VType>(0)
 
             if (type !is VListIteratorType) {
-                notImplemented()
+                TODO()
             }
 
             VListIterator(assertArgAs(1))

@@ -6,7 +6,6 @@ import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.collections.VTuple
 import com.chattriggers.mamba.core.values.exceptions.MambaException
 import com.chattriggers.mamba.core.values.exceptions.VBaseException
-import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import java.util.*
 
 class Interpreter(val fileName: String, val lines: List<String>) {
@@ -35,21 +34,13 @@ class Interpreter(val fileName: String, val lines: List<String>) {
 
     internal fun popScope(): VObject {
         if (scopeStackBacker.empty()) {
-            notImplemented("Error")
+            TODO("Error")
         }
 
         return scopeStackBacker.pop()
     }
 
     internal fun getScope() = scopeStackBacker.peek()
-
-    internal inline fun <reified T : VBaseException> throwException(lineNumber: Int, vararg args: VObject): Nothing {
-        exceptionStack.push(CallFrame(fileName, sourceStack.pop(), lineNumber))
-
-        throw MambaException(
-            T::class.java.getDeclaredConstructor(VTuple::class.java).newInstance(VTuple(*args))
-        )
-    }
 
     internal fun throwException(exception: VBaseException, lineNumber: Int): Nothing {
         exceptionStack.push(CallFrame(fileName, sourceStack.pop(), lineNumber))

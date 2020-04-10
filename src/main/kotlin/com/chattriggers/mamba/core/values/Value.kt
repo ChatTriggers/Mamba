@@ -5,8 +5,6 @@ import com.chattriggers.mamba.core.FieldWrapper
 import com.chattriggers.mamba.core.MethodWrapper
 import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.base.*
-import com.chattriggers.mamba.core.values.exceptions.notImplemented
-
 /**
  * Superclass of every value accessible in the Python runtime.
  *
@@ -32,6 +30,6 @@ fun Value?.unwrap(): VObject {
         is MethodWrapper -> ThreadContext.currentContext.runtime.construct(VBuiltinMethodType, listOf(this))
         is FieldWrapper -> this.field(ClassFieldBuilder(ThreadContext.currentContext))
         is Wrapper -> ThreadContext.currentContext.runtime.toVObject(this.value)
-        else -> notImplemented()
+        else -> TODO()
     }
 }

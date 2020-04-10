@@ -10,8 +10,6 @@ class VNotImplementedError(
     args: VTuple
 ) : VException(args, LazyValue("VNotImplementedErrorType") { VNotImplementedErrorType }) {
     override val className = "NotImplementedError"
-
-    constructor() : this(VTuple())
 }
 
 object VNotImplementedErrorType : VType(LazyValue("VExceptionType") { VExceptionType }) {
@@ -23,7 +21,7 @@ object VNotImplementedErrorType : VType(LazyValue("VExceptionType") { VException
             val type = assertArgAs<VType>(0)
 
             if (type !is VNotImplementedErrorType) {
-                notImplemented()
+                TODO()
             }
 
             VNotImplementedError(arguments().toValue())

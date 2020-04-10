@@ -8,7 +8,6 @@ import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.VReturnWrapper
 import com.chattriggers.mamba.core.values.exceptions.MambaException
 import com.chattriggers.mamba.core.values.exceptions.VStopIteration
-import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import com.chattriggers.mamba.core.values.singletons.VNone
 
 class ForStatementNode(
@@ -22,7 +21,7 @@ class ForStatementNode(
         val iterator = ctx.runtime.getIterator(iterableNode.execute(ctx))
 
         if (targetNode !is IdentifierNode)
-            notImplemented()
+            TODO()
 
         val targetName = targetNode.identifier
 

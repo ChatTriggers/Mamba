@@ -7,7 +7,6 @@ import com.chattriggers.mamba.ast.nodes.expressions.IdentifierNode
 import com.chattriggers.mamba.core.MethodWrapper
 import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.base.VFunctionType
-import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
 
@@ -28,7 +27,7 @@ class FunctionNode(
         }
 
         if (args.size < requiredArgs)
-            notImplemented()
+            TODO()
 
         try {
             val scope = ctx.runtime.construct(VObjectType)
@@ -42,7 +41,7 @@ class FunctionNode(
 
             return when (val returned = executeStatements(ctx, statements)) {
                 is VReturnWrapper -> returned.wrapped
-                is VFlowWrapper -> notImplemented() // Should have been handled by an enclosing node
+                is VFlowWrapper -> TODO() // Should have been handled by an enclosing node
                 else -> VNone
             }
         } finally {

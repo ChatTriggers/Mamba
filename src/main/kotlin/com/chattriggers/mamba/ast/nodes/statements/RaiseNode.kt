@@ -15,7 +15,7 @@ class RaiseNode(
         val exception = exceptionNode.execute(ctx)
 
         if (exception !is VBaseException) {
-            ctx.interp.throwException<VTypeError>(lineNumber, "exceptions must derive from BaseException".toValue())
+            ctx.interp.throwException(VTypeError.construct("exceptions must derive from BaseException"), lineNumber)
         }
 
         ctx.interp.throwException(exception, lineNumber)

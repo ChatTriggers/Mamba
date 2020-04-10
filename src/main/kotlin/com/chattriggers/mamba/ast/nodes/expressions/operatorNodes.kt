@@ -5,7 +5,6 @@ import com.chattriggers.mamba.api.ComparisonOperator
 import com.chattriggers.mamba.api.UnaryOperator
 import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.base.VObject
-import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import com.chattriggers.mamba.core.values.singletons.toValue
 
 class OrExpresionNode(
@@ -57,7 +56,7 @@ class ComparisonNode(
             ComparisonOperator.NOT_EQ -> rt.valueCompare("__ne__", leftValue, rightValue)
             ComparisonOperator.GTE -> rt.valueCompare("__ge__", leftValue, rightValue)
             ComparisonOperator.LTE -> rt.valueCompare("__le__", leftValue, rightValue)
-            ComparisonOperator.DIAMOND -> notImplemented() // >:(
+            ComparisonOperator.DIAMOND -> TODO() // >:(
             ComparisonOperator.IN -> rt.toBoolean(rt.valueCompare("__contains__", leftValue, rightValue)).toValue()
             ComparisonOperator.NOT_IN -> (!rt.toBoolean(rt.valueCompare("__contains__", leftValue, rightValue))).toValue()
             ComparisonOperator.IS -> (leftValue == rightValue).toValue()

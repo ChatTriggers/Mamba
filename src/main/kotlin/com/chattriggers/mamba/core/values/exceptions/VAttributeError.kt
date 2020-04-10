@@ -12,10 +12,15 @@ import com.chattriggers.mamba.core.values.toValue
 class VAttributeError(args: VTuple) : VException(args, LazyValue("VAttributeErrorType") { VAttributeErrorType }) {
     override val className = "AttributeError"
 
-    constructor(identifier: String, type: String) : this(ThreadContext.currentContext.runtime.construct(
-        VTupleType,
-        listOf("'$type' object has no attribute '$identifier'")
-    ) as VTuple)
+    companion object {
+        fun construct(identifier: String, type: String): VAttributeError {
+            val rt = ThreadContext.currentContext.runtime
+
+            return rt.construct(VAttributeErrorType, listOf(
+                rt.construct(VTupleType, listOf("'$type' object has no attribute '$identifier"))
+            )) as VAttributeError
+        }
+    }
 }
 
 object VAttributeErrorType : VType(LazyValue("VExceptionType") { VExceptionType }) {
@@ -27,7 +32,7 @@ object VAttributeErrorType : VType(LazyValue("VExceptionType") { VExceptionType 
             val type = assertArgAs<VType>(0)
 
             if (type !is VAttributeErrorType) {
-                notImplemented()
+                TODO()
             }
 
             VAttributeError(arguments().toValue())

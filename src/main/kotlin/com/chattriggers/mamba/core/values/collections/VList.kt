@@ -9,7 +9,6 @@ import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.base.VType
 import com.chattriggers.mamba.core.values.exceptions.MambaException
 import com.chattriggers.mamba.core.values.exceptions.VStopIteration
-import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.unwrap
 import kotlin.contracts.ExperimentalContracts
@@ -33,7 +32,7 @@ object VListType : VType(LazyValue("VObjectType") { VObjectType }) {
             val type = assertArgAs<VType>(0)
 
             if (type !is VListType) {
-                notImplemented()
+                TODO()
             }
 
             val iterable = when (argSize) {
@@ -43,7 +42,7 @@ object VListType : VType(LazyValue("VObjectType") { VObjectType }) {
                         val value = arg.value
 
                         if (value !is MutableList<*> || value.size == 0 || value[0] !is VObject) {
-                            notImplemented()
+                            TODO()
                         }
 
                         @Suppress("UNCHECKED_CAST")
@@ -51,11 +50,11 @@ object VListType : VType(LazyValue("VObjectType") { VObjectType }) {
                     }
                     else -> arg.unwrap()
                 }
-                else -> notImplemented()
+                else -> TODO()
             }
 
             if (!runtime.isIterable(iterable)) {
-                notImplemented("Error")
+                TODO("Error")
             }
 
             val iterator = runtime.getIterator(iterable)

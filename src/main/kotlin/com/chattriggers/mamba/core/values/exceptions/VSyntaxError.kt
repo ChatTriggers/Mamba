@@ -8,8 +8,6 @@ import com.chattriggers.mamba.core.values.singletons.VNone
 
 class VSyntaxError(args: VTuple) : VException(args, LazyValue("VSyntaxErrorType") { VSyntaxErrorType }) {
     override val className = "SyntaxError"
-
-    constructor() : this(VTuple())
 }
 
 object VSyntaxErrorType : VType(LazyValue("VExceptionType") { VExceptionType }) {
@@ -21,7 +19,7 @@ object VSyntaxErrorType : VType(LazyValue("VExceptionType") { VExceptionType }) 
             val type = assertArgAs<VType>(0)
 
             if (type !is VSyntaxErrorType) {
-                notImplemented()
+                TODO()
             }
 
             VSyntaxError(arguments().toValue())

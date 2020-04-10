@@ -43,7 +43,7 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
             val type = assertArgAs<VType>(0)
 
             if (type !is VComplexType) {
-                notImplemented()
+                TODO()
             }
 
             var real = 0.0
@@ -53,7 +53,7 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
                 real = when (val v = argumentRaw(1)) {
                     is Wrapper -> v.value as Double
                     is VObject -> runtime.toDouble(v)
-                    else -> notImplemented("Error")
+                    else -> TODO("Error")
                 }
             }
 
@@ -61,7 +61,7 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
                 imag = when (val v = argumentRaw(2)) {
                     is Wrapper -> v.value as Double
                     is VObject -> runtime.toDouble(v)
-                    else -> notImplemented("Error")
+                    else -> TODO("Error")
                 }
             }
 
@@ -75,7 +75,7 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
             when (val self = argument(0)) {
                 is VComplex -> construct(VComplexType, self.real, -self.imag)
                 is VFloat, is VInt -> self
-                else -> notImplemented()
+                else -> TODO()
             }
         }
 
@@ -94,7 +94,7 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
                 is VInt -> real + other.int to imag
                 is VFloat -> real + other.double to imag
                 is VComplex -> real + other.real to imag + other.imag
-                else -> notImplemented("Error")
+                else -> TODO("Error")
             }.let {
                 construct(VComplexType, it.first, it.second)
             }
@@ -105,7 +105,7 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
             }
         }
         addMethod("__divmod__") {
-            throw MambaException(VTypeError("TODO: Error"))
+            throw MambaException(VTypeError.construct("TODO: Error"))
         }
         addMethod("__eq__") {
             val (real, imag) = assertSelfAs<VComplex>()
@@ -114,40 +114,40 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
                 is VInt -> real == other.int.toDouble() && imag == 0.0
                 is VFloat -> real == other.double && imag == 0.0
                 is VComplex -> real == other.real && imag == other.imag
-                else -> notImplemented("Error")
+                else -> TODO("Error")
             }.let {
                 construct(VBoolType, it)
             }
         }
         addMethod("__float__") {
-            throw MambaException(VTypeError("can't convert complex to float"))
+            throw MambaException(VTypeError.construct("can't convert complex to float"))
         }
         addMethod("__floordiv__") {
-            throw MambaException(VTypeError("can't take floor of complex number"))
+            throw MambaException(VTypeError.construct("can't take floor of complex number"))
         }
         addMethod("__ge__") {
-            throw MambaException(VTypeError("TODO: Error"))
+            throw MambaException(VTypeError.construct("TODO: Error"))
         }
         addMethod("__gt__") {
-            throw MambaException(VTypeError("TODO: Error"))
+            throw MambaException(VTypeError.construct("TODO: Error"))
         }
         addMethod("__int__") {
-            throw MambaException(VTypeError("can't convert complex to int"))
+            throw MambaException(VTypeError.construct("can't convert complex to int"))
         }
         addMethod("__le__") {
-            throw MambaException(VTypeError("TODO: Error"))
+            throw MambaException(VTypeError.construct("TODO: Error"))
         }
         addMethod("__lt__") {
-            throw MambaException(VTypeError("TODO: Error"))
+            throw MambaException(VTypeError.construct("TODO: Error"))
         }
         addMethod("__mod__") {
-            throw MambaException(VTypeError("TODO: Error"))
+            throw MambaException(VTypeError.construct("TODO: Error"))
         }
         addMethod("__mul__") {
-            throw MambaException(VTypeError("TODO: Error"))
+            throw MambaException(VTypeError.construct("TODO: Error"))
         }
         addMethod("__ne__") {
-            throw MambaException(VTypeError("TODO: Error"))
+            throw MambaException(VTypeError.construct("TODO: Error"))
         }
         addMethod("__neg__") {
             val (real, imag) = assertSelfAs<VComplex>()
@@ -157,7 +157,7 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
             assertSelfAs<VComplex>()
         }
         addMethod("__pow__") {
-            notImplemented("Implement complex power algorithm")
+            TODO("Implement complex power algorithm")
         }
         addMethod("__radd__") {
             runtime.callProperty(argument(1), "__add__", listOf(argument(0)))
@@ -190,7 +190,7 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
                 is VInt -> real - other.int to imag
                 is VFloat -> real - other.double to imag
                 is VComplex -> real - other.real to imag - other.imag
-                else -> notImplemented("Error")
+                else -> TODO("Error")
             }.let {
                 construct(VComplexType, it.first, it.second)
             }
@@ -207,7 +207,7 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
                     val i = (imag * other.real - real * other.imag) / d
                     r to i
                 }
-                else -> notImplemented("Error")
+                else -> TODO("Error")
             }.let {
                 construct(VComplexType, it.first, it.second)
             }

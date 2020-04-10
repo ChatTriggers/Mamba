@@ -12,6 +12,16 @@ class VStopIteration(args: VTuple) : VException(args, LazyValue("VStopIterationT
     override val className = "StopIteration"
 
     constructor() : this(ThreadContext.currentContext.runtime.construct(VTupleType, emptyList()) as VTuple)
+
+    companion object {
+        fun construct(): VStopIteration {
+            val rt = ThreadContext.currentContext.runtime
+
+            return rt.construct(VStopIterationType, listOf(
+                rt.construct(VTupleType, emptyList())
+            )) as VStopIteration
+        }
+    }
 }
 
 object VStopIterationType : VType(LazyValue("VExceptionType") { VExceptionType }) {
@@ -23,7 +33,7 @@ object VStopIterationType : VType(LazyValue("VExceptionType") { VExceptionType }
             val type = assertArgAs<VType>(0)
 
             if (type !is VStopIterationType) {
-                notImplemented()
+                TODO()
             }
 
             VStopIteration(arguments().toValue())

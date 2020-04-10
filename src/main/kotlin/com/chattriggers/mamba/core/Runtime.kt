@@ -10,7 +10,6 @@ import com.chattriggers.mamba.core.values.collections.VDict
 import com.chattriggers.mamba.core.values.collections.VList
 import com.chattriggers.mamba.core.values.collections.VListType
 import com.chattriggers.mamba.core.values.collections.VTupleType
-import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import com.chattriggers.mamba.core.values.numbers.*
 import com.chattriggers.mamba.core.values.exceptions.MambaException
 import com.chattriggers.mamba.core.values.exceptions.VTypeError
@@ -31,11 +30,11 @@ class Runtime(private val ctx: ThreadContext) {
     }
 
     fun toInt(value: VObject): Int {
-        notImplemented()
+        TODO()
     }
 
     fun toDouble(value: VObject): Double {
-        notImplemented()
+        TODO()
     }
 
     fun toVObject(obj: Any?): VObject = when (obj) {
@@ -47,14 +46,14 @@ class Runtime(private val ctx: ThreadContext) {
         is String -> construct(VStringType, listOf(obj))
         is Boolean -> if (obj) VTrue else VFalse
         null -> VNone
-        else -> notImplemented("Conversion of type ${obj.javaClass.simpleName} to Value not implemented")
+        else -> TODO("Conversion of type ${obj.javaClass.simpleName} to Value not implemented")
     }
 
     fun getName(value: Node): String {
         return when (value) {
             is IdentifierNode -> value.identifier
             is DotAccessNode -> value.property.identifier
-            else -> notImplemented()
+            else -> TODO()
         }
     }
 
@@ -89,9 +88,9 @@ class Runtime(private val ctx: ThreadContext) {
                 if (obj.containsSlot("__call__"))
                     return callProperty(obj, "__call__", args)
 
-                throw MambaException(VTypeError("'${obj.className}' object is not callable"))
+                throw MambaException(VTypeError.construct("'${obj.className}' object is not callable"))
             }
-            else -> notImplemented("Error")
+            else -> TODO("Error")
         }
     }
 

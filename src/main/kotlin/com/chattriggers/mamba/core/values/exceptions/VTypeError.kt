@@ -1,8 +1,10 @@
 package com.chattriggers.mamba.core.values.exceptions
 
+import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.LazyValue
 import com.chattriggers.mamba.core.values.base.VType
 import com.chattriggers.mamba.core.values.collections.VTuple
+import com.chattriggers.mamba.core.values.collections.VTupleType
 import com.chattriggers.mamba.core.values.collections.toValue
 import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.toValue
@@ -10,9 +12,15 @@ import com.chattriggers.mamba.core.values.toValue
 class VTypeError(args: VTuple) : VException(args, LazyValue("VTypeErrorType") { VTypeErrorType }) {
     override val className = "TypeError"
 
-    constructor() : this(VTuple())
+    companion object {
+        fun construct(message: String): VTypeError {
+            val rt = ThreadContext.currentContext.runtime
 
-    constructor(msg: String) : this(VTuple(msg.toValue()))
+            return rt.construct(VTypeErrorType, listOf(
+                rt.construct(VTupleType, listOf(message))
+            )) as VTypeError
+        }
+    }
 }
 
 object VTypeErrorType : VType(LazyValue("VExceptionType") { VExceptionType }) {
@@ -24,7 +32,7 @@ object VTypeErrorType : VType(LazyValue("VExceptionType") { VExceptionType }) {
             val type = assertArgAs<VType>(0)
 
             if (type !is VTypeErrorType) {
-                notImplemented()
+                TODO()
             }
 
             VTypeError(arguments().toValue())

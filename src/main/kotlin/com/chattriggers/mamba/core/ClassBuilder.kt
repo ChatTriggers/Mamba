@@ -7,7 +7,6 @@ import com.chattriggers.mamba.core.values.base.VType
 import com.chattriggers.mamba.core.values.Wrapper
 import com.chattriggers.mamba.core.values.base.VBuiltinMethodType
 import com.chattriggers.mamba.core.values.base.VFunctionType
-import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import com.chattriggers.mamba.core.values.unwrap
 
 class ClassMethodBuilder(val ctx: ThreadContext, private val _args: List<Value>) {
@@ -29,7 +28,7 @@ class ClassMethodBuilder(val ctx: ThreadContext, private val _args: List<Value>)
     inline fun <reified T : Value> assertArgAs(index: Int): T {
         val arg = argumentRaw(index)
         if (arg !is T)
-            notImplemented()
+            TODO()
         return arg
     }
 
@@ -79,7 +78,7 @@ data class MethodWrapper(
         return when {
             funcNode != null -> funcNode.call(ctx, newArgs.map { it as VObject })
             method != null -> method.invoke(ClassMethodBuilder(ctx, newArgs))
-            else -> notImplemented("Impossible")
+            else -> TODO("Impossible")
         }
     }
 }

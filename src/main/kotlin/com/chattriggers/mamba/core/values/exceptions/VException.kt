@@ -11,8 +11,6 @@ open class VException(
     type: LazyValue<VType> = LazyValue("VBaseExceptionType") { VBaseExceptionType }
 ) : VBaseException(args, type) {
     override val className = "Exception"
-
-    constructor() : this(VTuple())
 }
 
 object VExceptionType : VType(LazyValue("VBaseExceptionType") { VBaseExceptionType }) {
@@ -24,7 +22,7 @@ object VExceptionType : VType(LazyValue("VBaseExceptionType") { VBaseExceptionTy
             val type = assertArgAs<VType>(0)
 
             if (type !is VExceptionType) {
-                notImplemented()
+                TODO()
             }
 
             VException(arguments().toValue())

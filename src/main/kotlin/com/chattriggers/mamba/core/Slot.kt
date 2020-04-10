@@ -15,7 +15,7 @@ data class Slot(
         get() = valueBacker
         set(value) {
             if (!isWritable) {
-                throw MambaException(VTypeError("can't set write-only property '$key'"))
+                throw MambaException(VTypeError.construct("can't set write-only property '$key'"))
             }
 
             valueBacker = value
