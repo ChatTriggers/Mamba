@@ -1,22 +1,17 @@
 package com.chattriggers.mamba.core.values.collections
 
 import com.chattriggers.mamba.core.values.*
-import com.chattriggers.mamba.core.values.exceptions.MambaException
 import com.chattriggers.mamba.core.values.exceptions.VValueError
 import com.chattriggers.mamba.core.values.numbers.VInt
-import java.lang.IllegalArgumentException
+import com.chattriggers.mamba.core.values.base.VObject
+import com.chattriggers.mamba.core.values.base.VObjectType
+import com.chattriggers.mamba.core.values.base.VType
+import com.chattriggers.mamba.core.values.singletons.VNone
 
 class VRange(val start: Int, val stop: Int, val step: Int = 1) : VObject(LazyValue("VRangeType") { VRangeType }) {
     internal var current = start
 
     override val className = "dict"
-
-    init {
-        // TODO: ValueError
-        if (step == 0) {
-            throw MambaException(VValueError(VTuple("range() arg 3 must not be 0".toValue())))
-        }
-    }
 
     constructor(stop: Int) : this(0, stop)
 
@@ -42,13 +37,26 @@ class VRange(val start: Int, val stop: Int, val step: Int = 1) : VObject(LazyVal
 
 object VRangeType : VType(LazyValue("VObjectType") { VObjectType }) {
     init {
-        addMethodDescriptor("__iter__") {
-            VRangeIterator(assertSelfAs())
+        addMethod("__iter__") {
+            runtime.construct(VRangeIteratorType, listOf(assertSelfAs<VRange>()))
         }
-        addMethodDescriptor("__call__") {
-            val first = assertArgAs<VInt>(0)
-            val second = argAs<VInt>(1)
-            val third = argAs<VInt>(2)
+        addMethod("__call__") {
+            runtime.construct(VRangeType, arguments())
+        }
+        addMethod("__new__", isStatic = true) {
+            val type = assertArgAs<VType>(0)
+
+            if (type !is VRangeType) {
+                TODO()
+            }
+
+            val first = assertArgAs<VInt>(1)
+            val second = argAs<VInt>(2)
+            val third = argAs<VInt>(3)
+
+            if (third != null && third.int == 0) {
+                return@addMethod VExceptionWrapper(VValueError.construct("range() arg 3 must not be 0"))
+            }
 
             when {
                 second == null -> VRange(first.int)
@@ -56,7 +64,8 @@ object VRangeType : VType(LazyValue("VObjectType") { VObjectType }) {
                 else -> VRange(first.int, second.int, third.int)
             }
         }
+        addMethod("__init__") {
+            VNone
+        }
     }
 }
-
-//fun ClosedRange = VRange(this.toMutableMap())

@@ -1,9 +1,10 @@
 package com.chattriggers.mamba.ast.nodes.statements
 
-import com.chattriggers.mamba.core.Interpreter
-import com.chattriggers.mamba.core.values.VObject
+import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.ast.nodes.Node
 import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
+import com.chattriggers.mamba.core.ThreadContext
+import com.chattriggers.mamba.core.values.VExceptionWrapper
 
 enum class IfConditionalNodeType {
     IF,
@@ -38,27 +39,23 @@ class IfStatementNode(
         }
     }
 
-    override fun execute(interp: Interpreter): VObject {
-        interp.pushScope()
+    override fun execute(ctx: ThreadContext): VObject {
+        val rt = ctx.runtime
+        var ifCond = ifBlock.condition.execute(ctx)
+        if (ifCond is VExceptionWrapper) return ifCond
 
-        try {
-            val rt = interp.runtime
-            var ifCond = ifBlock.condition.execute(interp)
-
-            if (rt.toBoolean(ifCond)) {
-                return executeStatements(interp, ifBlock.body)
-            }
-
-            for (elifBlock in elifBlocks) {
-                ifCond = elifBlock.condition.execute(interp)
-                if (rt.toBoolean(ifCond))
-                    return executeStatements(interp, elifBlock.body)
-            }
-
-            return executeStatements(interp, elseBlock)
-        } finally {
-            interp.popScope()
+        if (rt.toBoolean(ifCond)) {
+            return executeStatements(ctx, ifBlock.body)
         }
+
+        for (elifBlock in elifBlocks) {
+            ifCond = elifBlock.condition.execute(ctx)
+            if (ifCond is VExceptionWrapper) return ifCond
+            if (rt.toBoolean(ifCond))
+                return executeStatements(ctx, elifBlock.body)
+        }
+
+        return executeStatements(ctx, elseBlock)
     }
 
     override fun print(indent: Int) {

@@ -1,5 +1,10 @@
 package com.chattriggers.mamba.core.values
 
+import com.chattriggers.mamba.core.ClassFieldBuilder
+import com.chattriggers.mamba.core.FieldWrapper
+import com.chattriggers.mamba.core.MethodWrapper
+import com.chattriggers.mamba.core.ThreadContext
+import com.chattriggers.mamba.core.values.base.*
 /**
  * Superclass of every value accessible in the Python runtime.
  *
@@ -17,3 +22,14 @@ package com.chattriggers.mamba.core.values
  * @see LazyValue
  */
 interface Value
+
+fun Value?.unwrap(): VObject {
+    return when (this) {
+        is LazyValue<*> -> valueProducer()
+        is VObject -> this
+        is MethodWrapper -> ThreadContext.currentContext.runtime.construct(VBuiltinMethodType, listOf(this))
+        is FieldWrapper -> this.field(ClassFieldBuilder(ThreadContext.currentContext))
+        is Wrapper -> ThreadContext.currentContext.runtime.toVObject(this.value)
+        else -> TODO()
+    }
+}

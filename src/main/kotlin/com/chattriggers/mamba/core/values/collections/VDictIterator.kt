@@ -1,9 +1,11 @@
 package com.chattriggers.mamba.core.values.collections
 
 import com.chattriggers.mamba.core.values.*
-import com.chattriggers.mamba.core.values.exceptions.MambaException
 import com.chattriggers.mamba.core.values.exceptions.VStopIteration
-import com.chattriggers.mamba.core.values.exceptions.notImplemented
+import com.chattriggers.mamba.core.values.base.VObject
+import com.chattriggers.mamba.core.values.base.VObjectType
+import com.chattriggers.mamba.core.values.base.VType
+import com.chattriggers.mamba.core.values.singletons.VNone
 
 class VDictIterator(val vdict: VDict) : VObject(LazyValue { VDictIteratorType }) {
     internal var vdictKeys = vdict.dict.keys.toList()
@@ -15,20 +17,35 @@ class VDictIterator(val vdict: VDict) : VObject(LazyValue { VDictIteratorType })
     override fun toString() = "<dict_iterator object>"
 }
 
-object VDictIteratorType : VType(LazyValue { VObjectType }) {
+object VDictIteratorType : VType(LazyValue("VObjectType") { VObjectType }) {
     init {
-        addMethodDescriptor("__iter__") {
+        addMethod("__iter__") {
             assertSelfAs<VDictIterator>()
         }
-        addMethodDescriptor("__next__") {
+        addMethod("__next__") {
             val self = assertSelfAs<VDictIterator>()
 
             when {
                 self.vdict.dict.size != self.vdictKeys.size ->
-                    notImplemented("RuntimeError: dictionary changed size during iteration")
-                self.cursor >= self.vdictKeys.size -> throw MambaException(VStopIteration())
+                    TODO("RuntimeError: dictionary changed size during iteration")
+                self.cursor >= self.vdictKeys.size -> VExceptionWrapper(VStopIteration.construct())
                 else -> self.vdict.dict[self.vdictKeys[self.cursor++]]!!
             }.unwrap()
+        }
+        addMethod("__call__") {
+            runtime.construct(VDictIteratorType, arguments())
+        }
+        addMethod("__new__", isStatic = true) {
+            val type = assertArgAs<VType>(0)
+
+            if (type !is VDictIteratorType) {
+                TODO()
+            }
+
+            VDictIterator(assertArgAs(1))
+        }
+        addMethod("__init__") {
+            VNone
         }
     }
 }

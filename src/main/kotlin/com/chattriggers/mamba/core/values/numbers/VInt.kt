@@ -1,10 +1,14 @@
 package com.chattriggers.mamba.core.values.numbers
 
+import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.LazyValue
-import com.chattriggers.mamba.core.values.VObject
-import com.chattriggers.mamba.core.values.VType
-import kotlin.math.ceil
-import kotlin.math.ln
+import com.chattriggers.mamba.core.values.VStringType
+import com.chattriggers.mamba.core.values.base.VObject
+import com.chattriggers.mamba.core.values.base.VObjectType
+import com.chattriggers.mamba.core.values.base.VType
+import com.chattriggers.mamba.core.values.Wrapper
+import com.chattriggers.mamba.core.values.singletons.*
+import kotlin.math.*
 
 open class VInt(val int: Int, type: LazyValue<VType> = LazyValue("VIntType") { VIntType }) : VObject(type) {
     override val className = "int"
@@ -12,68 +16,274 @@ open class VInt(val int: Int, type: LazyValue<VType> = LazyValue("VIntType") { V
     override fun toString() = int.toString()
 }
 
-object VIntType : VType(LazyValue("VComplexType") { VComplexType }) {
+object VIntType : VType(LazyValue("VObjectType") { VObjectType }) {
     init {
-        addMethodDescriptor("bit_length") {
+        addMethod("__call__") {
+            construct(VIntType, *arguments().toTypedArray())
+        }
+        addMethod("__new__", isStatic = true) {
+            val type = assertArgAs<VType>(0)
+
+            if (type !is VIntType) {
+                TODO()
+            }
+
+            var num = 0
+
+            if (argSize > 0) {
+                num = when (val v = argumentRaw(1)) {
+                    is Wrapper -> v.value as Int
+                    is VObject -> runtime.toInt(v)
+                    else -> TODO("Error")
+                }
+            }
+
+            VInt(num)
+        }
+        addMethod("__init__") {
+            VNone
+        }
+
+        addMethod("bit_length") {
             val self = assertSelfAs<VInt>()
             ceil(ln(self.int.toDouble()) / ln(2.toDouble())).toInt().toValue()
         }
 
-        // Magic methods
-        addMethodDescriptor("__and__") {
+        addMethod("__abs__") {
+            construct(VIntType, assertSelfAs<VInt>().int.absoluteValue)
+        }
+        addMethod("__add__") {
+            val self = assertSelfAs<VInt>()
+
+            when (val other = assertArgAs<VObject>(1)) {
+                is VInt -> construct(VIntType, self.int + other.int)
+                is VFloat -> construct(VFloatType, self.int.toDouble() + other.double)
+                is VComplex -> construct(VComplexType, self.int.toDouble() + other.real, other.imag)
+                else -> TODO("Error")
+            }
+        }
+        addMethod("__and__") {
             val self = assertSelfAs<VInt>()
             val other = assertArgAs<VInt>(1)
 
-            VInt(self.int and other.int)
+            construct(VIntType, self.int and other.int)
         }
-        addMethodDescriptor("__ceil__") {
+        addMethod("__bool__") {
+            if (assertSelfAs<VInt>().int == 0) VFalse else VTrue
+        }
+        addMethod("__ceil__") {
             argument(0)
         }
-        addMethodDescriptor("__floor__") {
-            argument(0)
+        addMethod("__divmod__") {
+            TODO()
         }
-        addMethodDescriptor("__invert__") {
+        addMethod("__eq__") {
             val self = assertSelfAs<VInt>()
-            VInt(self.int.inv())
-        }
-        addMethodDescriptor("__lshift__") {
-            val self = assertSelfAs<VInt>()
-            val other = assertArgAs<VInt>(1)
-            VInt(self.int shl other.int)
-        }
-        addMethodDescriptor("__rand__") {
-            argument(1).callProperty(interp, "__and__", listOf(argument(0)))
-        }
-        addMethodDescriptor("__rlshift__") {
-            argument(1).callProperty(interp, "__lshift__", listOf(argument(0)))
-        }
-        addMethodDescriptor("__rrshift__") {
-            argument(1).callProperty(interp, "__rshift__", listOf(argument(0)))
-        }
-        addMethodDescriptor("__rshift__") {
-            val self = assertSelfAs<VInt>()
-            val other = assertArgAs<VInt>(1)
-            VInt(self.int shr other.int)
-        }
-        addMethodDescriptor("__ror__") {
-            argument(1).callProperty(interp, "__or__", listOf(argument(0)))
-        }
-        addMethodDescriptor("__rxor__") {
-            argument(1).callProperty(interp, "__xor__", listOf(argument(0)))
-        }
-        addMethodDescriptor("__or__") {
-            val self = assertSelfAs<VInt>()
-            val other = assertArgAs<VInt>(1)
 
-            VInt(self.int or other.int)
+            when (val other = assertArgAs<VObject>(1)) {
+                is VInt -> construct(VBoolType, self.int == other.int)
+                is VFloat -> construct(VBoolType, self.int.toDouble() == other.double)
+                is VComplex -> construct(VBoolType, self.int.toDouble() == other.real && other.imag == 0.0)
+                else -> TODO("Error")
+            }
         }
-        addMethodDescriptor("__xor__") {
+        addMethod("__float__") {
+            val self = assertSelfAs<VInt>()
+            construct(VFloatType, self.int.toDouble())
+        }
+        addMethod("__floor__") {
+            assertSelfAs<VInt>()
+        }
+        addMethod("__floordiv") {
+            val self = assertSelfAs<VInt>()
+
+            when (val other = assertArgAs<VObject>(1)) {
+                is VInt -> construct(VIntType, self.int / other.int)
+                is VFloat -> construct(VFloatType, floor((self.int.toDouble() / other.double)))
+                is VComplex -> {
+                    val d = other.real.pow(2.0) + other.imag.pow(2.0)
+                    val r = floor((self.int.toDouble() * other.real) / d)
+                    val i = floor(-(self.int.toDouble() * other.imag) / d)
+                    construct(VComplexType, r, i)
+                }
+                else -> TODO("Error")
+            }
+        }
+        addMethod("__ge__") {
+            val self = assertSelfAs<VInt>()
+
+            when (val other = assertArgAs<VObject>(1)) {
+                is VInt -> construct(VBoolType, self.int >= other.int)
+                is VFloat -> construct(VBoolType, self.int.toDouble() >= other.double)
+                else -> TODO()
+            }
+        }
+        addMethod("__gt__") {
+            val self = assertSelfAs<VInt>()
+
+            when (val other = assertArgAs<VObject>(1)) {
+                is VInt -> construct(VBoolType, self.int > other.int)
+                is VFloat -> construct(VBoolType, self.int.toDouble() > other.double)
+                else -> TODO()
+            }
+        }
+        addMethod("__int__") {
+            assertSelfAs<VInt>()
+        }
+        addMethod("__invert__") {
+            construct(VIntType, assertSelfAs<VInt>().int.inv())
+        }
+        addMethod("__le__") {
+            val self = assertSelfAs<VInt>()
+
+            when (val other = assertArgAs<VObject>(1)) {
+                is VInt -> construct(VBoolType, self.int <= other.int)
+                is VFloat -> construct(VBoolType, self.int.toDouble() <= other.double)
+                else -> TODO()
+            }
+        }
+        addMethod("__lshift__") {
             val self = assertSelfAs<VInt>()
             val other = assertArgAs<VInt>(1)
+            construct(VIntType, self.int shl other.int)
+        }
+        addMethod("__lt__") {
+            val self = assertSelfAs<VInt>()
 
-            VInt(self.int xor other.int)
+            when (val other = assertArgAs<VObject>(1)) {
+                is VInt -> construct(VBoolType, self.int < other.int)
+                is VFloat -> construct(VBoolType, self.int.toDouble() < other.double)
+                else -> TODO()
+            }
+        }
+        addMethod("__mod__") {
+            val self = assertSelfAs<VInt>()
+
+            when (val other = assertArgAs<VObject>(1)) {
+                is VInt -> construct(VIntType, self.int.rem(other.int))
+                is VFloat -> construct(VFloatType, self.int.toDouble().rem(other.double))
+                else -> TODO()
+            }
+        }
+        addMethod("__mul__") {
+            val self = assertSelfAs<VInt>()
+
+            when (val other = assertArgAs<VObject>(1)) {
+                is VInt -> construct(VIntType, self.int * other.int)
+                is VFloat -> construct(VFloatType, self.int.toDouble() * other.double)
+                is VComplex -> construct(VComplexType, self.int.toDouble() * other.real, self.int.toDouble() * other.imag)
+                else -> TODO()
+            }
+        }
+        addMethod("__ne__") {
+            val self = assertSelfAs<VInt>()
+
+            when (val other = assertArgAs<VObject>(1)) {
+                is VInt -> construct(VBoolType, self.int != other.int)
+                is VFloat -> construct(VBoolType, self.int.toDouble() != other.double)
+                is VComplex -> construct(VBoolType, self.int.toDouble() != other.real || other.imag == 0.0)
+                else -> TODO("Error")
+            }
+        }
+        addMethod("__neg__") {
+            construct(VIntType, -assertSelfAs<VInt>().int)
+        }
+        addMethod("__or__") {
+            val self = assertSelfAs<VInt>()
+            val other = assertArgAs<VInt>(1)
+            construct(VIntType, self.int or other.int)
+        }
+        addMethod("__pow__") {
+            val self = assertSelfAs<VInt>()
+
+            when (val other = assertArgAs<VObject>(1)) {
+                is VInt -> construct(VIntType, self.int.toDouble().pow(other.int).toInt())
+                is VFloat -> construct(VFloatType, self.int.toDouble().pow(other.double))
+                is VComplex -> TODO("TODO")
+                else -> TODO()
+            }
+        }
+        addMethod("__radd__") {
+            runtime.callProperty(argument(1), "__add__", listOf(argument(0)))
+        }
+        addMethod("__rand__") {
+            runtime.callProperty(argument(1), "__and__", listOf(argument(0)))
+        }
+        addMethod("__rdivmod__") {
+            runtime.callProperty(argument(1), "__divmod__", listOf(argument(0)))
+        }
+        addMethod("__rfloordiv__") {
+            runtime.callProperty(argument(1), "__floordiv__", listOf(argument(0)))
+        }
+        addMethod("__rlshift__") {
+            runtime.callProperty(argument(1), "__lshift__", listOf(argument(0)))
+        }
+        addMethod("__rmod__") {
+            runtime.callProperty(argument(1), "__mod__", listOf(argument(0)))
+        }
+        addMethod("__rmul__") {
+            runtime.callProperty(argument(1), "__mul__", listOf(argument(0)))
+        }
+        addMethod("__ror__") {
+            runtime.callProperty(argument(1), "__or__", listOf(argument(0)))
+        }
+        addMethod("__round__") {
+            TODO()
+        }
+        addMethod("__rpow__") {
+            runtime.callProperty(argument(1), "__pow__", listOf(argument(0)))
+        }
+        addMethod("__rrshift__") {
+            runtime.callProperty(argument(1), "__rshift__", listOf(argument(0)))
+        }
+        addMethod("__rshift__") {
+            val self = assertSelfAs<VInt>()
+            val other = assertArgAs<VInt>(1)
+            construct(VIntType, self.int shr other.int)
+        }
+        addMethod("__rsub__") {
+            runtime.callProperty(argument(1), "__sub__", listOf(argument(0)))
+        }
+        addMethod("__rtruediv__") {
+            runtime.callProperty(argument(1), "__truediv__", listOf(argument(0)))
+        }
+        addMethod("__rxor__") {
+            runtime.callProperty(argument(1), "__xor__", listOf(argument(0)))
+        }
+        addMethod("__str__") {
+            construct(VStringType, assertSelfAs<VInt>().int.toString())
+        }
+        addMethod("__sub__") {
+            val self = assertSelfAs<VInt>()
+
+            when (val other = assertArgAs<VObject>(1)) {
+                is VInt -> construct(VIntType, self.int - other.int)
+                is VFloat -> construct(VFloatType, self.int.toDouble() - other.double)
+                is VComplex -> construct(VComplexType, self.int.toDouble() - other.real, -other.imag)
+                else -> TODO("Error")
+            }
+        }
+        addMethod("__truediv__") {
+            val self = assertSelfAs<VInt>()
+
+            when (val other = assertArgAs<VObject>(1)) {
+                is VInt -> construct(VFloatType, self.int.toDouble() / other.int.toDouble())
+                is VFloat -> construct(VFloatType, self.int.toDouble() / other.double)
+                is VComplex -> {
+                    val d = other.real.pow(2.0) + other.imag.pow(2.0)
+                    val r = (self.int.toDouble() * other.real) / d
+                    val i = -(self.int.toDouble() * other.imag) / d
+                    construct(VComplexType, r, i)
+                }
+                else -> TODO()
+            }
+        }
+        addMethod("__xor__") {
+            val self = assertSelfAs<VInt>()
+            val other = assertArgAs<VInt>(1)
+            construct(VIntType, self.int xor other.int)
         }
     }
 }
 
-fun Int.toValue() = VInt(this)
+fun Int.toValue() = ThreadContext.currentContext.runtime.construct(VIntType, listOf(this))

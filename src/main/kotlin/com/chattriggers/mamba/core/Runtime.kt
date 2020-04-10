@@ -3,21 +3,19 @@ package com.chattriggers.mamba.core
 import com.chattriggers.mamba.ast.nodes.Node
 import com.chattriggers.mamba.ast.nodes.expressions.DotAccessNode
 import com.chattriggers.mamba.ast.nodes.expressions.IdentifierNode
-import com.chattriggers.mamba.ast.nodes.expressions.MemberAccessNode
-import com.chattriggers.mamba.ast.nodes.statements.FunctionNode
 import com.chattriggers.mamba.core.values.*
+import com.chattriggers.mamba.core.values.base.*
 import com.chattriggers.mamba.core.values.collections.VDict
 import com.chattriggers.mamba.core.values.collections.VList
-import com.chattriggers.mamba.core.values.exceptions.notImplemented
-import com.chattriggers.mamba.core.values.functions.ICallable
-import com.chattriggers.mamba.core.values.functions.IMethod
+import com.chattriggers.mamba.core.values.collections.VListType
+import com.chattriggers.mamba.core.values.collections.VTupleType
+import com.chattriggers.mamba.core.values.exceptions.VBaseException
+import com.chattriggers.mamba.core.values.exceptions.VStopIteration
 import com.chattriggers.mamba.core.values.numbers.*
-import com.chattriggers.mamba.core.values.singletons.VFalse
-import com.chattriggers.mamba.core.values.singletons.VNone
-import com.chattriggers.mamba.core.values.singletons.VNotImplemented
-import com.chattriggers.mamba.core.values.singletons.toValue
+import com.chattriggers.mamba.core.values.exceptions.VTypeError
+import com.chattriggers.mamba.core.values.singletons.*
 
-class Runtime(val interp: Interpreter) {
+class Runtime(private val ctx: ThreadContext) {
     fun toBoolean(value: VObject): Boolean {
         return when {
             value is VNone || value is VFalse -> false
@@ -25,120 +23,131 @@ class Runtime(val interp: Interpreter) {
             value is VString -> value.string.isNotEmpty()
             value is VList -> value.list.isNotEmpty()
             value is VDict -> value.dict.isNotEmpty()
-            "__bool__" in value -> toBoolean(value.callProperty(interp, "__bool__"))
-            "__len__" in value -> toInt(value.callProperty(interp, "__len__")) != 0
+            value.containsSlot("__bool__") -> toBoolean(callProperty(value, "__bool__"))
+            value.containsSlot("__len__") -> toInt(callProperty(value, "__len__")) != 0
             else -> true
         }
-
     }
 
-    fun toInt(value: VObject): Int {
-        notImplemented()
+    fun toInt(obj: VObject): Int {
+        return when (obj) {
+            is VInt -> obj.int
+            else -> {
+                val ret = callProperty(obj, "__int__")
+                if (ret !is VInt) TODO()
+                return ret.int
+            }
+        }
+    }
+
+    fun toDouble(value: VObject): Double {
+        TODO()
+    }
+
+    fun toVObject(obj: Any?): VObject = when (obj) {
+        is MutableList<*> -> construct(VListType, listOf(obj))
+        is List<*> -> construct(VTupleType, listOf(obj))
+        is Int -> construct(VIntType, listOf(obj))
+        is Double -> construct(VFloatType, listOf(obj))
+        is Float -> construct(VFloatType, listOf(obj.toDouble()))
+        is String -> construct(VStringType, listOf(obj))
+        is Boolean -> if (obj) VTrue else VFalse
+        null -> VNone
+        else -> TODO("Conversion of type ${obj.javaClass.simpleName} to Value not implemented")
     }
 
     fun getName(value: Node): String {
         return when (value) {
             is IdentifierNode -> value.identifier
             is DotAccessNode -> value.property.identifier
-            else -> notImplemented()
-        }
-    }
-
-    fun widen(left: VObject, right: VObject): Pair<VObject, VObject> {
-        return widenHelper(left, right) to widenHelper(right, left)
-    }
-
-    private fun widenHelper(self: VObject, other: VObject): VObject {
-        if (self !is VInt && self !is VFloat && self !is VComplex)
-            notImplemented()
-
-        if (other !is VInt && other !is VFloat && other !is VComplex)
-            notImplemented()
-
-        return when (other) {
-            is VComplex -> when (self) {
-                is VComplex -> self
-                is VFloat -> VComplex(
-                    self.double,
-                    0.0
-                )
-                is VInt -> VComplex(
-                    self.int.toDouble(),
-                    0.0
-                )
-                else -> notImplemented()
-            }
-            is VFloat -> when (self) {
-                is VComplex, is VFloat -> self
-                is VInt -> VFloat(
-                    self.int.toDouble()
-                )
-                else -> notImplemented()
-            }
-            is VInt -> self
-            else -> notImplemented()
-        }
-    }
-
-    fun call(obj: VObject, args: List<VObject>): VObject {
-        interp.pushScope()
-
-        try {
-            if (obj is ICallable)
-                return obj.call(interp, args)
-
-            return obj.callProperty(interp, "__call__", args)
-        } finally {
-            interp.popScope()
+            else -> TODO()
         }
     }
 
     fun valueCompare(method: String, left: VObject, right: VObject): VObject {
-        return when (method) {
-            in left -> left.callProperty(interp, method, listOf(right))
+        return when {
+            left.containsSlot(method) -> callProperty(left, method, listOf(right))
             else -> VNotImplemented
         }
     }
 
     fun valueArithmetic(method: String, reverseMethod: String, left: VObject, right: VObject): VObject {
         return when {
-            method in left -> left.callProperty(interp, method, listOf(right))
-            reverseMethod in right -> right.callProperty(interp, reverseMethod, listOf(left))
+            left.containsSlot(method) -> callProperty(left, method, listOf(right))
+            right.containsSlot(reverseMethod) -> callProperty(right, reverseMethod, listOf(left))
             else -> VNotImplemented
         }
     }
 
-    fun dir(args: List<VObject>): VObject {
-        if (args.isEmpty() || args.size > 2)
-            notImplemented()
+    fun callProperty(obj: VObject, property: String, args: List<Value> = emptyList()): VObject {
+        return callProperty(obj, Wrapper(property), args)
+    }
 
-        return args[0].callProperty(interp, "__dir__", listOf(args[0]))
+    fun callProperty(obj: VObject, property: Value, args: List<Value> = emptyList()): VObject {
+        val prop = obj.getValue(property)
+        return call(prop, args)
+    }
+
+    fun call(obj: Any, args: List<Value>): VObject {
+        return when (obj) {
+            is IMethod -> obj.call(ctx, args)
+            is VObject -> {
+                if (obj.containsSlot("__call__"))
+                    return callProperty(obj, "__call__", args)
+
+                VExceptionWrapper(VTypeError.construct("'${obj.className}' object is not callable"))
+            }
+            else -> TODO("Error")
+        }
+    }
+
+    fun construct(type: VType) = construct(type, emptyList())
+
+    fun construct(type: VType, args: List<Any>): VObject {
+        val mappedArgs = args.map {
+            if (it !is Value) Wrapper(it) else it
+        }
+        val obj = callProperty(type, "__new__", listOf(type) + mappedArgs)
+
+        // TODO: Ensure VNone is returned
+        callProperty(obj, "__init__", mappedArgs)
+
+        return obj
     }
 
     fun getIterator(iterable: VObject): VObject {
-        return iterable.callProperty(interp, "__iter__")
+        return callProperty(iterable, "__iter__")
     }
 
     fun getIteratorNext(iterator: VObject): VObject {
-        return iterator.callProperty(interp, "__next__")
+        return callProperty(iterator, "__next__")
+    }
+
+    fun isIterable(obj: VObject) = obj.containsSlot("__iter__")
+
+    fun isIterator(obj: VObject) = isIterable(obj) && obj.containsSlot("__next__")
+
+    fun iterableToList(iterable: VObject): Value {
+        if (!isIterable(iterable)) TODO()
+
+        val iterator = getIterator(iterable)
+        val list = mutableListOf<VObject>()
+
+        while (true) {
+            val next = getIteratorNext(iterator)
+            if (next is VExceptionWrapper) {
+                if (next.exception is VStopIteration) {
+                    return Wrapper(list)
+                }
+                return next
+            }
+            list.add(next)
+        }
     }
 
     companion object {
-        fun toValue(obj: Any): VObject {
-            return when (obj) {
-                is Int -> obj.toValue()
-                is String -> obj.toValue()
-                is Boolean -> obj.toValue()
-                else -> throw IllegalArgumentException()
-            }
-        }
-
-        fun isIterable(obj: VObject): Boolean {
-            return "__iter__" in obj
-        }
-
-        fun isIterator(obj: VObject): Boolean {
-            return isIterator(obj) && "__next__" in obj
+        inline fun <reified T : VBaseException> isException(obj: VObject): Boolean {
+            return obj is VExceptionWrapper && obj.exception is T
         }
     }
 }

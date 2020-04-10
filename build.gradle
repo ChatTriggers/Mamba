@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     id "org.jetbrains.kotlin.jvm" version "1.3.70"
     id "antlr"
@@ -35,4 +37,12 @@ tasks.generateGrammarSource {
 
 tasks.build {
     dependsOn "generateGrammarSource"
+}
+
+allprojects {
+    tasks.withType(KotlinCompile).all {
+        kotlinOptions {
+            freeCompilerArgs += '-XXLanguage:+NewInference'
+        }
+    }
 }

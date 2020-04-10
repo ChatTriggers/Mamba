@@ -1,12 +1,12 @@
 package com.chattriggers.mamba.core.values.collections
 
 import com.chattriggers.mamba.core.values.LazyValue
-import com.chattriggers.mamba.core.values.VObject
-import com.chattriggers.mamba.core.values.VObjectType
-import com.chattriggers.mamba.core.values.VType
-import com.chattriggers.mamba.core.values.exceptions.MambaException
+import com.chattriggers.mamba.core.values.VExceptionWrapper
+import com.chattriggers.mamba.core.values.base.VObject
+import com.chattriggers.mamba.core.values.base.VObjectType
+import com.chattriggers.mamba.core.values.base.VType
 import com.chattriggers.mamba.core.values.exceptions.VStopIteration
-import com.chattriggers.mamba.core.values.singletons.VNotImplemented
+import com.chattriggers.mamba.core.values.singletons.VNone
 
 class VTupleIterator(internal val vtuple: VTuple) : VObject(LazyValue("VTupleIteratorType") { VTupleIteratorType }) {
     internal var cursor = 0
@@ -18,17 +18,32 @@ class VTupleIterator(internal val vtuple: VTuple) : VObject(LazyValue("VTupleIte
 
 object VTupleIteratorType : VType(LazyValue("VObjectType") { VObjectType }) {
     init {
-        addMethodDescriptor("__iter__") {
+        addMethod("__iter__") {
             assertSelfAs<VTupleIterator>()
         }
-        addMethodDescriptor("__next__") {
+        addMethod("__next__") {
             val self = assertSelfAs<VTupleIterator>()
 
             if (self.cursor >= self.vtuple.items.size) {
-                throw MambaException(VStopIteration())
+                VExceptionWrapper(VStopIteration.construct())
             } else {
                 self.vtuple.items[self.cursor++]
             }
+        }
+        addMethod("__call__") {
+            runtime.construct(VTupleIteratorType, arguments())
+        }
+        addMethod("__new__", isStatic = true) {
+            val type = assertArgAs<VType>(0)
+
+            if (type !is VTupleIteratorType) {
+                TODO()
+            }
+
+            VTupleIterator(assertArgAs(1))
+        }
+        addMethod("__init__") {
+            VNone
         }
     }
 }

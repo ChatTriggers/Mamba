@@ -3,9 +3,9 @@ package com.chattriggers.mamba.ast.nodes.expressions
 import com.chattriggers.mamba.api.ArithmeticOperator
 import com.chattriggers.mamba.api.ComparisonOperator
 import com.chattriggers.mamba.api.UnaryOperator
-import com.chattriggers.mamba.core.Interpreter
-import com.chattriggers.mamba.core.values.VObject
-import com.chattriggers.mamba.core.values.exceptions.notImplemented
+import com.chattriggers.mamba.core.ThreadContext
+import com.chattriggers.mamba.core.values.VExceptionWrapper
+import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.singletons.toValue
 
 class OrExpresionNode(
@@ -45,10 +45,13 @@ class ComparisonNode(
     private val left: ExpressionNode,
     private val right: ExpressionNode
 ) : ExpressionNode(lineNumber, listOf(left, right)) {
-    override fun execute(interp: Interpreter): VObject {
-        val rt = interp.runtime
-        val leftValue = left.execute(interp)
-        val rightValue = right.execute(interp)
+    override fun execute(ctx: ThreadContext): VObject {
+        val rt = ctx.runtime
+        val leftValue = left.execute(ctx)
+        if (leftValue is VExceptionWrapper) return leftValue
+
+        val rightValue = right.execute(ctx)
+        if (rightValue is VExceptionWrapper) return rightValue
 
         return when (op) {
             ComparisonOperator.LT -> rt.valueCompare("__lt__", leftValue, rightValue)
@@ -57,7 +60,7 @@ class ComparisonNode(
             ComparisonOperator.NOT_EQ -> rt.valueCompare("__ne__", leftValue, rightValue)
             ComparisonOperator.GTE -> rt.valueCompare("__ge__", leftValue, rightValue)
             ComparisonOperator.LTE -> rt.valueCompare("__le__", leftValue, rightValue)
-            ComparisonOperator.DIAMOND -> notImplemented() // >:(
+            ComparisonOperator.DIAMOND -> TODO() // >:(
             ComparisonOperator.IN -> rt.toBoolean(rt.valueCompare("__contains__", leftValue, rightValue)).toValue()
             ComparisonOperator.NOT_IN -> (!rt.toBoolean(rt.valueCompare("__contains__", leftValue, rightValue))).toValue()
             ComparisonOperator.IS -> (leftValue == rightValue).toValue()
@@ -80,10 +83,13 @@ class ArithmeticExpressionNode(
     private val left: ExpressionNode,
     private val right: ExpressionNode
 ) : ExpressionNode(lineNumber, listOf(left, right)) {
-    override fun execute(interp: Interpreter): VObject {
-        val rt = interp.runtime
-        val leftValue = left.execute(interp)
-        val rightValue = right.execute(interp)
+    override fun execute(ctx: ThreadContext): VObject {
+        val rt = ctx.runtime
+        val leftValue = left.execute(ctx)
+        if (leftValue is VExceptionWrapper) return leftValue
+
+        val rightValue = right.execute(ctx)
+        if (rightValue is VExceptionWrapper) return rightValue
 
         return when (op) {
             ArithmeticOperator.ADD -> rt.valueArithmetic("__add__", "__radd__", leftValue, rightValue)
@@ -115,13 +121,14 @@ class UnaryExpressionNode(
     private val op: UnaryOperator,
     private val child: ExpressionNode
 ) : ExpressionNode(lineNumber, child) {
-    override fun execute(interp: Interpreter): VObject {
-        val value = child.execute(interp)
+    override fun execute(ctx: ThreadContext): VObject {
+        val value = child.execute(ctx)
+        if (value is VExceptionWrapper) return value
 
         return when (op) {
-            UnaryOperator.NEG -> value.callProperty(interp, "__neg__")
-            UnaryOperator.POS -> value.callProperty(interp, "__pos__")
-            UnaryOperator.INVERT -> value.callProperty(interp, "__invert__")
+            UnaryOperator.NEG -> ctx.runtime.callProperty(value, "__neg__")
+            UnaryOperator.POS -> ctx.runtime.callProperty(value, "__pos__")
+            UnaryOperator.INVERT -> ctx.runtime.callProperty(value, "__invert__")
         }
     }
 

@@ -8,48 +8,67 @@ import com.chattriggers.mamba.core.values.exceptions.*
 import com.chattriggers.mamba.core.values.numbers.VComplexType
 import com.chattriggers.mamba.core.values.numbers.VFloatType
 import com.chattriggers.mamba.core.values.numbers.VIntType
+import com.chattriggers.mamba.core.values.base.VObject
+import com.chattriggers.mamba.core.values.base.VObjectType
+import com.chattriggers.mamba.core.values.base.VType
+import com.chattriggers.mamba.core.values.base.VTypeType
+import com.chattriggers.mamba.core.values.collections.toValue
 import com.chattriggers.mamba.core.values.singletons.*
 
 object GlobalScope : VObject(LazyValue("GlobalScopeType") { GlobalScopeType })
 
-object GlobalScopeType : VType() {
+object GlobalScopeType : VType(LazyValue("VObjectType") { VObjectType }) {
     init {
-        addFieldDescriptor("True", VTrue)
-        addFieldDescriptor("False", VFalse)
-        addFieldDescriptor("None", VNone)
-        addFieldDescriptor("...", VEllipsis)
+        addField("True") { VTrue }
+        addField("False") { VFalse }
+        addField("None") { VNone }
+        addField("...") { VEllipsis }
 
-        addFieldDescriptor("object", VObjectType)
-        addFieldDescriptor("type", VTypeType)
-        addFieldDescriptor("complex", VComplexType)
-        addFieldDescriptor("float", VFloatType)
-        addFieldDescriptor("int", VIntType)
-        addFieldDescriptor("bool", VBoolType)
-        addFieldDescriptor("str", VStringType)
-        addFieldDescriptor("list", VListType)
-        addFieldDescriptor("dict", VDictType)
-        addFieldDescriptor("range", VRangeType)
+        addField("object") { VObjectType }
+        addField("type") { VTypeType }
+        addField("complex") { VComplexType }
+        addField("float") { VFloatType }
+        addField("int") { VIntType }
+        addField("bool") { VBoolType }
+        addField("str") { VStringType }
+        addField("list") { VListType }
+        addField("dict") { VDictType }
+        addField("range") { VRangeType }
 
-        addFieldDescriptor("ArithmeticError", VArithmeticErrorType)
-        addFieldDescriptor("BaseException", VBaseExceptionType)
-        addFieldDescriptor("Exception", VExceptionType)
-        addFieldDescriptor("LookupError", VLookupErrorType)
-        addFieldDescriptor("NameError", VNameErrorType)
-        addFieldDescriptor("NotImplementedError", VNotImplementedErrorType)
-        addFieldDescriptor("StopIteration", VStopIterationType)
-        addFieldDescriptor("SyntaxError", VSyntaxErrorType)
-        addFieldDescriptor("TypeError", VTypeErrorType)
-        addFieldDescriptor("ValueError", VValueErrorType)
+        addField("ArithmeticError") { VArithmeticErrorType }
+        addField("BaseException") { VBaseExceptionType }
+        addField("Exception") { VExceptionType }
+        addField("LookupError") { VLookupErrorType }
+        addField("NameError") { VNameErrorType }
+        addField("NotImplementedError") { VNotImplementedErrorType }
+        addField("StopIteration") { VStopIterationType }
+        addField("SyntaxError") { VSyntaxErrorType }
+        addField("TypeError") { VTypeErrorType }
+        addField("ValueError") { VValueErrorType }
 
-        addStaticMethodDescriptor("abs") {
-            assertArgAs<VObject>(0).callProperty(interp, "__abs__")
+        addMethod("abs", isStatic = true) {
+            runtime.callProperty(argument(0), "__abs__")
         }
 
-        addStaticMethodDescriptor("dir") {
-            runtime.dir(arguments())
+        addMethod("all", isStatic = true) {
+            val iterable = assertArgAs<VObject>(0)
+            val returnList = runtime.iterableToList(iterable)
+
+            if (returnList is VExceptionWrapper) {
+                returnList
+            } else {
+                @Suppress("UNCHECKED_CAST")
+                val list = (returnList as Wrapper).value as List<VObject>
+
+                if (list.all { runtime.toBoolean(it) }) VTrue else VFalse
+            }
         }
 
-        addStaticMethodDescriptor("print") {
+        addMethod("dir", isStatic = true) {
+            runtime.callProperty(argument(0), "__dir__")
+        }
+
+        addMethod("print", isStatic = true) {
             println(arguments().joinToString(separator = " "))
             VNone
         }

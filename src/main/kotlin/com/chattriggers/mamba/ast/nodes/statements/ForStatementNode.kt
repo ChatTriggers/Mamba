@@ -2,16 +2,13 @@ package com.chattriggers.mamba.ast.nodes.statements
 
 import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
 import com.chattriggers.mamba.ast.nodes.expressions.IdentifierNode
-import com.chattriggers.mamba.core.Interpreter
+import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.VBreakWrapper
-import com.chattriggers.mamba.core.values.VContinueWrapper
-import com.chattriggers.mamba.core.values.VObject
+import com.chattriggers.mamba.core.values.VExceptionWrapper
+import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.VReturnWrapper
-import com.chattriggers.mamba.core.values.exceptions.MambaException
 import com.chattriggers.mamba.core.values.exceptions.VStopIteration
-import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import com.chattriggers.mamba.core.values.singletons.VNone
-import com.chattriggers.mamba.core.values.singletons.VNotImplemented
 
 class ForStatementNode(
     lineNumber: Int,
@@ -20,47 +17,43 @@ class ForStatementNode(
     private val body: List<StatementNode>,
     private val elseBlock: List<StatementNode>
 ) : StatementNode(lineNumber, listOf(targetNode, iterableNode) + body + elseBlock) {
-    override fun execute(interp: Interpreter): VObject {
-        val iterator = interp.runtime.getIterator(iterableNode.execute(interp))
+    override fun execute(ctx: ThreadContext): VObject {
+        val iterable = iterableNode.execute(ctx)
+        if (iterable is VExceptionWrapper) return iterable
+
+        val iterator = ctx.runtime.getIterator(iterable)
+        if (iterator is VExceptionWrapper) return iterator
 
         if (targetNode !is IdentifierNode)
-            notImplemented()
+            TODO()
 
         val targetName = targetNode.identifier
 
-        val scope = VObject()
-        interp.pushScope(scope)
-
         var didBreak = false
 
-        try {
-            while (true) {
-                val nextValue = interp.runtime.getIteratorNext(iterator)
+        outer@
+        while (true) {
+            val nextValue = ctx.runtime.getIteratorNext(iterator)
 
-                scope[targetName] = nextValue
+            if (nextValue is VExceptionWrapper) {
+                if (nextValue.exception is VStopIteration) break
+                else return nextValue
+            }
 
-                when (val execResult = executeStatements(interp, body)) {
-                    VBreakWrapper -> didBreak = true
-                    is VReturnWrapper -> return execResult
+            ctx.interp.getScope().putSlot(targetName, nextValue)
+
+            when (val execResult = executeStatements(ctx, body)) {
+                VBreakWrapper -> {
+                    didBreak = true
+                    break@outer
                 }
+                is VReturnWrapper -> return execResult
+                is VExceptionWrapper -> return execResult
             }
-        } catch (e: MambaException) {
-            val reason = e.reason
-
-            if (reason !is VStopIteration) {
-                throw e
-            }
-        } finally {
-            interp.popScope()
         }
 
         if (!didBreak && elseBlock.isNotEmpty()) {
-            interp.pushScope()
-            try {
-                return executeStatements(interp, elseBlock)
-            } finally {
-                interp.popScope()
-            }
+            return executeStatements(ctx, elseBlock)
         }
 
         return VNone
