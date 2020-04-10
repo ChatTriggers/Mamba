@@ -5,6 +5,7 @@ import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.base.VType
 import com.chattriggers.mamba.core.values.exceptions.VTypeError
+import com.chattriggers.mamba.core.values.numbers.toValue
 import com.chattriggers.mamba.core.values.singletons.VNone
 
 class VString(val string: String) : VObject(LazyValue("VStringType") { VStringType }) {
@@ -19,15 +20,6 @@ class VString(val string: String) : VObject(LazyValue("VStringType") { VStringTy
 
 object VStringType : VType(LazyValue("VObjectType") { VObjectType }) {
     init {
-        addMethod("lower") {
-            assertSelfAs<VString>().string.toLowerCase().toValue()
-        }
-        addMethod("__add__") {
-            val self = assertSelfAs<VString>()
-            val other = assertArgAs<VString>(1)
-
-            (self.string + other.string).toValue()
-        }
         addMethod("__call__", id = "str_call") {
             runtime.construct(VStringType, arguments())
         }
@@ -46,6 +38,21 @@ object VStringType : VType(LazyValue("VObjectType") { VObjectType }) {
         }
         addMethod("__init__") {
             VNone
+        }
+
+        addMethod("lower") {
+            assertSelfAs<VString>().string.toLowerCase().toValue()
+        }
+
+        addMethod("__add__") {
+            val self = assertSelfAs<VString>()
+            val other = assertArgAs<VString>(1)
+
+            (self.string + other.string).toValue()
+        }
+        addMethod("__int__") {
+            val self = assertSelfAs<VString>()
+            self.string.toInt().toValue()
         }
     }
 }

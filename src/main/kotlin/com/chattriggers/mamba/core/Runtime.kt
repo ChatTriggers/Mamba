@@ -13,8 +13,6 @@ import com.chattriggers.mamba.core.values.exceptions.VBaseException
 import com.chattriggers.mamba.core.values.numbers.*
 import com.chattriggers.mamba.core.values.exceptions.VTypeError
 import com.chattriggers.mamba.core.values.singletons.*
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.contract
 
 class Runtime(private val ctx: ThreadContext) {
     fun toBoolean(value: VObject): Boolean {
@@ -30,8 +28,15 @@ class Runtime(private val ctx: ThreadContext) {
         }
     }
 
-    fun toInt(value: VObject): Int {
-        TODO()
+    fun toInt(obj: VObject): Int {
+        return when (obj) {
+            is VInt -> obj.int
+            else -> {
+                val ret = callProperty(obj, "__int__")
+                if (ret !is VInt) TODO()
+                return ret.int
+            }
+        }
     }
 
     fun toDouble(value: VObject): Double {
