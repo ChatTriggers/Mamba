@@ -2,11 +2,12 @@ package com.chattriggers.mamba.ast.nodes.statements
 
 import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
 import com.chattriggers.mamba.ast.nodes.expressions.IdentifierNode
+import com.chattriggers.mamba.core.Runtime
 import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.VBreakWrapper
+import com.chattriggers.mamba.core.values.VExceptionWrapper
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.VReturnWrapper
-import com.chattriggers.mamba.core.values.exceptions.MambaException
 import com.chattriggers.mamba.core.values.exceptions.VStopIteration
 import com.chattriggers.mamba.core.values.singletons.VNone
 
@@ -27,19 +28,25 @@ class ForStatementNode(
 
         var didBreak = false
 
-        try {
-            while (true) {
-                val nextValue = ctx.runtime.getIterableNext(iterator)
+        outer@
+        while (true) {
+            val nextValue = ctx.runtime.getIterableNext(iterator)
 
-                ctx.interp.getScope().putSlot(targetName, nextValue)
-
-                when (val execResult = executeStatements(ctx, body)) {
-                    VBreakWrapper -> didBreak = true
-                    is VReturnWrapper -> return execResult
-                }
+            if (nextValue is VExceptionWrapper) {
+                if (nextValue.exception is VStopIteration) break
+                else return nextValue
             }
-        } catch (e: IllegalStateException) {
-            // TODO: Exceptions should be a VFlowWrapper
+
+            ctx.interp.getScope().putSlot(targetName, nextValue)
+
+            when (val execResult = executeStatements(ctx, body)) {
+                VBreakWrapper -> {
+                    didBreak = true
+                    break@outer
+                }
+                is VReturnWrapper -> return execResult
+                is VExceptionWrapper -> return execResult
+            }
         }
 
         if (!didBreak && elseBlock.isNotEmpty()) {

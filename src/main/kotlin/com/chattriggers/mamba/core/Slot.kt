@@ -1,8 +1,6 @@
 package com.chattriggers.mamba.core
 
 import com.chattriggers.mamba.core.values.Value
-import com.chattriggers.mamba.core.values.exceptions.MambaException
-import com.chattriggers.mamba.core.values.exceptions.VTypeError
 
 data class Slot(
     val key: Value,
@@ -15,7 +13,7 @@ data class Slot(
         get() = valueBacker
         set(value) {
             if (!isWritable) {
-                throw MambaException(VTypeError.construct("can't set write-only property '$key'"))
+                throw IllegalStateException()
             }
 
             valueBacker = value

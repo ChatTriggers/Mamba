@@ -2,9 +2,8 @@ package com.chattriggers.mamba.core
 
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.ast.nodes.ScriptNode
+import com.chattriggers.mamba.core.values.VExceptionWrapper
 import com.chattriggers.mamba.core.values.base.VObjectType
-import com.chattriggers.mamba.core.values.collections.VTuple
-import com.chattriggers.mamba.core.values.exceptions.MambaException
 import com.chattriggers.mamba.core.values.exceptions.VBaseException
 import java.util.*
 
@@ -42,8 +41,8 @@ class Interpreter(val fileName: String, val lines: List<String>) {
 
     internal fun getScope() = scopeStackBacker.peek()
 
-    internal fun throwException(exception: VBaseException, lineNumber: Int): Nothing {
+    internal fun throwException(exception: VBaseException, lineNumber: Int): VObject {
         exceptionStack.push(CallFrame(fileName, sourceStack.pop(), lineNumber))
-        throw MambaException(exception)
+        return VExceptionWrapper(exception)
     }
 }

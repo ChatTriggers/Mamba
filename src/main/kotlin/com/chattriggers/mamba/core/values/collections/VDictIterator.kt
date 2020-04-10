@@ -1,7 +1,6 @@
 package com.chattriggers.mamba.core.values.collections
 
 import com.chattriggers.mamba.core.values.*
-import com.chattriggers.mamba.core.values.exceptions.MambaException
 import com.chattriggers.mamba.core.values.exceptions.VStopIteration
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
@@ -29,7 +28,7 @@ object VDictIteratorType : VType(LazyValue("VObjectType") { VObjectType }) {
             when {
                 self.vdict.dict.size != self.vdictKeys.size ->
                     TODO("RuntimeError: dictionary changed size during iteration")
-                self.cursor >= self.vdictKeys.size -> throw MambaException(VStopIteration.construct())
+                self.cursor >= self.vdictKeys.size -> VExceptionWrapper(VStopIteration.construct())
                 else -> self.vdict.dict[self.vdictKeys[self.cursor++]]!!
             }.unwrap()
         }

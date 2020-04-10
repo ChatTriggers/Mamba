@@ -17,7 +17,7 @@ class VAttributeError(args: VTuple) : VException(args, LazyValue("VAttributeErro
             val rt = ThreadContext.currentContext.runtime
 
             return rt.construct(VAttributeErrorType, listOf(
-                rt.construct(VTupleType, listOf("'$type' object has no attribute '$identifier"))
+                rt.construct(VTupleType, listOf(listOf("'$type' object has no attribute '$identifier")))
             )) as VAttributeError
         }
     }

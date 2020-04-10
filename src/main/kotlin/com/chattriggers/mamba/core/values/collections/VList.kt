@@ -1,18 +1,15 @@
 package com.chattriggers.mamba.core.values.collections
 
-import com.chattriggers.mamba.core.Runtime
 import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.LazyValue
+import com.chattriggers.mamba.core.values.VExceptionWrapper
 import com.chattriggers.mamba.core.values.Wrapper
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.base.VType
-import com.chattriggers.mamba.core.values.exceptions.MambaException
 import com.chattriggers.mamba.core.values.exceptions.VStopIteration
 import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.unwrap
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.contract
 
 class VList(val list: MutableList<VObject>) : VObject(LazyValue("VListType") { VListType }) {
     override val className = "list"
@@ -41,12 +38,16 @@ object VListType : VType(LazyValue("VObjectType") { VObjectType }) {
                     is Wrapper -> {
                         val value = arg.value
 
-                        if (value !is MutableList<*> || value.size == 0 || value[0] !is VObject) {
-                            TODO()
+                        if (value is MutableList<*>) {
+                            if (value.isEmpty()) {
+                                return@addMethod VList(mutableListOf())
+                            } else if (value.isNotEmpty() && value.all { it is VObject }) {
+                                @Suppress("UNCHECKED_CAST")
+                                return@addMethod VList(value as MutableList<VObject>)
+                            }
                         }
 
-                        @Suppress("UNCHECKED_CAST")
-                        return@addMethod VList(value as MutableList<VObject>)
+                        arg.unwrap()
                     }
                     else -> arg.unwrap()
                 }
@@ -60,14 +61,15 @@ object VListType : VType(LazyValue("VObjectType") { VObjectType }) {
             val iterator = runtime.getIterator(iterable)
             val list = mutableListOf<VObject>()
 
-            try {
-                while (true) {
-                    list.add(runtime.getIterableNext(iterator))
+            while (true) {
+                val result = runtime.getIterableNext(iterator)
+
+                if (result is VExceptionWrapper) {
+                    if (result.exception is VStopIteration) break
+                    else return@addMethod result
                 }
-            } catch (e: MambaException) {
-                if (e.reason !is VStopIteration) {
-                    throw e
-                }
+
+                list.add(result)
             }
 
             VList(list)

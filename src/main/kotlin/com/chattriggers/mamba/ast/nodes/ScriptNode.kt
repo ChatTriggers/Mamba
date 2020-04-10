@@ -4,15 +4,13 @@ import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.ast.nodes.statements.StatementNode
 import com.chattriggers.mamba.core.ThreadContext
-import com.chattriggers.mamba.core.values.exceptions.MambaException
+import com.chattriggers.mamba.core.values.VExceptionWrapper
 
 class ScriptNode(private val statements: List<StatementNode>) : Node(1, statements) {
     override fun execute(ctx: ThreadContext): VObject {
-        try {
-            statements.forEach {
-                it.execute(ctx)
-            }
-        } catch (e: MambaException) {
+        val result = StatementNode.executeStatements(ctx, statements)
+
+        if (result is VExceptionWrapper) {
             println("Traceback (most recent call last):")
 
             ctx.interp.exceptionStack.reversed().forEach {
@@ -22,7 +20,7 @@ class ScriptNode(private val statements: List<StatementNode>) : Node(1, statemen
                 )
             }
 
-            println(e.reason.toString())
+            println(result.exception.toString())
         }
 
         return VNone

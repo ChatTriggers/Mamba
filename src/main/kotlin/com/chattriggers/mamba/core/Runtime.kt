@@ -3,17 +3,18 @@ package com.chattriggers.mamba.core
 import com.chattriggers.mamba.ast.nodes.Node
 import com.chattriggers.mamba.ast.nodes.expressions.DotAccessNode
 import com.chattriggers.mamba.ast.nodes.expressions.IdentifierNode
-import com.chattriggers.mamba.ast.nodes.statements.FunctionNode
 import com.chattriggers.mamba.core.values.*
 import com.chattriggers.mamba.core.values.base.*
 import com.chattriggers.mamba.core.values.collections.VDict
 import com.chattriggers.mamba.core.values.collections.VList
 import com.chattriggers.mamba.core.values.collections.VListType
 import com.chattriggers.mamba.core.values.collections.VTupleType
+import com.chattriggers.mamba.core.values.exceptions.VBaseException
 import com.chattriggers.mamba.core.values.numbers.*
-import com.chattriggers.mamba.core.values.exceptions.MambaException
 import com.chattriggers.mamba.core.values.exceptions.VTypeError
 import com.chattriggers.mamba.core.values.singletons.*
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 class Runtime(private val ctx: ThreadContext) {
     fun toBoolean(value: VObject): Boolean {
@@ -88,7 +89,7 @@ class Runtime(private val ctx: ThreadContext) {
                 if (obj.containsSlot("__call__"))
                     return callProperty(obj, "__call__", args)
 
-                throw MambaException(VTypeError.construct("'${obj.className}' object is not callable"))
+                VExceptionWrapper(VTypeError.construct("'${obj.className}' object is not callable"))
             }
             else -> TODO("Error")
         }
@@ -119,4 +120,10 @@ class Runtime(private val ctx: ThreadContext) {
     fun isIterable(obj: VObject) = obj.containsSlot("__iter__")
 
     fun isIterator(obj: VObject) = isIterable(obj) && obj.containsSlot("__next__")
+
+    companion object {
+        inline fun <reified T : VBaseException> isException(obj: VObject): Boolean {
+            return obj is VExceptionWrapper && obj.exception is T
+        }
+    }
 }

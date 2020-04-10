@@ -6,7 +6,6 @@ import com.chattriggers.mamba.core.values.Wrapper
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.base.VType
-import com.chattriggers.mamba.core.values.exceptions.MambaException
 import com.chattriggers.mamba.core.values.exceptions.VStopIteration
 import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.unwrap
@@ -18,19 +17,6 @@ class VTuple(val items: List<VObject>) : VObject(LazyValue("VTupleType") { VTupl
         0 -> "()"
         1 -> "(${items[0]},)"
         else -> "(${items.joinToString()})"
-    }
-
-    companion object {
-        private var emptyTupleBacker: VTuple? = null
-
-        val EMPTY_TUPLE: VTuple
-            get() {
-                if (emptyTupleBacker == null) {
-                    emptyTupleBacker = ThreadContext.currentContext.runtime.construct(VTupleType, emptyList()) as VTuple
-                }
-
-                return emptyTupleBacker!!
-            }
     }
 }
 
@@ -50,17 +36,21 @@ object VTupleType : VType(LazyValue("VObjectType") { VObjectType }) {
             }
 
             val iterable = when (argSize) {
-                1 -> VTuple.EMPTY_TUPLE
+                1 -> return@addMethod VTuple(emptyList())
                 2 -> when (val arg = argumentRaw(1)) {
                     is Wrapper -> {
                         val value = arg.value
 
-                        if (value !is List<*> || value.size == 0 || value[0] !is VObject) {
-                            TODO()
+                        if (value is List<*>) {
+                            if (value.isEmpty()) {
+                                return@addMethod VTuple(emptyList())
+                            } else if (value.isNotEmpty() && value.all { it is VObject }) {
+                                @Suppress("UNCHECKED_CAST")
+                                return@addMethod VTuple(value as List<VObject>)
+                            }
                         }
 
-                        @Suppress("UNCHECKED_CAST")
-                        return@addMethod VTuple(value as List<VObject>)
+                        arg.unwrap()
                     }
                     else -> arg.unwrap()
                 }
@@ -73,14 +63,8 @@ object VTupleType : VType(LazyValue("VObjectType") { VObjectType }) {
 
             val list = mutableListOf<VObject>()
 
-            try {
-                while (true) {
-                    list.add(runtime.getIterableNext(iterable))
-                }
-            } catch (e: MambaException) {
-                if (e.reason !is VStopIteration) {
-                    throw e
-                }
+            while (true) {
+                list.add(runtime.getIterableNext(iterable))
             }
 
             VTuple(list)

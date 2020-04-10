@@ -4,7 +4,6 @@ import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.base.VType
-import com.chattriggers.mamba.core.values.exceptions.MambaException
 import com.chattriggers.mamba.core.values.exceptions.VTypeError
 import com.chattriggers.mamba.core.values.singletons.VNone
 
@@ -37,7 +36,7 @@ object VStringType : VType(LazyValue("VObjectType") { VObjectType }) {
 
             if (type !is VStringType) {
                 val name = type.className
-                throw MambaException(VTypeError.construct("string.__new__($name) is not safe, use $name.__new__()"))
+                return@addMethod VExceptionWrapper(VTypeError.construct("string.__new__($name) is not safe, use $name.__new__()"))
             }
 
             when (val arg = argumentRaw(1)) {

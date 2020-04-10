@@ -2,8 +2,8 @@ package com.chattriggers.mamba.ast.nodes.expressions
 
 import com.chattriggers.mamba.core.CallFrame
 import com.chattriggers.mamba.core.ThreadContext
+import com.chattriggers.mamba.core.values.VExceptionWrapper
 import com.chattriggers.mamba.core.values.base.VObject
-import com.chattriggers.mamba.core.values.exceptions.MambaException
 
 class FunctionCallNode(
     lineNumber: Int,
@@ -19,16 +19,14 @@ class FunctionCallNode(
         interp.callStack.push(CallFrame(interp.fileName, interp.sourceStack.peek(), lineNumber))
         interp.sourceStack.push(ctx.runtime.getName(target))
 
-        return try {
-            val v = ctx.runtime.call(targetValue, mappedArgs)
-            interp.callStack.pop()
-            v
-        } catch (e: MambaException) {
+        val v = ctx.runtime.call(targetValue, mappedArgs)
+        interp.callStack.pop()
+
+        if (v is VExceptionWrapper) {
             interp.exceptionStack.push(interp.callStack.pop())
-            throw e
-        } finally {
-            interp.sourceStack.pop()
         }
+
+        return v
     }
 
     override fun print(indent: Int) {

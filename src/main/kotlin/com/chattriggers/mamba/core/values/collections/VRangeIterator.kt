@@ -1,8 +1,6 @@
 package com.chattriggers.mamba.core.values.collections
 
-import com.chattriggers.mamba.core.Runtime
 import com.chattriggers.mamba.core.values.*
-import com.chattriggers.mamba.core.values.exceptions.MambaException
 import com.chattriggers.mamba.core.values.exceptions.VStopIteration
 import com.chattriggers.mamba.core.values.numbers.toValue
 import com.chattriggers.mamba.core.values.base.VObject
@@ -34,7 +32,7 @@ object VRangeIteratorType : VType(LazyValue("VObjectType") { VObjectType }) {
                     start > stop && step > 0
 
             if (shouldThrow) {
-                throw MambaException(VStopIteration.construct())
+                return@addMethod VExceptionWrapper(VStopIteration.construct())
             }
 
             self.vrange.current += step

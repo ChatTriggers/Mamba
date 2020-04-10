@@ -15,10 +15,10 @@ class RaiseNode(
         val exception = exceptionNode.execute(ctx)
 
         if (exception !is VBaseException) {
-            ctx.interp.throwException(VTypeError.construct("exceptions must derive from BaseException"), lineNumber)
+            return ctx.interp.throwException(VTypeError.construct("exceptions must derive from BaseException"), lineNumber)
         }
 
-        ctx.interp.throwException(exception, lineNumber)
+        return ctx.interp.throwException(exception, lineNumber)
     }
 
     override fun print(indent: Int) {

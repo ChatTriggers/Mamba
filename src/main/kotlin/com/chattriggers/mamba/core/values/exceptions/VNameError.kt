@@ -16,7 +16,7 @@ class VNameError(args: VTuple) : VException(args, LazyValue("VNameErrorType") { 
             val rt = ThreadContext.currentContext.runtime
 
             return rt.construct(VNameErrorType, listOf(
-                rt.construct(VTupleType, listOf("name '$name' is not defined"))
+                rt.construct(VTupleType, listOf(listOf("name '$name' is not defined")))
             )) as VNameError
         }
     }

@@ -2,6 +2,7 @@ package com.chattriggers.mamba.core.values.exceptions
 
 import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.LazyValue
+import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VType
 import com.chattriggers.mamba.core.values.collections.VTuple
 import com.chattriggers.mamba.core.values.collections.VTupleType
@@ -18,7 +19,7 @@ class VStopIteration(args: VTuple) : VException(args, LazyValue("VStopIterationT
             val rt = ThreadContext.currentContext.runtime
 
             return rt.construct(VStopIterationType, listOf(
-                rt.construct(VTupleType, emptyList())
+                rt.construct(VTupleType, listOf(emptyList<VObject>()))
             )) as VStopIteration
         }
     }

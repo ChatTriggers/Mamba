@@ -105,7 +105,7 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
             }
         }
         addMethod("__divmod__") {
-            throw MambaException(VTypeError.construct("TODO: Error"))
+            VExceptionWrapper(VTypeError.construct("TODO: Error"))
         }
         addMethod("__eq__") {
             val (real, imag) = assertSelfAs<VComplex>()
@@ -120,34 +120,34 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
             }
         }
         addMethod("__float__") {
-            throw MambaException(VTypeError.construct("can't convert complex to float"))
+            VExceptionWrapper(VTypeError.construct("can't convert complex to float"))
         }
         addMethod("__floordiv__") {
-            throw MambaException(VTypeError.construct("can't take floor of complex number"))
+            VExceptionWrapper(VTypeError.construct("can't take floor of complex number"))
         }
         addMethod("__ge__") {
-            throw MambaException(VTypeError.construct("TODO: Error"))
+            VExceptionWrapper(VTypeError.construct("TODO: Error"))
         }
         addMethod("__gt__") {
-            throw MambaException(VTypeError.construct("TODO: Error"))
+            VExceptionWrapper(VTypeError.construct("TODO: Error"))
         }
         addMethod("__int__") {
-            throw MambaException(VTypeError.construct("can't convert complex to int"))
+            VExceptionWrapper(VTypeError.construct("can't convert complex to int"))
         }
         addMethod("__le__") {
-            throw MambaException(VTypeError.construct("TODO: Error"))
+            VExceptionWrapper(VTypeError.construct("TODO: Error"))
         }
         addMethod("__lt__") {
-            throw MambaException(VTypeError.construct("TODO: Error"))
+            VExceptionWrapper(VTypeError.construct("TODO: Error"))
         }
         addMethod("__mod__") {
-            throw MambaException(VTypeError.construct("TODO: Error"))
+            VExceptionWrapper(VTypeError.construct("TODO: Error"))
         }
         addMethod("__mul__") {
-            throw MambaException(VTypeError.construct("TODO: Error"))
+            VExceptionWrapper(VTypeError.construct("TODO: Error"))
         }
         addMethod("__ne__") {
-            throw MambaException(VTypeError.construct("TODO: Error"))
+            VExceptionWrapper(VTypeError.construct("TODO: Error"))
         }
         addMethod("__neg__") {
             val (real, imag) = assertSelfAs<VComplex>()

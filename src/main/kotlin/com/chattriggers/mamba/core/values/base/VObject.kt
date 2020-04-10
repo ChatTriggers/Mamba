@@ -4,7 +4,6 @@ import com.chattriggers.mamba.core.IMethod
 import com.chattriggers.mamba.core.Slot
 import com.chattriggers.mamba.core.values.*
 import com.chattriggers.mamba.core.values.collections.toValue
-import com.chattriggers.mamba.core.values.exceptions.MambaException
 import com.chattriggers.mamba.core.values.exceptions.VAttributeError
 import com.chattriggers.mamba.core.values.exceptions.VTypeError
 import com.chattriggers.mamba.core.values.singletons.VNone
@@ -122,7 +121,7 @@ object VObjectType : VType() {
             when {
                 self.containsSlot(key) -> self.getValue(key).unwrap()
                 self.containsSlot("__getattr__") -> runtime.callProperty(self, "__getattr__", listOf(self, key))
-                else -> throw MambaException(VAttributeError.construct(key.toString(), self.className))
+                else -> VExceptionWrapper(VAttributeError.construct(key.toString(), self.className))
             }
 
             // TODO: Property descriptors via __get__ and __set__
@@ -141,7 +140,7 @@ object VObjectType : VType() {
 
             if (type !is VObjectType) {
                 val name = type.className
-                throw MambaException(VTypeError.construct("object.__new__($name) is not safe, use $name.__new__()"))
+                return@addMethod VExceptionWrapper(VTypeError.construct("object.__new__($name) is not safe, use $name.__new__()"))
             }
 
             VObject(LazyValue("VObjectType") { VObjectType })

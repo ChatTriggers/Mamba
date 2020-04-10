@@ -1,6 +1,7 @@
 package com.chattriggers.mamba.core.values
 
 import com.chattriggers.mamba.core.values.base.VObject
+import com.chattriggers.mamba.core.values.exceptions.VBaseException
 
 /**
  * This class is a way for child nodes to communicate
@@ -29,3 +30,5 @@ class VReturnWrapper(val wrapped: VObject) : VFlowWrapper()
 object VBreakWrapper : VFlowWrapper()
 
 object VContinueWrapper : VFlowWrapper()
+
+class VExceptionWrapper(val exception: VBaseException) : VFlowWrapper()
