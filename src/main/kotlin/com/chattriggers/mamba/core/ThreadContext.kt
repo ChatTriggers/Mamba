@@ -9,6 +9,9 @@ class ThreadContext(val interp: Interpreter) {
         internal val currentContext: ThreadContext
             get() = ctxThreadLocal.get()
 
+        @Volatile
+        internal var objectIdAccumulator: Int = 0
+
         fun enterContext(context: ThreadContext) {
             ctxThreadLocal.set(context)
         }

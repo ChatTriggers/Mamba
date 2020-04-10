@@ -240,7 +240,7 @@ atomExpression: (AWAIT)? atom trailer*;
 atom: parenAtom | listAtom | dictOrSetAtom | basicAtom;
 parenAtom: '(' (yieldExpression | testListComp)? ')';
 listAtom: '[' testListComp? ']';
-dictOrSetAtom: '{' (dictMaker | setMaker) '}';
+dictOrSetAtom: '{' (dictMaker | setMaker)? '}';
 basicAtom: NAME | number | STRING+ | ELLIPSIS | NONE | TRUE | FALSE;
 testListComp: testlistElem (compFor | (COMMA testlistElem)* COMMA?);
 trailer: trailerCall | trailerMemberAccess | trailerDotAccess;

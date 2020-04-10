@@ -5,14 +5,11 @@ import com.chattriggers.mamba.core.values.collections.VDictType
 import com.chattriggers.mamba.core.values.collections.VListType
 import com.chattriggers.mamba.core.values.collections.VRangeType
 import com.chattriggers.mamba.core.values.exceptions.*
-import com.chattriggers.mamba.core.values.numbers.VComplexType
-import com.chattriggers.mamba.core.values.numbers.VFloatType
-import com.chattriggers.mamba.core.values.numbers.VIntType
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.base.VType
 import com.chattriggers.mamba.core.values.base.VTypeType
-import com.chattriggers.mamba.core.values.numbers.VInt
+import com.chattriggers.mamba.core.values.numbers.*
 import com.chattriggers.mamba.core.values.singletons.*
 
 object GlobalScope : VObject(LazyValue("GlobalScopeType") { GlobalScopeType })
@@ -92,6 +89,10 @@ object GlobalScopeType : VType(LazyValue("VObjectType") { VObjectType }) {
 
         addMethod("dir", isStatic = true) {
             runtime.callProp(argument(0), "__dir__")
+        }
+
+        addMethod("id", isStatic = true) {
+            assertArgAs<VObject>(0).id.toValue()
         }
 
         addMethod("print", isStatic = true) {

@@ -39,20 +39,20 @@ object VDictType : VType(LazyValue("VObjectType") { VObjectType }) {
                 TODO()
             }
 
-            val map = mutableMapOf<String, VObject>()
-
             if (argSize == 1) {
                 return@addMethod VTuple(emptyList())
             }
 
+            val map = mutableMapOf<String, VObject>()
             val arg1 = argumentRaw(1)
 
             val iterable = when {
                 arg1.name != null -> null
                 arg1.value is Wrapper -> {
-                    val value = arg1.value
+                    val wrapper = arg1.value
+                    val value = wrapper.value
 
-                    if (value is MutableMap<*, *>) {
+                    if (value is Map<*, *>) {
                         // Put values directly into the map
                         if (value.isNotEmpty()) {
                             @Suppress("UNCHECKED_CAST")
@@ -60,7 +60,7 @@ object VDictType : VType(LazyValue("VObjectType") { VObjectType }) {
                         }
                         null
                     } else {
-                        value.unwrap()
+                        wrapper.unwrap()
                     }
                 }
                 else -> arg1.value.unwrap()

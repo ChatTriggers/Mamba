@@ -634,7 +634,11 @@ internal class ASTVisitor {
         if (dictMaker != null)
             return visitDictMaker(dictMaker)
 
-        TODO()
+        val setMaker = ctx.setMaker()
+        if (setMaker != null)
+            TODO()
+
+        return DictLiteral(ctx.lineNumber(), mapOf())
     }
 
     private fun visitDictMaker(ctx: DictMakerContext): ExpressionNode {

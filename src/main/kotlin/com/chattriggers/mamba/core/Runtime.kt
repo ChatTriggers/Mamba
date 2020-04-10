@@ -49,6 +49,7 @@ class Runtime(private val ctx: ThreadContext) {
     fun toVObject(obj: Any?): VObject = when (obj) {
         is MutableList<*> -> construct(VListType, listOf(obj))
         is List<*> -> construct(VTupleType, listOf(obj))
+        is MutableMap<*, *> -> construct(VDictType, listOf(obj))
         is Int -> construct(VIntType, listOf(obj))
         is Double -> construct(VFloatType, listOf(obj))
         is Float -> construct(VFloatType, listOf(obj.toDouble()))

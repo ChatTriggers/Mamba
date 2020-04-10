@@ -2,6 +2,7 @@ package com.chattriggers.mamba.core.values.base
 
 import com.chattriggers.mamba.core.IMethod
 import com.chattriggers.mamba.core.Slot
+import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.*
 import com.chattriggers.mamba.core.values.collections.toValue
 import com.chattriggers.mamba.core.values.exceptions.VAttributeError
@@ -22,6 +23,7 @@ import com.chattriggers.mamba.core.values.singletons.VNone
  */
 open class VObject(private vararg val baseTypes: LazyValue<VType>) : Value {
     private val baseTypesUnwrapped = mutableListOf<VType>()
+    val id = ThreadContext.objectIdAccumulator++
 
     open val className = "object"
 
