@@ -13,6 +13,18 @@ class OrExpresionNode(
     private val left: ExpressionNode,
     private val right: ExpressionNode
 ) : ExpressionNode(lineNumber, listOf(left, right)) {
+    override fun execute(ctx: ThreadContext): VObject {
+        val leftValue = left.execute(ctx)
+        if (leftValue is VExceptionWrapper)
+            return leftValue
+
+        val rightValue = right.execute(ctx)
+        if (rightValue is VExceptionWrapper)
+            return rightValue
+
+        return (ctx.runtime.toBoolean(leftValue) or ctx.runtime.toBoolean(rightValue)).toValue()
+    }
+
     override fun print(indent: Int) {
         printNodeHeader(indent, this)
         left.print(indent + 1)
@@ -25,6 +37,18 @@ class AndExpressionNode(
     private val left: ExpressionNode,
     private val right: ExpressionNode
 ) : ExpressionNode(lineNumber, listOf(left, right)) {
+    override fun execute(ctx: ThreadContext): VObject {
+        val leftValue = left.execute(ctx)
+        if (leftValue is VExceptionWrapper)
+            return leftValue
+
+        val rightValue = right.execute(ctx)
+        if (rightValue is VExceptionWrapper)
+            return rightValue
+
+        return (ctx.runtime.toBoolean(leftValue) and ctx.runtime.toBoolean(rightValue)).toValue()
+    }
+
     override fun print(indent: Int) {
         printNodeHeader(indent, this)
         left.print(indent + 1)
@@ -33,6 +57,13 @@ class AndExpressionNode(
 }
 
 class NotExpressionNode(lineNumber: Int, private val child: ExpressionNode) : ExpressionNode(lineNumber, child) {
+    override fun execute(ctx: ThreadContext): VObject {
+        val childValue = child.execute(ctx)
+        if (childValue is VExceptionWrapper)
+            return childValue
+
+        return ctx.runtime.toBoolean(childValue).not().toValue()
+    }
     override fun print(indent: Int) {
         printNodeHeader(indent, this)
         child.print(indent + 1)
