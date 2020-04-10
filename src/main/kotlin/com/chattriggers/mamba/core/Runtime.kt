@@ -5,10 +5,7 @@ import com.chattriggers.mamba.ast.nodes.expressions.DotAccessNode
 import com.chattriggers.mamba.ast.nodes.expressions.IdentifierNode
 import com.chattriggers.mamba.core.values.*
 import com.chattriggers.mamba.core.values.base.*
-import com.chattriggers.mamba.core.values.collections.VDict
-import com.chattriggers.mamba.core.values.collections.VList
-import com.chattriggers.mamba.core.values.collections.VListType
-import com.chattriggers.mamba.core.values.collections.VTupleType
+import com.chattriggers.mamba.core.values.collections.*
 import com.chattriggers.mamba.core.values.exceptions.VBaseException
 import com.chattriggers.mamba.core.values.exceptions.VStopIteration
 import com.chattriggers.mamba.core.values.numbers.*
@@ -20,10 +17,14 @@ class Runtime(private val ctx: ThreadContext) {
         return when {
             value is VNone || value is VFalse -> false
             value is VInt -> value.int != 0
+            value is VFloat -> value.double != 0.0
+            value is VComplex -> value.real != 0.0 || value.imag != 0.0
             value is VString -> value.string.isNotEmpty()
             value is VList -> value.list.isNotEmpty()
             value is VDict -> value.dict.isNotEmpty()
-            value.containsSlot("__bool__") -> toBoolean(callProperty(value, "__bool__"))
+            value is VTuple -> value.items.isNotEmpty()
+            value is VRange -> value.start == 0 && value.stop == 0 && value.step == 1
+            value.containsSlot("__bool__") -> callProperty(value, "__bool__") != VFalse
             value.containsSlot("__len__") -> toInt(callProperty(value, "__len__")) != 0
             else -> true
         }
