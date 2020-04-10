@@ -6,7 +6,6 @@ import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.base.VType
 import com.chattriggers.mamba.core.values.exceptions.VStopIteration
-import com.chattriggers.mamba.core.values.numbers.VInt
 import com.chattriggers.mamba.core.values.singletons.VNone
 
 class VDict(val dict: MutableMap<String, VObject>) : VObject(LazyValue("VDictType") { VDictType }) {
@@ -31,7 +30,7 @@ class VDict(val dict: MutableMap<String, VObject>) : VObject(LazyValue("VDictTyp
 object VDictType : VType(LazyValue("VObjectType") { VObjectType }) {
     init {
         addMethod("__call__") {
-            runtime.construct(VDictType, arguments())
+            constructFromArgs(VDictType, argumentsRaw())
         }
         addMethod("__new__", isStatic = true) {
             val type = assertArgAs<VType>(0)
@@ -40,62 +39,81 @@ object VDictType : VType(LazyValue("VObjectType") { VObjectType }) {
                 TODO()
             }
 
-            val iterable = when (argSize) {
-                1 -> return@addMethod VTuple(emptyList())
-                2 -> when (val arg = argumentValueRaw(1)) {
-                    is Wrapper -> {
-                        val value = arg.value
-
-                        if (value is MutableMap<*, *>) {
-                            if (value.isEmpty()) {
-                                return@addMethod VDict(mutableMapOf())
-                            } else if (value.isNotEmpty()) {
-                                @Suppress("UNCHECKED_CAST")
-                                return@addMethod VDict(value as MutableMap<String, VObject>)
-                            }
-                        }
-
-                        arg.unwrap()
-                    }
-                    else -> arg.unwrap()
-                }
-                else -> TODO()
-            }
-
-            if (!runtime.isIterable(iterable)) {
-                TODO("Error")
-            }
-
             val map = mutableMapOf<String, VObject>()
 
-            while (true) {
-                val it = runtime.getIteratorNext(iterable)
+            if (argSize == 1) {
+                return@addMethod VTuple(emptyList())
+            }
 
-                if (it is VExceptionWrapper) {
-                    if (it.exception is VStopIteration) break
-                    else return@addMethod it
+            val arg1 = argumentRaw(1)
+
+            val iterable = when {
+                arg1.name != null -> null
+                arg1.value is Wrapper -> {
+                    val value = arg1.value
+
+                    if (value is MutableMap<*, *>) {
+                        // Put values directly into the map
+                        if (value.isNotEmpty()) {
+                            @Suppress("UNCHECKED_CAST")
+                            map.putAll(value as MutableMap<String, VObject>)
+                        }
+                        null
+                    } else {
+                        value.unwrap()
+                    }
                 }
+                else -> arg1.value.unwrap()
+            }
 
-                if (!runtime.isIterable(it)) {
+            if (iterable != null) {
+                if (!runtime.isIterable(iterable)) {
                     TODO("Error")
                 }
 
-                val key = runtime.getIteratorNext(it)
-                val value = runtime.getIteratorNext(it)
+                val iterator = runtime.getIterator(iterable)
+                if (iterator is VExceptionWrapper)
+                    return@addMethod iterator
 
-                if (key is VExceptionWrapper)
-                    return@addMethod key
+                while (true) {
+                    val subIterable = runtime.getIteratorNext(iterator)
 
-                if (value is VExceptionWrapper)
-                    return@addMethod key
+                    if (subIterable is VExceptionWrapper) {
+                        if (subIterable.exception is VStopIteration) break
+                        else return@addMethod subIterable
+                    }
 
-                map[key.toString()] = value
+                    if (!runtime.isIterable(subIterable)) {
+                        TODO("Error")
+                    }
 
-                // Sub-iterable can only have two elements
-                val next = runtime.getIteratorNext(it)
-                if (next !is VExceptionWrapper) {
-                    TODO("ValueError")
+                    val subIterator = runtime.getIterator(subIterable)
+                    if (subIterator is VExceptionWrapper)
+                        return@addMethod subIterator
+
+                    val key = runtime.getIteratorNext(subIterator)
+
+                    if (key is VExceptionWrapper)
+                        return@addMethod key
+
+                    val value = runtime.getIteratorNext(subIterator)
+                    if (value is VExceptionWrapper)
+                        return@addMethod key
+
+                    map[key.toString()] = value
+
+                    // Sub-iterator can only have two elements
+                    val next = runtime.getIteratorNext(subIterator)
+                    if (next !is VExceptionWrapper) {
+                        TODO("ValueError")
+                    }
                 }
+            }
+
+            val namedArgs = namedArguments()
+
+            for (arg in namedArgs) {
+                map[arg.name!!] = arg.value.unwrap()
             }
 
             VDict(map)

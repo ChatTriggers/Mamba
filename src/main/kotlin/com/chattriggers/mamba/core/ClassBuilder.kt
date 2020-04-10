@@ -27,6 +27,13 @@ class ClassMethodBuilder(val ctx: ThreadContext, private val _args: List<Argumen
 
     fun arguments() = _args.map { it.value as VObject }
 
+    fun namedArgument(name: String) = _args.firstOrNull { it.name == name }
+
+    fun namedArgumentValue(name: String) = namedArgument(name)?.value
+
+    // Equivalent to **kwargs in a python function definition
+    fun namedArguments() = _args.filter { it.name != null }
+
     inline fun <reified T : Value> assertArgAs(index: Int): T {
         val arg = argumentValueRaw(index)
         if (arg !is T)
@@ -42,8 +49,8 @@ class ClassMethodBuilder(val ctx: ThreadContext, private val _args: List<Argumen
         return runtime.construct(type, args.toList())
     }
 
-    fun constructFromArgs(type: VType, vararg args: Argument): VObject {
-        return runtime.constructFromArgs(type, args.toList())
+    fun constructFromArgs(type: VType, args: List<Argument>): VObject {
+        return runtime.constructFromArgs(type, args)
     }
 
     inline fun <reified T : VObject> argAs(index: Int): T? {
