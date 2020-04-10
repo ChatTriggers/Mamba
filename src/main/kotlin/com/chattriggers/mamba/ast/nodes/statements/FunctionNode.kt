@@ -4,9 +4,9 @@ import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
 import com.chattriggers.mamba.core.values.*
 import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.ast.nodes.expressions.IdentifierNode
+import com.chattriggers.mamba.core.MethodWrapper
 import com.chattriggers.mamba.core.ThreadContext
-import com.chattriggers.mamba.core.values.base.VMethod
-import com.chattriggers.mamba.core.values.base.VMethodType
+import com.chattriggers.mamba.core.values.base.VFunctionType
 import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
@@ -52,7 +52,7 @@ class FunctionNode(
 
     override fun execute(ctx: ThreadContext): VObject {
         val scope = ctx.interp.getScope()
-        scope.putSlot(identifier.identifier, ctx.runtime.construct(VMethodType, listOf(this)))
+        scope.putSlot(identifier.identifier, MethodWrapper(identifier.identifier, this))
         return VNone
     }
 

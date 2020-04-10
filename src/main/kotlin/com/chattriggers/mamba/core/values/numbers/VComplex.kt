@@ -4,7 +4,7 @@ import com.chattriggers.mamba.core.values.*
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.base.VType
-import com.chattriggers.mamba.core.values.base.Wrapper
+import com.chattriggers.mamba.core.values.Wrapper
 import com.chattriggers.mamba.core.values.exceptions.*
 import com.chattriggers.mamba.core.values.singletons.*
 import kotlin.math.floor

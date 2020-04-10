@@ -6,11 +6,9 @@ import com.chattriggers.mamba.core.values.VStringType
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.base.VType
-import com.chattriggers.mamba.core.values.base.Wrapper
-import com.chattriggers.mamba.core.values.collections.VTuple
+import com.chattriggers.mamba.core.values.Wrapper
 import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import com.chattriggers.mamba.core.values.singletons.*
-import java.lang.Math.abs
 import kotlin.math.*
 
 open class VInt(val int: Int, type: LazyValue<VType> = LazyValue("VIntType") { VIntType }) : VObject(type) {

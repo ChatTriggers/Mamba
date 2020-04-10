@@ -3,6 +3,7 @@ package com.chattriggers.mamba.core.values.collections
 import com.chattriggers.mamba.core.Runtime
 import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.LazyValue
+import com.chattriggers.mamba.core.values.Wrapper
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.base.VType
@@ -10,6 +11,7 @@ import com.chattriggers.mamba.core.values.exceptions.MambaException
 import com.chattriggers.mamba.core.values.exceptions.VStopIteration
 import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import com.chattriggers.mamba.core.values.singletons.VNone
+import com.chattriggers.mamba.core.values.unwrap
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
@@ -34,17 +36,34 @@ object VListType : VType(LazyValue("VObjectType") { VObjectType }) {
                 notImplemented()
             }
 
-            val iterable = if (argSize > 0) argument(0) else VList(mutableListOf())
+            val iterable = when (argSize) {
+                1 -> return@addMethod VList(mutableListOf())
+                2 -> when (val arg = argumentRaw(1)) {
+                    is Wrapper -> {
+                        val value = arg.value
 
-            if (!Runtime.isIterable(iterable)) {
+                        if (value !is MutableList<*> || value.size == 0 || value[0] !is VObject) {
+                            notImplemented()
+                        }
+
+                        @Suppress("UNCHECKED_CAST")
+                        return@addMethod VList(value as MutableList<VObject>)
+                    }
+                    else -> arg.unwrap()
+                }
+                else -> notImplemented()
+            }
+
+            if (!runtime.isIterable(iterable)) {
                 notImplemented("Error")
             }
 
+            val iterator = runtime.getIterator(iterable)
             val list = mutableListOf<VObject>()
 
             try {
                 while (true) {
-                    list.add(runtime.getIterableNext(iterable))
+                    list.add(runtime.getIterableNext(iterator))
                 }
             } catch (e: MambaException) {
                 if (e.reason !is VStopIteration) {

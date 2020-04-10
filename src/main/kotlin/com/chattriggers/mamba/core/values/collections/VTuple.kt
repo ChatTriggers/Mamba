@@ -50,7 +50,7 @@ object VTupleType : VType(LazyValue("VObjectType") { VObjectType }) {
 
             val iterable = argument(0)
 
-            if (!Runtime.isIterable(iterable)) {
+            if (!runtime.isIterable(iterable)) {
                 notImplemented("Error")
             }
 

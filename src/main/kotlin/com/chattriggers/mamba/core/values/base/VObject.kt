@@ -1,14 +1,14 @@
 package com.chattriggers.mamba.core.values.base
 
-import com.chattriggers.mamba.core.values.LazyValue
-import com.chattriggers.mamba.core.values.Value
+import com.chattriggers.mamba.core.IMethod
+import com.chattriggers.mamba.core.Slot
+import com.chattriggers.mamba.core.values.*
 import com.chattriggers.mamba.core.values.collections.toValue
 import com.chattriggers.mamba.core.values.exceptions.MambaException
 import com.chattriggers.mamba.core.values.exceptions.VAttributeError
 import com.chattriggers.mamba.core.values.exceptions.VTypeError
 import com.chattriggers.mamba.core.values.exceptions.notImplemented
 import com.chattriggers.mamba.core.values.singletons.VNone
-import com.chattriggers.mamba.core.values.toValue
 
 /**
  * This is the base class of all regular Python types.
@@ -27,53 +27,62 @@ open class VObject(private vararg val baseTypes: LazyValue<VType>) : Value {
 
     open val className = "object"
 
-    internal val slotMap = mutableMapOf<VObject, Slot>()
+    internal val slotMap = mutableMapOf<Value, Slot>()
 
-    fun getValue(key: String) = getValue(key.toValue())
+    fun getValue(key: String) = getValue(Wrapper(key))
 
-    fun getValue(key: VObject): VObject {
+    fun getValue(key: Value): Value {
         return getSlot(key).value
     }
 
-    fun getSlot(key: String) = getSlot(key.toValue())
+    fun getSlot(key: String) = getSlot(Wrapper(key))
 
-    fun getSlot(key: VObject): Slot {
+    fun getSlot(key: Value): Slot {
         ensureUnwrapped()
 
         if (key in slotMap)
             return slotMap[key]!!
 
         for (baseType in baseTypesUnwrapped) {
-            if (key in baseType.slotMap)
-                return baseType.slotMap[key]!!
+            baseType.ensureUnwrapped()
+
+            if (baseType.containsSlot(key)) {
+                val slot = baseType.getSlot(key)
+                val value = slot.value
+
+                if (!slot.isStatic && value is IMethod) {
+                    val newSlot = slot.copy(valueBacker = value.bind(this))
+                    slotMap[key] = newSlot
+                    return newSlot
+                }
+
+                return slot
+            }
         }
 
-        throw MambaException(VAttributeError(key.toString(), className))
+        throw IllegalStateException()
     }
 
-    fun containsSlot(key: String) = containsSlot(key.toValue())
+    fun containsSlot(key: String) = containsSlot(Wrapper(key))
 
-    fun containsSlot(key: VObject) = try {
+    fun containsSlot(key: Value) = try {
         getSlot(key)
         true
-    } catch (e: MambaException) {
-        if (e.reason is VAttributeError) {
-            false
-        } else {
-            throw e
-        }
+    } catch (e: IllegalStateException) {
+        false
     }
 
-    fun putSlot(key: String, value: VObject, createNewSlot: Boolean = true) {
-        putSlot(key.toValue(), value, createNewSlot)
+    fun putSlot(key: String, value: Value, createNewSlot: Boolean = true) {
+        putSlot(Wrapper(key), value, createNewSlot)
     }
 
-    fun putSlot(key: VObject, value: VObject, createNewSlot: Boolean = true) {
+    fun putSlot(key: Value, value: Value, createNewSlot: Boolean = true) {
         ensureUnwrapped()
 
         when {
             containsSlot(key) -> getSlot(key).value = value
-            createNewSlot -> slotMap[key] = Slot(key, value, isStatic = false, isWritable = true)
+            createNewSlot -> slotMap[key] =
+                Slot(key, value, isStatic = false, isWritable = true)
             else -> throw IllegalStateException("No existing slot for key $key")
         }
     }
@@ -83,44 +92,36 @@ open class VObject(private vararg val baseTypes: LazyValue<VType>) : Value {
     protected fun ensureUnwrapped() {
         if (baseTypes.isNotEmpty() && baseTypesUnwrapped.isEmpty()) {
             baseTypes.map { it.valueProducer() }.run(baseTypesUnwrapped::addAll)
-
-            for (baseType in baseTypesUnwrapped) {
-                baseType.ensureUnwrapped()
-
-                for ((key, slot) in baseType.slotMap) {
-                    // TODO: We only move methods into this.slotMap
-                    // since fields don't need to be bound. Is this
-                    // an issue?
-                    if (key in slotMap) continue
-
-                    if (slot.isStatic) continue
-
-                    val v = slot.value
-                    if (v !is IMethod) continue
-
-                    slotMap[key] = slot.copy(valueBacker = v.bind(this))
-                }
-            }
         }
     }
 }
 
 object VObjectType : VType() {
     init {
-        addField("__class__", VTypeType)
-
-        addMethod("__dir__") {
-            assertSelfAs<VObject>().allKeys().toList().toValue()
+        addField("__class__") {
+            VTypeType
         }
 
-        addField("__doc__", "The most base type".toValue())
+        addMethod("__dir__") {
+            assertSelfAs<VObject>().allKeys().toList().map {
+                when (it) {
+                    is VObject -> it
+                    is Wrapper -> it.toValue()
+                    else -> notImplemented("Error")
+                }
+            }.toValue()
+        }
+
+        addField("__doc__") {
+            "The most base type".toValue()
+        }
 
         addMethod("__getattribute__") {
             val self = assertSelfAs<VObject>()
             val key = assertArgAs<VObject>(1)
 
             when {
-                self.containsSlot(key) -> self.getValue(key)
+                self.containsSlot(key) -> self.getValue(key).unwrap()
                 self.containsSlot("__getattr__") -> runtime.callProperty(self, "__getattr__", listOf(self, key))
                 else -> throw MambaException(VAttributeError(key.toString(), self.className))
             }

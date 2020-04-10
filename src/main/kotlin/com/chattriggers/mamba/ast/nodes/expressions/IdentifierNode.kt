@@ -4,12 +4,13 @@ import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.exceptions.VNameError
 import com.chattriggers.mamba.core.values.toValue
+import com.chattriggers.mamba.core.values.unwrap
 
 class IdentifierNode(lineNumber: Int, val identifier: String) : ExpressionNode(lineNumber) {
     override fun execute(ctx: ThreadContext): VObject {
         for (scope in ctx.interp.scopeStack) {
             if (scope.containsSlot(identifier)) {
-                return scope.getValue(identifier)
+                return scope.getValue(identifier).unwrap()
             }
         }
 

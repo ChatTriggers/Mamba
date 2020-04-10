@@ -1,7 +1,10 @@
 package com.chattriggers.mamba.core.values
 
-import com.chattriggers.mamba.core.values.base.VObject
-import com.chattriggers.mamba.core.values.base.Wrapper
+import com.chattriggers.mamba.core.ClassFieldBuilder
+import com.chattriggers.mamba.core.FieldWrapper
+import com.chattriggers.mamba.core.MethodWrapper
+import com.chattriggers.mamba.core.ThreadContext
+import com.chattriggers.mamba.core.values.base.*
 import com.chattriggers.mamba.core.values.exceptions.notImplemented
 
 /**
@@ -26,7 +29,9 @@ fun Value?.unwrap(): VObject {
     return when (this) {
         is LazyValue<*> -> valueProducer()
         is VObject -> this
-        is Wrapper -> notImplemented("Unexpected Wrapper.unwrap()")
+        is MethodWrapper -> ThreadContext.currentContext.runtime.construct(VBuiltinMethodType, listOf(this))
+        is FieldWrapper -> this.field(ClassFieldBuilder(ThreadContext.currentContext))
+        is Wrapper -> ThreadContext.currentContext.runtime.toVObject(this.value)
         else -> notImplemented()
     }
 }

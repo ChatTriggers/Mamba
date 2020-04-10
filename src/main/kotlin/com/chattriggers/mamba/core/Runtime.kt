@@ -3,21 +3,18 @@ package com.chattriggers.mamba.core
 import com.chattriggers.mamba.ast.nodes.Node
 import com.chattriggers.mamba.ast.nodes.expressions.DotAccessNode
 import com.chattriggers.mamba.ast.nodes.expressions.IdentifierNode
+import com.chattriggers.mamba.ast.nodes.statements.FunctionNode
 import com.chattriggers.mamba.core.values.*
+import com.chattriggers.mamba.core.values.base.*
 import com.chattriggers.mamba.core.values.collections.VDict
 import com.chattriggers.mamba.core.values.collections.VList
+import com.chattriggers.mamba.core.values.collections.VListType
+import com.chattriggers.mamba.core.values.collections.VTupleType
 import com.chattriggers.mamba.core.values.exceptions.notImplemented
-import com.chattriggers.mamba.core.values.base.IMethod
 import com.chattriggers.mamba.core.values.numbers.*
-import com.chattriggers.mamba.core.values.base.VObject
-import com.chattriggers.mamba.core.values.base.VType
-import com.chattriggers.mamba.core.values.base.Wrapper
 import com.chattriggers.mamba.core.values.exceptions.MambaException
 import com.chattriggers.mamba.core.values.exceptions.VTypeError
-import com.chattriggers.mamba.core.values.singletons.VFalse
-import com.chattriggers.mamba.core.values.singletons.VNone
-import com.chattriggers.mamba.core.values.singletons.VNotImplemented
-import com.chattriggers.mamba.core.values.singletons.toValue
+import com.chattriggers.mamba.core.values.singletons.*
 
 class Runtime(private val ctx: ThreadContext) {
     fun toBoolean(value: VObject): Boolean {
@@ -41,47 +38,24 @@ class Runtime(private val ctx: ThreadContext) {
         notImplemented()
     }
 
+    fun toVObject(obj: Any?): VObject = when (obj) {
+        is MutableList<*> -> construct(VListType, listOf(obj))
+        is List<*> -> construct(VTupleType, listOf(obj))
+        is Int -> construct(VIntType, listOf(obj))
+        is Double -> construct(VFloatType, listOf(obj))
+        is Float -> construct(VFloatType, listOf(obj.toDouble()))
+        is String -> construct(VStringType, listOf(obj))
+        is Boolean -> if (obj) VTrue else VFalse
+        null -> VNone
+        else -> notImplemented("Conversion of type ${obj.javaClass.simpleName} to Value not implemented")
+    }
+
     fun getName(value: Node): String {
         return when (value) {
             is IdentifierNode -> value.identifier
             is DotAccessNode -> value.property.identifier
             else -> notImplemented()
         }
-    }
-
-    fun callProperty(obj: VObject, property: String, args: List<Value> = emptyList()): VObject {
-        return callProperty(obj, property.toValue(), args)
-    }
-
-    fun callProperty(obj: VObject, property: VObject, args: List<Value> = emptyList()): VObject {
-        val prop = obj.getValue(property)
-        return call(prop, args)
-    }
-
-    fun call(obj: VObject, args: List<Value>): VObject {
-        if (obj is IMethod)
-            return obj.call(ctx, args)
-
-        if (obj.containsSlot("__call__"))
-            return callProperty(obj, "__call__", args)
-
-        throw MambaException(VTypeError("'${obj.className}' object is not callable"))
-    }
-
-    fun construct(type: VType) = construct(type, emptyList())
-
-    fun construct(type: VType, args: List<Any>): VObject {
-        val mappedArgs = args.map {
-            if (it !is Value) Wrapper(it) else it
-        }
-        val obj = callProperty(type, "__new__", listOf(type) + mappedArgs)
-
-        // TODO: May have to pass obj with args depending on implementation
-        // of __new__ and __init__
-        // TODO: Ensure VNone is returned
-        callProperty(obj, "__init__", mappedArgs)
-
-        return obj
     }
 
     fun valueCompare(method: String, left: VObject, right: VObject): VObject {
@@ -99,6 +73,42 @@ class Runtime(private val ctx: ThreadContext) {
         }
     }
 
+    fun callProperty(obj: VObject, property: String, args: List<Value> = emptyList()): VObject {
+        return callProperty(obj, Wrapper(property), args)
+    }
+
+    fun callProperty(obj: VObject, property: Value, args: List<Value> = emptyList()): VObject {
+        val prop = obj.getValue(property)
+        return call(prop, args)
+    }
+
+    fun call(obj: Any, args: List<Value>): VObject {
+        return when (obj) {
+            is IMethod -> obj.call(ctx, args)
+            is VObject -> {
+                if (obj.containsSlot("__call__"))
+                    return callProperty(obj, "__call__", args)
+
+                throw MambaException(VTypeError("'${obj.className}' object is not callable"))
+            }
+            else -> notImplemented("Error")
+        }
+    }
+
+    fun construct(type: VType) = construct(type, emptyList())
+
+    fun construct(type: VType, args: List<Any>): VObject {
+        val mappedArgs = args.map {
+            if (it !is Value) Wrapper(it) else it
+        }
+        val obj = callProperty(type, "__new__", listOf(type) + mappedArgs)
+
+        // TODO: Ensure VNone is returned
+        callProperty(obj, "__init__", mappedArgs)
+
+        return obj
+    }
+
     fun getIterator(iterable: VObject): VObject {
         return callProperty(iterable, "__iter__")
     }
@@ -107,18 +117,7 @@ class Runtime(private val ctx: ThreadContext) {
         return callProperty(iterator, "__next__")
     }
 
-    companion object {
-        fun toValue(obj: Any): VObject {
-            return when (obj) {
-                is Int -> obj.toValue()
-                is String -> obj.toValue()
-                is Boolean -> obj.toValue()
-                else -> throw IllegalArgumentException()
-            }
-        }
+    fun isIterable(obj: VObject) = obj.containsSlot("__iter__")
 
-        fun isIterable(obj: VObject) = obj.containsSlot("__iter__")
-
-        fun isIterator(obj: VObject) = isIterable(obj) && obj.containsSlot("__next__")
-    }
+    fun isIterator(obj: VObject) = isIterable(obj) && obj.containsSlot("__next__")
 }

@@ -39,12 +39,8 @@ class ForStatementNode(
                     is VReturnWrapper -> return execResult
                 }
             }
-        } catch (e: MambaException) {
-            val reason = e.reason
-
-            if (reason !is VStopIteration) {
-                throw e
-            }
+        } catch (e: IllegalStateException) {
+            // TODO: Exceptions should be a VFlowWrapper
         }
 
         if (!didBreak && elseBlock.isNotEmpty()) {

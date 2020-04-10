@@ -18,32 +18,32 @@ object GlobalScope : VObject(LazyValue("GlobalScopeType") { GlobalScopeType })
 
 object GlobalScopeType : VType(LazyValue("VObjectType") { VObjectType }) {
     init {
-        addField("True", VTrue)
-        addField("False", VFalse)
-        addField("None", VNone)
-        addField("...", VEllipsis)
+        addField("True") { VTrue }
+        addField("False") { VFalse }
+        addField("None") { VNone }
+        addField("...") { VEllipsis }
 
-        addField("object", VObjectType)
-        addField("type", VTypeType)
-        addField("complex", VComplexType)
-        addField("float", VFloatType)
-        addField("int", VIntType)
-        addField("bool", VBoolType)
-        addField("str", VStringType)
-        addField("list", VListType)
-        addField("dict", VDictType)
-        addField("range", VRangeType)
+        addField("object") { VObjectType }
+        addField("type") { VTypeType }
+        addField("complex") { VComplexType }
+        addField("float") { VFloatType }
+        addField("int") { VIntType }
+        addField("bool") { VBoolType }
+        addField("str") { VStringType }
+        addField("list") { VListType }
+        addField("dict") { VDictType }
+        addField("range") { VRangeType }
 
-        addField("ArithmeticError", VArithmeticErrorType)
-        addField("BaseException", VBaseExceptionType)
-        addField("Exception", VExceptionType)
-        addField("LookupError", VLookupErrorType)
-        addField("NameError", VNameErrorType)
-        addField("NotImplementedError", VNotImplementedErrorType)
-        addField("StopIteration", VStopIterationType)
-        addField("SyntaxError", VSyntaxErrorType)
-        addField("TypeError", VTypeErrorType)
-        addField("ValueError", VValueErrorType)
+        addField("ArithmeticError") { VArithmeticErrorType }
+        addField("BaseException") { VBaseExceptionType }
+        addField("Exception") { VExceptionType }
+        addField("LookupError") { VLookupErrorType }
+        addField("NameError") { VNameErrorType }
+        addField("NotImplementedError") { VNotImplementedErrorType }
+        addField("StopIteration") { VStopIterationType }
+        addField("SyntaxError") { VSyntaxErrorType }
+        addField("TypeError") { VTypeErrorType }
+        addField("ValueError") { VValueErrorType }
 
         addMethod("abs", isStatic = true) {
             runtime.callProperty(argument(0), "__abs__")

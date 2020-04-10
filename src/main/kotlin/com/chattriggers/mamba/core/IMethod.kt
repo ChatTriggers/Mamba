@@ -1,7 +1,7 @@
-package com.chattriggers.mamba.core.values.base
+package com.chattriggers.mamba.core
 
-import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.Value
+import com.chattriggers.mamba.core.values.base.VObject
 
 /**
  * Represents any object that can be called.
@@ -9,9 +9,9 @@ import com.chattriggers.mamba.core.values.Value
  * user-defined functions
  */
 interface IMethod {
-    var self: VObject?
+    val self: VObject?
 
     fun call(ctx: ThreadContext, args: List<Value>): VObject
 
-    fun bind(newSelf: VObject): VObject
+    fun bind(newSelf: VObject): Value
 }

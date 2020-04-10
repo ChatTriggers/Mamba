@@ -4,6 +4,7 @@ import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.exceptions.notImplemented
+import com.chattriggers.mamba.core.values.unwrap
 
 class MemberAccessNode(
     lineNumber: Int,
@@ -29,7 +30,7 @@ class DotAccessNode(
     override fun execute(ctx: ThreadContext): VObject {
         val obj = target.execute(ctx)
         return if (obj.containsSlot(property.identifier)) {
-            obj.getValue(property.identifier)
+            obj.getValue(property.identifier).unwrap()
         } else VNone
     }
 

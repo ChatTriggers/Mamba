@@ -47,7 +47,7 @@ object VDictType : VType(LazyValue("VObjectType") { VObjectType }) {
 
             val iterable = if (argSize > 0) argument(0) else VDict(mutableMapOf())
 
-            if (!Runtime.isIterable(iterable)) {
+            if (!runtime.isIterable(iterable)) {
                 notImplemented("Error")
             }
 
@@ -57,7 +57,7 @@ object VDictType : VType(LazyValue("VObjectType") { VObjectType }) {
                 while (true) {
                     val it = runtime.getIterableNext(iterable)
 
-                    if (!Runtime.isIterable(it)) {
+                    if (!runtime.isIterable(it)) {
                         notImplemented("Error")
                     }
 

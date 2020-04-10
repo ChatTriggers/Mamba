@@ -1,9 +1,8 @@
 package com.chattriggers.mamba.core.values.base
 
-import com.chattriggers.mamba.ast.nodes.statements.FunctionNode
-import com.chattriggers.mamba.core.ThreadContext
+import com.chattriggers.mamba.core.*
 import com.chattriggers.mamba.core.values.LazyValue
-import com.chattriggers.mamba.core.values.toValue
+import com.chattriggers.mamba.core.values.Wrapper
 
 /**
  * Represents the type of an object.
@@ -22,36 +21,23 @@ open class VType : VObject {
 
     constructor() : super()
 
-    protected fun addField(key: String, value: VObject, isStatic: Boolean = false, isWritable: Boolean = false) {
-        addField(key.toValue(), value, isStatic, isWritable)
-    }
+    protected fun addField(key: String, isStatic: Boolean = false, isWritable: Boolean = false, field: NCFType) {
+        val wrapper = Wrapper(key)
 
-    protected fun addField(key: VObject, value: VObject, isStatic: Boolean = false, isWritable: Boolean = false) {
-        slotMap[key] = Slot(key, value, isStatic, isWritable)
-    }
-
-    protected fun addMethod(key: String, isStatic: Boolean = false, isWritable: Boolean = false, id: String? = null, method: NativeClassMethod) {
-        addMethod(key.toValue(), isStatic, isWritable, id, method)
-    }
-
-    protected fun addMethod(key: String, method: FunctionNode, isStatic: Boolean = false, isWritable: Boolean = false, id: String? = null) {
-        addMethod(key.toValue(), method, isStatic, isWritable, id)
-    }
-
-    protected fun addMethod(key: VObject, isStatic: Boolean = false, isWritable: Boolean = false, id: String? = null, method: NativeClassMethod) {
-        slotMap[key] = Slot(
-            key,
-            ThreadContext.currentContext.runtime.construct(VNativeMethodType, listOf(method)),
+        slotMap[wrapper] = Slot(
+            wrapper,
+            FieldWrapper(field),
             isStatic,
-            isWritable,
-            id
+            isWritable
         )
     }
 
-    protected fun addMethod(key: VObject, method: FunctionNode, isStatic: Boolean = false, isWritable: Boolean = false, id: String? = null) {
-        slotMap[key] = Slot(
-            key,
-            ThreadContext.currentContext.runtime.construct(VMethodType, listOf(method)),
+    protected fun addMethod(key: String, isStatic: Boolean = false, isWritable: Boolean = false, id: String? = null, method: NCMType) {
+        val wrapper = Wrapper(key)
+
+        slotMap[wrapper] = Slot(
+            wrapper,
+            MethodWrapper(key, method),
             isStatic,
             isWritable,
             id
