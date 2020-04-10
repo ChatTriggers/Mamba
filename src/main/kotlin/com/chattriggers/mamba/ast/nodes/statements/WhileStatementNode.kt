@@ -5,6 +5,7 @@ import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
 import com.chattriggers.mamba.core.ThreadContext
+import com.chattriggers.mamba.core.values.VExceptionWrapper
 
 class WhileStatementNode(
     lineNumber: Int,
@@ -15,13 +16,19 @@ class WhileStatementNode(
     override fun execute(ctx: ThreadContext): VObject {
         var broke = false
 
-        loop@
-        while (ctx.runtime.toBoolean(condition.execute(ctx))) {
+        while (true) {
+            val condition = condition.execute(ctx)
+            if (condition is VExceptionWrapper) return condition
+
+            if (!ctx.runtime.toBoolean(condition)) {
+                break
+            }
+
             // We don't really need to check for VContinueWrapper
             // here, since it's already the last statement
             if (executeStatements(ctx, body) is VBreakWrapper) {
                 broke = true
-                break@loop
+                break
             }
         }
 

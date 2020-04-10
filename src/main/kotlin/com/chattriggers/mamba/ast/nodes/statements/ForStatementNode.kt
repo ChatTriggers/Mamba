@@ -19,7 +19,11 @@ class ForStatementNode(
     private val elseBlock: List<StatementNode>
 ) : StatementNode(lineNumber, listOf(targetNode, iterableNode) + body + elseBlock) {
     override fun execute(ctx: ThreadContext): VObject {
-        val iterator = ctx.runtime.getIterator(iterableNode.execute(ctx))
+        val iterable = iterableNode.execute(ctx)
+        if (iterable is VExceptionWrapper) return iterable
+
+        val iterator = ctx.runtime.getIterator(iterable)
+        if (iterator is VExceptionWrapper) return iterator
 
         if (targetNode !is IdentifierNode)
             TODO()

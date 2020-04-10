@@ -4,13 +4,20 @@ import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.collections.VList
 import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
 import com.chattriggers.mamba.core.ThreadContext
+import com.chattriggers.mamba.core.values.VExceptionWrapper
 import com.chattriggers.mamba.core.values.collections.VListType
 
 class ListLiteral(lineNumber: Int, private val elements: List<ExpressionNode>) : ExpressionNode(lineNumber, elements) {
     override fun execute(ctx: ThreadContext): VObject {
-        return ctx.runtime.construct(VListType, listOf(
-            elements.map { it.execute(ctx) }.toMutableList()
-        ))
+        val list = mutableListOf<VObject>()
+
+        for (node in elements) {
+            val value = node.execute(ctx)
+            if (value is VExceptionWrapper) return value
+            list.add(value)
+        }
+
+        return ctx.runtime.construct(VListType, listOf(list))
     }
 
     override fun print(indent: Int) {

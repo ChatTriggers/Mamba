@@ -1,6 +1,7 @@
 package com.chattriggers.mamba.ast.nodes.expressions
 
 import com.chattriggers.mamba.core.ThreadContext
+import com.chattriggers.mamba.core.values.VExceptionWrapper
 import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.unwrap
@@ -28,6 +29,8 @@ class DotAccessNode(
 ) : ExpressionNode(lineNumber, listOf(target, property)) {
     override fun execute(ctx: ThreadContext): VObject {
         val obj = target.execute(ctx)
+        if (obj is VExceptionWrapper) return obj
+
         return if (obj.containsSlot(property.identifier)) {
             obj.getValue(property.identifier).unwrap()
         } else VNone

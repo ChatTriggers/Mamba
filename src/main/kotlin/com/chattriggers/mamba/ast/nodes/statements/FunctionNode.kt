@@ -32,8 +32,15 @@ class FunctionNode(
         try {
             val scope = ctx.runtime.construct(VObjectType)
 
-            parameters.forEachIndexed { index, node ->
-                val value = if (index < args.size) args[index] else node.defaultValue!!.execute(ctx)
+            for ((index, node) in parameters.withIndex()) {
+                val value = if (index < args.size)
+                    args[index]
+                else {
+                    val temp = node.defaultValue!!.execute(ctx)
+                    if (temp is VExceptionWrapper) return temp
+                    temp
+                }
+
                 scope.putSlot(node.identifier.identifier, value)
             }
 
@@ -41,7 +48,7 @@ class FunctionNode(
 
             return when (val returned = executeStatements(ctx, statements)) {
                 is VReturnWrapper -> returned.wrapped
-                is VExceptionWrapper -> return ctx.interp.throwException(returned.exception, lineNumber)
+                is VExceptionWrapper -> return returned
                 is VFlowWrapper -> TODO() // Should have been handled by an enclosing node
                 else -> VNone
             }

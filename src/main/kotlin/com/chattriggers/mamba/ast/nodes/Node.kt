@@ -13,7 +13,7 @@ abstract class Node(val lineNumber: Int, val children: List<Node>) {
         }
     }
 
-    open fun execute(ctx: ThreadContext): VObject = VNone
+    open fun execute(ctx: ThreadContext): VObject = TODO()
 
     /* fun compile(compiler: Compiler) */
 

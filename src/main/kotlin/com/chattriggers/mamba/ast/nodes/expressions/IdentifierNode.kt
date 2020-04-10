@@ -15,7 +15,7 @@ class IdentifierNode(lineNumber: Int, val identifier: String) : ExpressionNode(l
             }
         }
 
-        return ctx.interp.throwException(VNameError.construct(identifier), lineNumber)
+        return VNameError.construct(identifier)
     }
 
     override fun print(indent: Int) {

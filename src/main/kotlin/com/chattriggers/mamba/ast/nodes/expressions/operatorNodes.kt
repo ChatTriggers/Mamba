@@ -4,6 +4,7 @@ import com.chattriggers.mamba.api.ArithmeticOperator
 import com.chattriggers.mamba.api.ComparisonOperator
 import com.chattriggers.mamba.api.UnaryOperator
 import com.chattriggers.mamba.core.ThreadContext
+import com.chattriggers.mamba.core.values.VExceptionWrapper
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.singletons.toValue
 
@@ -47,7 +48,10 @@ class ComparisonNode(
     override fun execute(ctx: ThreadContext): VObject {
         val rt = ctx.runtime
         val leftValue = left.execute(ctx)
+        if (leftValue is VExceptionWrapper) return leftValue
+
         val rightValue = right.execute(ctx)
+        if (rightValue is VExceptionWrapper) return rightValue
 
         return when (op) {
             ComparisonOperator.LT -> rt.valueCompare("__lt__", leftValue, rightValue)
@@ -82,7 +86,10 @@ class ArithmeticExpressionNode(
     override fun execute(ctx: ThreadContext): VObject {
         val rt = ctx.runtime
         val leftValue = left.execute(ctx)
+        if (leftValue is VExceptionWrapper) return leftValue
+
         val rightValue = right.execute(ctx)
+        if (rightValue is VExceptionWrapper) return rightValue
 
         return when (op) {
             ArithmeticOperator.ADD -> rt.valueArithmetic("__add__", "__radd__", leftValue, rightValue)
@@ -116,6 +123,7 @@ class UnaryExpressionNode(
 ) : ExpressionNode(lineNumber, child) {
     override fun execute(ctx: ThreadContext): VObject {
         val value = child.execute(ctx)
+        if (value is VExceptionWrapper) return value
 
         return when (op) {
             UnaryOperator.NEG -> ctx.runtime.callProperty(value, "__neg__")

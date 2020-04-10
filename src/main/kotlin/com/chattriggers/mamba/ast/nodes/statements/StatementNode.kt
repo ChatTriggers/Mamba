@@ -1,6 +1,5 @@
 package com.chattriggers.mamba.ast.nodes.statements
 
-import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.values.VFlowWrapper
 import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.base.VObject
@@ -13,8 +12,7 @@ open class StatementNode(lineNumber: Int, children: List<Node>): Node(lineNumber
     constructor(lineNumber: Int) : this(lineNumber, emptyList())
 
     override fun execute(ctx: ThreadContext): VObject {
-        children.forEach { it.execute(ctx) }
-        return VNone
+        return executeStatements(ctx, children)
     }
 
     override fun print(indent: Int) {
@@ -23,7 +21,7 @@ open class StatementNode(lineNumber: Int, children: List<Node>): Node(lineNumber
     }
 
     companion object {
-        fun executeStatements(ctx: ThreadContext, statements: List<StatementNode>): VObject {
+        fun executeStatements(ctx: ThreadContext, statements: List<Node>): VObject {
             for (statement in statements) {
                 val returned = statement.execute(ctx)
                 if (returned is VFlowWrapper)

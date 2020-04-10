@@ -11,16 +11,8 @@ class ScriptNode(private val statements: List<StatementNode>) : Node(1, statemen
         val result = StatementNode.executeStatements(ctx, statements)
 
         if (result is VExceptionWrapper) {
-            println("Traceback (most recent call last):")
-
-            ctx.interp.exceptionStack.reversed().forEach {
-                println(
-                    "  File \"${it.file}\", line ${it.lineNumber}, in ${it.source}\n" +
-                    "    ${ctx.interp.lines[it.lineNumber - 1].trim()}"
-                )
-            }
-
-            println(result.exception.toString())
+            println("Exception:")
+            println(result.exception)
         }
 
         return VNone

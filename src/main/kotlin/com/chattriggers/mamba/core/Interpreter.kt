@@ -13,14 +13,8 @@ class Interpreter(val fileName: String, val lines: List<String>) {
 
     private val scopeStackBacker = Stack<VObject>()
 
-    // Stacktrace data
-    internal val callStack = Stack<CallFrame>()
-    internal val exceptionStack = Stack<CallFrame>()
-    internal val sourceStack = Stack<String>()
-
     init {
         scopeStackBacker.push(GlobalScope)
-        sourceStack.push("<module>")
     }
 
     fun execute(script: ScriptNode): Any {
@@ -40,9 +34,4 @@ class Interpreter(val fileName: String, val lines: List<String>) {
     }
 
     internal fun getScope() = scopeStackBacker.peek()
-
-    internal fun throwException(exception: VBaseException, lineNumber: Int): VObject {
-        exceptionStack.push(CallFrame(fileName, sourceStack.pop(), lineNumber))
-        return VExceptionWrapper(exception)
-    }
 }
