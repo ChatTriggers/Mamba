@@ -6,9 +6,10 @@ import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.base.VType
 import com.chattriggers.mamba.core.values.exceptions.VStopIteration
+import com.chattriggers.mamba.core.values.numbers.VInt
 import com.chattriggers.mamba.core.values.singletons.VNone
 
-class VDict(val dict: MutableMap<String, Value>) : VObject(LazyValue("VDictType") { VDictType }) {
+class VDict(val dict: MutableMap<String, VObject>) : VObject(LazyValue("VDictType") { VDictType }) {
     override val className = "dict"
 
     override fun toString() = StringBuilder().apply {
@@ -29,9 +30,6 @@ class VDict(val dict: MutableMap<String, Value>) : VObject(LazyValue("VDictType"
 
 object VDictType : VType(LazyValue("VObjectType") { VObjectType }) {
     init {
-        addMethod("__iter__") {
-            runtime.construct(VDictIteratorType, listOf(assertSelfAs<VDict>()))
-        }
         addMethod("__call__") {
             runtime.construct(VDictType, arguments())
         }
@@ -53,7 +51,7 @@ object VDictType : VType(LazyValue("VObjectType") { VObjectType }) {
                                 return@addMethod VDict(mutableMapOf())
                             } else if (value.isNotEmpty()) {
                                 @Suppress("UNCHECKED_CAST")
-                                return@addMethod VDict(value as MutableMap<String, Value>)
+                                return@addMethod VDict(value as MutableMap<String, VObject>)
                             }
                         }
 
@@ -68,7 +66,7 @@ object VDictType : VType(LazyValue("VObjectType") { VObjectType }) {
                 TODO("Error")
             }
 
-            val map = mutableMapOf<String, Value>()
+            val map = mutableMapOf<String, VObject>()
 
             while (true) {
                 val it = runtime.getIteratorNext(iterable)
@@ -103,6 +101,23 @@ object VDictType : VType(LazyValue("VObjectType") { VObjectType }) {
             VDict(map)
         }
         addMethod("__init__") {
+            VNone
+        }
+
+        addMethod("__iter__") {
+            runtime.construct(VDictIteratorType, listOf(assertSelfAs<VDict>()))
+        }
+        addMethod("__getitem__") {
+            val self = assertSelfAs<VDict>()
+            val index = assertArgAs<VString>(1)
+            self.dict[index.string]!!
+        }
+        addMethod("__setitem__") {
+            val self = assertSelfAs<VDict>()
+            val index = assertArgAs<VString>(1)
+            val obj = assertArgAs<VObject>(2)
+            self.dict[index.string] = obj
+
             VNone
         }
     }

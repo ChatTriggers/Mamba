@@ -8,6 +8,7 @@ import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.base.VType
 import com.chattriggers.mamba.core.values.exceptions.VStopIteration
+import com.chattriggers.mamba.core.values.numbers.VInt
 import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.unwrap
 
@@ -23,9 +24,6 @@ class VTuple(val items: List<VObject>) : VObject(LazyValue("VTupleType") { VTupl
 
 object VTupleType : VType(LazyValue("VObjectType") { VObjectType }) {
     init {
-        addMethod("__iter__") {
-            runtime.construct(VTupleIteratorType, listOf(assertSelfAs<VTuple>()))
-        }
         addMethod("__call__") {
             runtime.construct(VTupleType, arguments())
         }
@@ -78,6 +76,15 @@ object VTupleType : VType(LazyValue("VObjectType") { VObjectType }) {
         }
         addMethod("__init__") {
             VNone
+        }
+
+        addMethod("__iter__") {
+            runtime.construct(VTupleIteratorType, listOf(assertSelfAs<VTuple>()))
+        }
+        addMethod("__getitem__") {
+            val self = assertSelfAs<VTuple>()
+            val index = assertArgAs<VInt>(1)
+            self.items[index.int]
         }
     }
 }
