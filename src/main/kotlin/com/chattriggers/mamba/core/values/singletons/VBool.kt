@@ -26,7 +26,7 @@ object VBoolType : VType(LazyValue("VIntType") { VIntType }) {
 
             val b = when (argSize) {
                 1 -> false
-                2 -> when (val arg = argumentRaw(1)) {
+                2 -> when (val arg = argumentValueRaw(1)) {
                     is Wrapper -> if (arg.value !is Boolean) TODO() else arg.value
                     else -> TODO()
                 }

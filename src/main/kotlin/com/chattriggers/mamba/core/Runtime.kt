@@ -1,6 +1,7 @@
 package com.chattriggers.mamba.core
 
 import com.chattriggers.mamba.ast.nodes.Node
+import com.chattriggers.mamba.ast.nodes.expressions.Argument
 import com.chattriggers.mamba.ast.nodes.expressions.DotAccessNode
 import com.chattriggers.mamba.ast.nodes.expressions.IdentifierNode
 import com.chattriggers.mamba.core.values.*
@@ -24,8 +25,8 @@ class Runtime(private val ctx: ThreadContext) {
             value is VDict -> value.dict.isNotEmpty()
             value is VTuple -> value.items.isNotEmpty()
             value is VRange -> value.start == 0 && value.stop == 0 && value.step == 1
-            value.containsSlot("__bool__") -> callProperty(value, "__bool__") != VFalse
-            value.containsSlot("__len__") -> toInt(callProperty(value, "__len__")) != 0
+            value.containsSlot("__bool__") -> callProp(value, "__bool__") != VFalse
+            value.containsSlot("__len__") -> toInt(callProp(value, "__len__")) != 0
             else -> true
         }
     }
@@ -34,7 +35,7 @@ class Runtime(private val ctx: ThreadContext) {
         return when (obj) {
             is VInt -> obj.int
             else -> {
-                val ret = callProperty(obj, "__int__")
+                val ret = callProp(obj, "__int__")
                 if (ret !is VInt) TODO()
                 return ret.int
             }
@@ -67,34 +68,36 @@ class Runtime(private val ctx: ThreadContext) {
 
     fun valueCompare(method: String, left: VObject, right: VObject): VObject {
         return when {
-            left.containsSlot(method) -> callProperty(left, method, listOf(right))
+            left.containsSlot(method) -> callProp(left, method, listOf(right))
             else -> VNotImplemented
         }
     }
 
     fun valueArithmetic(method: String, reverseMethod: String, left: VObject, right: VObject): VObject {
         return when {
-            left.containsSlot(method) -> callProperty(left, method, listOf(right))
-            right.containsSlot(reverseMethod) -> callProperty(right, reverseMethod, listOf(left))
+            left.containsSlot(method) -> callProp(left, method, listOf(right))
+            right.containsSlot(reverseMethod) -> callProp(right, reverseMethod, listOf(left))
             else -> VNotImplemented
         }
     }
 
-    fun callProperty(obj: VObject, property: String, args: List<Value> = emptyList()): VObject {
-        return callProperty(obj, Wrapper(property), args)
+    fun callProp(obj: VObject, property: String, args: List<Value> = emptyList()): VObject {
+        return callPropWithArgs(obj, Wrapper(property), args.map {
+            Argument(it, null, spread = false, kwSpread = false)
+        })
     }
 
-    fun callProperty(obj: VObject, property: Value, args: List<Value> = emptyList()): VObject {
+    fun callPropWithArgs(obj: VObject, property: Value, args: List<Argument> = emptyList()): VObject {
         val prop = obj.getValue(property)
         return call(prop, args)
     }
 
-    fun call(obj: Any, args: List<Value>): VObject {
+    fun call(obj: Any, args: List<Argument>): VObject {
         return when (obj) {
             is IMethod -> obj.call(ctx, args)
             is VObject -> {
                 if (obj.containsSlot("__call__"))
-                    return callProperty(obj, "__call__", args)
+                    return callPropWithArgs(obj, Wrapper("__call__"), args)
 
                 VExceptionWrapper(VTypeError.construct("'${obj.className}' object is not callable"))
             }
@@ -108,20 +111,31 @@ class Runtime(private val ctx: ThreadContext) {
         val mappedArgs = args.map {
             if (it !is Value) Wrapper(it) else it
         }
-        val obj = callProperty(type, "__new__", listOf(type) + mappedArgs)
+        val obj = callProp(type, "__new__", listOf(type) + mappedArgs)
 
         // TODO: Ensure VNone is returned
-        callProperty(obj, "__init__", mappedArgs)
+        callProp(obj, "__init__", mappedArgs)
+
+        return obj
+    }
+
+    fun constructFromArgs(type: VType, args: List<Argument>): VObject {
+        val obj = callPropWithArgs(type, Wrapper("__new__"), listOf(
+            Argument(type, null, spread = false, kwSpread = false)) + args
+        )
+
+        // TODO: Ensure VNone is returned
+        callPropWithArgs(obj, Wrapper("__init__"), args)
 
         return obj
     }
 
     fun getIterator(iterable: VObject): VObject {
-        return callProperty(iterable, "__iter__")
+        return callProp(iterable, "__iter__")
     }
 
     fun getIteratorNext(iterator: VObject): VObject {
-        return callProperty(iterator, "__next__")
+        return callProp(iterator, "__next__")
     }
 
     fun isIterable(obj: VObject) = obj.containsSlot("__iter__")

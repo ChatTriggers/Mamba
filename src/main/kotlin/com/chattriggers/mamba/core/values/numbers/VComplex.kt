@@ -50,7 +50,7 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
             var imag = 0.0
 
             if (argSize > 0) {
-                real = when (val v = argumentRaw(1)) {
+                real = when (val v = argumentValueRaw(1)) {
                     is Wrapper -> v.value as Double
                     is VObject -> runtime.toDouble(v)
                     else -> TODO("Error")
@@ -58,7 +58,7 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
             }
 
             if (argSize > 1) {
-                imag = when (val v = argumentRaw(2)) {
+                imag = when (val v = argumentValueRaw(2)) {
                     is Wrapper -> v.value as Double
                     is VObject -> runtime.toDouble(v)
                     else -> TODO("Error")
@@ -160,28 +160,28 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
             TODO("Implement complex power algorithm")
         }
         addMethod("__radd__") {
-            runtime.callProperty(argument(1), "__add__", listOf(argument(0)))
+            runtime.callProp(argument(1), "__add__", listOf(argument(0)))
         }
         addMethod("__rdivmod__") {
-            runtime.callProperty(argument(1), "__divmod__", listOf(argument(0)))
+            runtime.callProp(argument(1), "__divmod__", listOf(argument(0)))
         }
         addMethod("__rfloordiv__") {
-            runtime.callProperty(argument(1), "__floordiv__", listOf(argument(0)))
+            runtime.callProp(argument(1), "__floordiv__", listOf(argument(0)))
         }
         addMethod("__rmod__") {
-            runtime.callProperty(argument(1), "__mod__", listOf(argument(0)))
+            runtime.callProp(argument(1), "__mod__", listOf(argument(0)))
         }
         addMethod("__rmul__") {
-            runtime.callProperty(argument(1), "__mul__", listOf(argument(0)))
+            runtime.callProp(argument(1), "__mul__", listOf(argument(0)))
         }
         addMethod("__rpow__") {
-            runtime.callProperty(argument(1), "__pow__", listOf(argument(0)))
+            runtime.callProp(argument(1), "__pow__", listOf(argument(0)))
         }
         addMethod("__rsub__") {
-            runtime.callProperty(argument(1), "__sub__", listOf(argument(0)))
+            runtime.callProp(argument(1), "__sub__", listOf(argument(0)))
         }
         addMethod("__rtruediv__") {
-            runtime.callProperty(argument(1), "__truediv__", listOf(argument(0)))
+            runtime.callProp(argument(1), "__truediv__", listOf(argument(0)))
         }
         addMethod("__sub__") {
             val (real, imag) = assertSelfAs<VComplex>()

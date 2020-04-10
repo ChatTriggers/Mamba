@@ -1,5 +1,6 @@
 package com.chattriggers.mamba.core
 
+import com.chattriggers.mamba.ast.nodes.expressions.Argument
 import com.chattriggers.mamba.ast.nodes.statements.FunctionNode
 import com.chattriggers.mamba.core.values.Value
 import com.chattriggers.mamba.core.values.base.VObject
@@ -9,24 +10,25 @@ import com.chattriggers.mamba.core.values.base.VBuiltinMethodType
 import com.chattriggers.mamba.core.values.base.VFunctionType
 import com.chattriggers.mamba.core.values.unwrap
 
-class ClassMethodBuilder(val ctx: ThreadContext, private val _args: List<Value>) {
+class ClassMethodBuilder(val ctx: ThreadContext, private val _args: List<Argument>) {
     val runtime = ctx.runtime
 
     val argSize = _args.size
 
-    fun argument(index: Int) = _args[index] as VObject
+    fun argumentValueRaw(index: Int) = _args[index].value
 
     fun argumentRaw(index: Int) = _args[index]
 
-    fun arguments() = _args.map(Value::unwrap)
+    fun argument(index: Int) = _args[index].value as VObject
 
-    inline fun <reified T : VObject> argAs(index: Int): T? {
-        if (index >= argSize) return null
-        return assertArgAs<T>(index)
-    }
+    fun argumentValuesRaw() = _args.map { it.value }
+
+    fun argumentsRaw() = _args
+
+    fun arguments() = _args.map { it.value as VObject }
 
     inline fun <reified T : Value> assertArgAs(index: Int): T {
-        val arg = argumentRaw(index)
+        val arg = argumentValueRaw(index)
         if (arg !is T)
             TODO()
         return arg
@@ -38,6 +40,15 @@ class ClassMethodBuilder(val ctx: ThreadContext, private val _args: List<Value>)
 
     fun construct(type: VType, vararg args: Any): VObject {
         return runtime.construct(type, args.toList())
+    }
+
+    fun constructFromArgs(type: VType, vararg args: Argument): VObject {
+        return runtime.constructFromArgs(type, args.toList())
+    }
+
+    inline fun <reified T : VObject> argAs(index: Int): T? {
+        if (index >= argSize) return null
+        return assertArgAs<T>(index)
     }
 }
 
@@ -65,14 +76,14 @@ data class MethodWrapper(
         return this.copy(self = newSelf)
     }
 
-    override fun call(ctx: ThreadContext, args: List<Value>): VObject {
+    override fun call(ctx: ThreadContext, args: List<Argument>): VObject {
         val newArgs = when (val s = self) {
             null -> args
-            else -> listOf(s) + args
+            else -> listOf(Argument(s, null, spread = false, kwSpread = false)) + args
         }
 
         return when {
-            funcNode != null -> funcNode.call(ctx, newArgs.map { it as VObject })
+            funcNode != null -> funcNode.call(ctx, newArgs)
             method != null -> method.invoke(ClassMethodBuilder(ctx, newArgs))
             else -> TODO("Impossible")
         }

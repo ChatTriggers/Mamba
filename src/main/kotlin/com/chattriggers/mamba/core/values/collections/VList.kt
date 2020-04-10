@@ -29,7 +29,7 @@ object VListType : VType(LazyValue("VObjectType") { VObjectType }) {
 
             val iterable = when (argSize) {
                 1 -> return@addMethod VList(mutableListOf())
-                2 -> when (val arg = argumentRaw(1)) {
+                2 -> when (val arg = argumentValueRaw(1)) {
                     is Wrapper -> {
                         val value = arg.value
 

@@ -710,7 +710,7 @@ internal class ASTVisitor {
         return node
     }
 
-    private fun visitArgList(ctx: ArgListContext?): List<ExpressionNode> {
+    private fun visitArgList(ctx: ArgListContext?): List<ArgumentNode> {
         if (ctx == null)
             return emptyList()
 
@@ -721,16 +721,39 @@ internal class ASTVisitor {
         return args.map(::visitArgument)
     }
 
-    private fun visitArgument(ctx: ArgumentContext): ExpressionNode {
-        if (ctx.argumentNamed() != null || ctx.argumentKwargSpread() != null || ctx.argumentArgSpread() != null)
-            TODO()
+    private fun visitArgument(ctx: ArgumentContext): ArgumentNode {
+        var name: String? = null
+        val value: ExpressionNode
+        var spread = false
+        var kwSpread = false
 
-        val arg = ctx.argumentCompFor()
+        val argCompFor = ctx.argumentCompFor()
+        val argNamed = ctx.argumentNamed()
+        val argSpread = ctx.argumentArgSpread()
+        val argKwSpread = ctx.argumentKwargSpread()
 
-        if (arg.compFor() != null)
-            TODO()
+        when {
+            argCompFor != null -> {
+                if (argCompFor.compFor() != null) TODO()
+                value = visitTest(argCompFor.test())
+            }
+            argNamed != null -> {
+                val nameTemp = visitTest(argNamed.test(0))
+                name = nameTemp.toString()
+                value = visitTest(argNamed.test(1))
+            }
+            argSpread != null -> {
+                spread = true
+                TODO()
+            }
+            argKwSpread != null -> {
+                kwSpread = true
+                TODO()
+            }
+            else -> TODO()
+        }
 
-        return visitTest(arg.test())
+        return ArgumentNode(value, name, spread, kwSpread)
     }
 
     private fun visitSubscriptList(ctx: SubscriptListContext?): List<ExpressionNode> {

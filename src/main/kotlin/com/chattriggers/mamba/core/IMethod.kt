@@ -1,5 +1,6 @@
 package com.chattriggers.mamba.core
 
+import com.chattriggers.mamba.ast.nodes.expressions.Argument
 import com.chattriggers.mamba.core.values.Value
 import com.chattriggers.mamba.core.values.base.VObject
 
@@ -11,7 +12,7 @@ import com.chattriggers.mamba.core.values.base.VObject
 interface IMethod {
     val self: VObject?
 
-    fun call(ctx: ThreadContext, args: List<Value>): VObject
+    fun call(ctx: ThreadContext, args: List<Argument>): VObject
 
     fun bind(newSelf: VObject): Value
 }

@@ -25,7 +25,7 @@ class MemberAccessNode(
         if (member is VExceptionWrapper)
             return member
 
-        return ctx.runtime.callProperty(value, "__getitem__", listOf(member))
+        return ctx.runtime.callProp(value, "__getitem__", listOf(member))
     }
 
     override fun print(indent: Int) {

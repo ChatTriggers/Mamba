@@ -1,5 +1,6 @@
 package com.chattriggers.mamba.ast.nodes.statements
 
+import com.chattriggers.mamba.ast.nodes.expressions.Argument
 import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
 import com.chattriggers.mamba.core.values.*
 import com.chattriggers.mamba.core.values.singletons.VNone
@@ -21,27 +22,64 @@ class FunctionNode(
     private val parameters: List<ParameterNode>,
     internal val statements: List<StatementNode>
 ) : StatementNode(lineNumber, listOf(identifier) + statements) {
-    fun call(ctx: ThreadContext, args: List<VObject>): VObject {
-        val requiredArgs = parameters.indexOfFirst { it.defaultValue != null }.let {
-            if (it == -1) args.size else it
-        }
-
-        if (args.size < requiredArgs)
-            TODO()
+    fun call(ctx: ThreadContext, args: List<Argument>): VObject {
+        if (args.any { it.spread } || args.any { it.kwSpread })
+            TODO("Support spread args")
 
         try {
             val scope = ctx.runtime.construct(VObjectType)
 
-            for ((index, node) in parameters.withIndex()) {
-                val value = if (index < args.size)
-                    args[index]
-                else {
-                    val temp = node.defaultValue!!.execute(ctx)
-                    if (temp is VExceptionWrapper) return temp
-                    temp
+            for ((index, param) in parameters.withIndex()) {
+                var value: VObject
+
+                // Make sure positional arguments are filled
+                if (index >= args.size && param.defaultValue == null) {
+                    TODO("Error: Missing required positional argument")
                 }
 
-                scope.putSlot(node.identifier.identifier, value)
+                // Check for arguments with same name
+                if (index >= args.size) {
+                    // Look for named argument with the same name as
+                    // this parameter
+                    val argSameName = args.firstOrNull {
+                        it.name == param.identifier.identifier
+                    }
+
+                    if (argSameName == null) {
+                        // Use default value
+                        value = param.defaultValue!!.execute(ctx)
+                        if (value is VExceptionWrapper)
+                            return value
+                    } else {
+                        value = argSameName.value.unwrap()
+                    }
+                } else {
+                    // We have an argument at this index, but we
+                    // first need to check for named argument with the
+                    // same name as this parameter
+                    // TODO: Is this necessary?
+                    val argSameName = args.firstOrNull {
+                        it.name == param.identifier.identifier
+                    }
+
+                    value = when {
+                        // Found named argument
+                        argSameName != null -> argSameName.value.unwrap()
+
+                        // Use positional argument, only if unnamed
+                        args[index].name == null -> args[index].value.unwrap()
+
+                        // Use default value
+                        else -> {
+                            val defaultValue = param.defaultValue!!.execute(ctx)
+                            if (defaultValue is VExceptionWrapper)
+                                return defaultValue
+                            defaultValue
+                        }
+                    }
+                }
+
+                scope.putSlot(param.identifier.identifier, value)
             }
 
             ctx.interp.pushScope(scope)

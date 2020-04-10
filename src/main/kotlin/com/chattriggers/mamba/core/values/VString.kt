@@ -31,9 +31,9 @@ object VStringType : VType(LazyValue("VObjectType") { VObjectType }) {
                 return@addMethod VExceptionWrapper(VTypeError.construct("string.__new__($name) is not safe, use $name.__new__()"))
             }
 
-            when (val arg = argumentRaw(1)) {
+            when (val arg = argumentValueRaw(1)) {
                 is Wrapper -> VString(arg.value.toString())
-                else -> VString(runtime.callProperty(arg.unwrap(), "__str__").toString())
+                else -> VString(runtime.callProp(arg.unwrap(), "__str__").toString())
             }
         }
         addMethod("__init__") {

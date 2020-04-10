@@ -120,7 +120,7 @@ object VObjectType : VType() {
 
             when {
                 self.containsSlot(key) -> self.getValue(key).unwrap()
-                self.containsSlot("__getattr__") -> runtime.callProperty(self, "__getattr__", listOf(self, key))
+                self.containsSlot("__getattr__") -> runtime.callProp(self, "__getattr__", listOf(self, key))
                 else -> VExceptionWrapper(VAttributeError.construct(key.toString(), self.className))
             }
 
@@ -132,7 +132,7 @@ object VObjectType : VType() {
         }
 
         addMethod("__call__", id = "obj_call") {
-            runtime.construct(VObjectType, arguments())
+            runtime.construct(VObjectType, argumentValuesRaw())
         }
 
         addMethod("__new__", isStatic = true) {

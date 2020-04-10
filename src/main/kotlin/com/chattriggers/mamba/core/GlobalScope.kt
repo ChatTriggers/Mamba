@@ -12,7 +12,6 @@ import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.base.VType
 import com.chattriggers.mamba.core.values.base.VTypeType
-import com.chattriggers.mamba.core.values.collections.toValue
 import com.chattriggers.mamba.core.values.numbers.VInt
 import com.chattriggers.mamba.core.values.singletons.*
 
@@ -48,7 +47,7 @@ object GlobalScopeType : VType(LazyValue("VObjectType") { VObjectType }) {
         addField("ValueError") { VValueErrorType }
 
         addMethod("abs", isStatic = true) {
-            runtime.callProperty(argument(0), "__abs__")
+            runtime.callProp(argument(0), "__abs__")
         }
 
         addMethod("all", isStatic = true) {
@@ -92,7 +91,7 @@ object GlobalScopeType : VType(LazyValue("VObjectType") { VObjectType }) {
         }
 
         addMethod("dir", isStatic = true) {
-            runtime.callProperty(argument(0), "__dir__")
+            runtime.callProp(argument(0), "__dir__")
         }
 
         addMethod("print", isStatic = true) {

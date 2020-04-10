@@ -31,7 +31,7 @@ object VIntType : VType(LazyValue("VObjectType") { VObjectType }) {
             var num = 0
 
             if (argSize > 0) {
-                num = when (val v = argumentRaw(1)) {
+                num = when (val v = argumentValueRaw(1)) {
                     is Wrapper -> v.value as Int
                     is VObject -> runtime.toInt(v)
                     else -> TODO("Error")
@@ -204,37 +204,37 @@ object VIntType : VType(LazyValue("VObjectType") { VObjectType }) {
             }
         }
         addMethod("__radd__") {
-            runtime.callProperty(argument(1), "__add__", listOf(argument(0)))
+            runtime.callProp(argument(1), "__add__", listOf(argument(0)))
         }
         addMethod("__rand__") {
-            runtime.callProperty(argument(1), "__and__", listOf(argument(0)))
+            runtime.callProp(argument(1), "__and__", listOf(argument(0)))
         }
         addMethod("__rdivmod__") {
-            runtime.callProperty(argument(1), "__divmod__", listOf(argument(0)))
+            runtime.callProp(argument(1), "__divmod__", listOf(argument(0)))
         }
         addMethod("__rfloordiv__") {
-            runtime.callProperty(argument(1), "__floordiv__", listOf(argument(0)))
+            runtime.callProp(argument(1), "__floordiv__", listOf(argument(0)))
         }
         addMethod("__rlshift__") {
-            runtime.callProperty(argument(1), "__lshift__", listOf(argument(0)))
+            runtime.callProp(argument(1), "__lshift__", listOf(argument(0)))
         }
         addMethod("__rmod__") {
-            runtime.callProperty(argument(1), "__mod__", listOf(argument(0)))
+            runtime.callProp(argument(1), "__mod__", listOf(argument(0)))
         }
         addMethod("__rmul__") {
-            runtime.callProperty(argument(1), "__mul__", listOf(argument(0)))
+            runtime.callProp(argument(1), "__mul__", listOf(argument(0)))
         }
         addMethod("__ror__") {
-            runtime.callProperty(argument(1), "__or__", listOf(argument(0)))
+            runtime.callProp(argument(1), "__or__", listOf(argument(0)))
         }
         addMethod("__round__") {
             TODO()
         }
         addMethod("__rpow__") {
-            runtime.callProperty(argument(1), "__pow__", listOf(argument(0)))
+            runtime.callProp(argument(1), "__pow__", listOf(argument(0)))
         }
         addMethod("__rrshift__") {
-            runtime.callProperty(argument(1), "__rshift__", listOf(argument(0)))
+            runtime.callProp(argument(1), "__rshift__", listOf(argument(0)))
         }
         addMethod("__rshift__") {
             val self = assertSelfAs<VInt>()
@@ -242,13 +242,13 @@ object VIntType : VType(LazyValue("VObjectType") { VObjectType }) {
             construct(VIntType, self.int shr other.int)
         }
         addMethod("__rsub__") {
-            runtime.callProperty(argument(1), "__sub__", listOf(argument(0)))
+            runtime.callProp(argument(1), "__sub__", listOf(argument(0)))
         }
         addMethod("__rtruediv__") {
-            runtime.callProperty(argument(1), "__truediv__", listOf(argument(0)))
+            runtime.callProp(argument(1), "__truediv__", listOf(argument(0)))
         }
         addMethod("__rxor__") {
-            runtime.callProperty(argument(1), "__xor__", listOf(argument(0)))
+            runtime.callProp(argument(1), "__xor__", listOf(argument(0)))
         }
         addMethod("__str__") {
             construct(VStringType, assertSelfAs<VInt>().int.toString())

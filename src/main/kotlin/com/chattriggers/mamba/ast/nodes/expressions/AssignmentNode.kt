@@ -24,7 +24,7 @@ class AssignmentNode(
                 if (member is VExceptionWrapper)
                     return member
 
-                ctx.runtime.callProperty(targetObj, "__setitem__", listOf(member, value))
+                ctx.runtime.callProp(targetObj, "__setitem__", listOf(member, value))
             }
             is DotAccessNode -> {
                 val targetObj = target.target.execute(ctx)
@@ -35,7 +35,7 @@ class AssignmentNode(
                 if (prop is VExceptionWrapper)
                     return prop
 
-                ctx.runtime.callProperty(targetObj, "__setattr__", listOf(prop, value))
+                ctx.runtime.callProp(targetObj, "__setattr__", listOf(prop, value))
             }
         }
 

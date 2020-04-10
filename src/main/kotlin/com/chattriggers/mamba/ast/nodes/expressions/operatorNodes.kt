@@ -126,9 +126,9 @@ class UnaryExpressionNode(
         if (value is VExceptionWrapper) return value
 
         return when (op) {
-            UnaryOperator.NEG -> ctx.runtime.callProperty(value, "__neg__")
-            UnaryOperator.POS -> ctx.runtime.callProperty(value, "__pos__")
-            UnaryOperator.INVERT -> ctx.runtime.callProperty(value, "__invert__")
+            UnaryOperator.NEG -> ctx.runtime.callProp(value, "__neg__")
+            UnaryOperator.POS -> ctx.runtime.callProp(value, "__pos__")
+            UnaryOperator.INVERT -> ctx.runtime.callProp(value, "__invert__")
         }
     }
 
