@@ -2,6 +2,7 @@ package com.chattriggers.mamba.core.values.collections
 
 import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.LazyValue
+import com.chattriggers.mamba.core.values.VExceptionWrapper
 import com.chattriggers.mamba.core.values.Wrapper
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
@@ -64,7 +65,13 @@ object VTupleType : VType(LazyValue("VObjectType") { VObjectType }) {
             val list = mutableListOf<VObject>()
 
             while (true) {
-                list.add(runtime.getIterableNext(iterable))
+                val next = runtime.getIterableNext(iterable)
+                if (next !is VExceptionWrapper) {
+                    list.add(next)
+                } else {
+                    if (next is VStopIteration) break
+                    else return@addMethod next
+                }
             }
 
             VTuple(list)
