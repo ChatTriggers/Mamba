@@ -25,7 +25,7 @@ object VListIteratorType : VType(LazyValue("VObjectType") { VObjectType }) {
             val self = assertSelfAs<VListIterator>()
 
             if (self.cursor >= self.vlist.list.size) {
-                VExceptionWrapper(VStopIteration.construct())
+                VStopIteration.construct()
             } else {
                 self.vlist.list[self.cursor++]
             }

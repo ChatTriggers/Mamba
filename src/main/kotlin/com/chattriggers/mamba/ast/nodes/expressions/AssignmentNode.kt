@@ -4,7 +4,7 @@ import com.chattriggers.mamba.core.GlobalScope
 import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.VExceptionWrapper
 import com.chattriggers.mamba.core.values.base.VObject
-import com.chattriggers.mamba.core.values.unwrap
+import com.chattriggers.mamba.core.values.exceptions.VSyntaxError
 
 class AssignmentNode(
     lineNumber: Int,
@@ -12,8 +12,7 @@ class AssignmentNode(
     private val expr: ExpressionNode
 ) : ExpressionNode(lineNumber, listOf(target, expr)) {
     override fun execute(ctx: ThreadContext): VObject {
-        val value = expr.execute(ctx)
-        if (value is VExceptionWrapper) return value
+        val value = expr.execute(ctx).ifException { return it }
 
         when (target) {
             is IdentifierNode -> {
@@ -34,30 +33,24 @@ class AssignmentNode(
                     }
 
                     if (!found)
-                        TODO("NameError")
+                        return VExceptionWrapper(lineNumber, VSyntaxError.construct(
+                            "no binding for nonlocal '$ident' found"
+                        ))
                 } else {
                     currScope.putSlot(ident, value)
                 }
             }
             is MemberAccessNode -> {
-                val targetObj = target.target.execute(ctx)
-                if (targetObj is VExceptionWrapper)
-                    return targetObj
+                val targetObj = target.target.execute(ctx).ifException { return it }
+                val member = target.members[0].execute(ctx).ifException { return it }
 
-                val member = target.members[0].execute(ctx)
-                if (member is VExceptionWrapper)
-                    return member
-
-                ctx.runtime.callProp(targetObj, "__setitem__", listOf(member, value))
+                ctx.runtime.callProp(targetObj, "__setitem__", listOf(member, value)).ifException {
+                    return it
+                }
             }
             is DotAccessNode -> {
-                val targetObj = target.target.execute(ctx)
-                if (targetObj is VExceptionWrapper)
-                    return targetObj
-
-                val prop = target.property.execute(ctx)
-                if (prop is VExceptionWrapper)
-                    return prop
+                val targetObj = target.target.execute(ctx).ifException { return it }
+                val prop = target.property.execute(ctx).ifException { return it }
 
                 ctx.runtime.callProp(targetObj, "__setattr__", listOf(prop, value))
             }

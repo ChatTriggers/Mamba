@@ -31,13 +31,14 @@ object VStopIterationType : VType(LazyValue("VExceptionType") { VExceptionType }
             runtime.construct(VStopIterationType, arguments())
         }
         addMethod("__new__", isStatic = true) {
-            val type = assertArgAs<VType>(0)
+            assertArgAs<VStopIterationType>(0)
 
-            if (type !is VStopIterationType) {
-                TODO()
+            val argument = when (val arg = assertArgAs<VObject>(1)) {
+                is VTuple -> arg
+                else -> runtime.construct(VTupleType, listOf(listOf(arg))) as VTuple
             }
 
-            VStopIteration(arguments().toValue())
+            VStopIteration(argument)
         }
         addMethod("__init__") {
             VNone

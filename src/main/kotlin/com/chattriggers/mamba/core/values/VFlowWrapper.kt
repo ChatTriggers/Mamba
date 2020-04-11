@@ -1,7 +1,10 @@
 package com.chattriggers.mamba.core.values
 
+import com.chattriggers.mamba.core.CallFrame
+import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.exceptions.VBaseException
+import java.util.*
 
 /**
  * This class is a way for child nodes to communicate
@@ -31,4 +34,16 @@ object VBreakWrapper : VFlowWrapper()
 
 object VContinueWrapper : VFlowWrapper()
 
-class VExceptionWrapper(val exception: VBaseException) : VFlowWrapper()
+class VExceptionWrapper(val lineNumber: Int, val exception: VBaseException) : VFlowWrapper() {
+    val callStack = ThreadContext.currentContext.interp.callStack.toList().map { it.copy() }
+
+    init {
+        for ((index, callFrame) in callStack.withIndex()) {
+            callFrame.lineNumber = if (index == callStack.lastIndex) {
+                lineNumber
+            } else {
+                callStack[index + 1].lineNumber
+            }
+        }
+    }
+}

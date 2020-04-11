@@ -2,12 +2,14 @@ package com.chattriggers.mamba.core
 
 import com.chattriggers.mamba.ast.nodes.expressions.Argument
 import com.chattriggers.mamba.ast.nodes.statements.FunctionNode
+import com.chattriggers.mamba.core.values.VExceptionWrapper
 import com.chattriggers.mamba.core.values.Value
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VType
 import com.chattriggers.mamba.core.values.Wrapper
 import com.chattriggers.mamba.core.values.base.VBuiltinMethodType
 import com.chattriggers.mamba.core.values.base.VFunctionType
+import com.chattriggers.mamba.core.values.exceptions.VBaseException
 import com.chattriggers.mamba.core.values.unwrap
 
 class ClassMethodBuilder(val ctx: ThreadContext, private val _args: List<Argument>) {
@@ -25,7 +27,9 @@ class ClassMethodBuilder(val ctx: ThreadContext, private val _args: List<Argumen
 
     fun argumentsRaw() = _args
 
-    fun arguments() = _args.map { it.value as VObject }
+    fun arguments() = _args.map {
+        if (it.value is VObject) it.value else it.value.unwrap()
+    }
 
     fun namedArgument(name: String) = _args.firstOrNull { it.name == name }
 
@@ -57,6 +61,33 @@ class ClassMethodBuilder(val ctx: ThreadContext, private val _args: List<Argumen
         if (index >= argSize) return null
         return assertArgAs<T>(index)
     }
+
+    inline fun VObject.ifException(block: (VObject) -> Unit): VObject {
+        when (this) {
+            is VExceptionWrapper, is VBaseException -> block(this)
+        }
+
+        return this
+    }
+
+    inline fun VObject.ifNotException(block: (VObject) -> Unit): VObject {
+        if (this !is VExceptionWrapper && this !is VBaseException)
+            block(this)
+
+        return this
+    }
+
+    inline fun <reified T : VBaseException> VObject.isException() = when (this) {
+        is VBaseException -> this is T
+        is VExceptionWrapper -> this.exception is T
+        else -> false
+    }
+
+    fun VObject.getException() = when (this) {
+        is VBaseException -> this
+        is VExceptionWrapper -> this.exception
+        else -> TODO()
+    }
 }
 
 class ClassFieldBuilder(val ctx: ThreadContext) {
@@ -75,6 +106,8 @@ data class MethodWrapper(
     private val method: NCMType? = null,
     override val self: VObject? = null
 ) : IMethod, Value {
+    val isNative = funcNode == null
+
     constructor(name: String, method: NCMType) : this(name, null, method, null)
 
     constructor(name: String, funcNode: FunctionNode) : this(name, funcNode, null, null)

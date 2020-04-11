@@ -71,7 +71,7 @@ object VTupleType : VType(LazyValue("VObjectType") { VObjectType }) {
                     if (next is VExceptionWrapper) {
                         if (next.exception is VStopIteration) break
                         else return@addMethod next
-                    }
+                    } else if (next is VStopIteration) break
 
                     list.add(next)
                 }

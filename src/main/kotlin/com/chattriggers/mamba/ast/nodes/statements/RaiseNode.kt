@@ -13,14 +13,13 @@ class RaiseNode(
     private val exceptionNode: ExpressionNode
 ) : StatementNode(lineNumber, exceptionNode) {
     override fun execute(ctx: ThreadContext): VObject {
-        val exception = exceptionNode.execute(ctx)
-        if (exception is VExceptionWrapper) return exception
+        val exception = exceptionNode.execute(ctx).ifException { return it }
 
         if (exception !is VBaseException) {
-            return VExceptionWrapper(VTypeError.construct("exceptions must derive from BaseException"))
+            return VExceptionWrapper(lineNumber, VTypeError.construct("exceptions must derive from BaseException"))
         }
 
-        return VExceptionWrapper(exception)
+        return VExceptionWrapper(lineNumber, exception)
     }
 
     override fun print(indent: Int) {

@@ -8,8 +8,7 @@ import com.chattriggers.mamba.core.values.VExceptionWrapper
 
 class ReturnNode(lineNumber: Int, private val child: ExpressionNode) : StatementNode(lineNumber, child) {
     override fun execute(ctx: ThreadContext): VObject {
-        val value = child.execute(ctx)
-        if (value is VExceptionWrapper) return value
+        val value = child.execute(ctx).ifException { return it }
         return VReturnWrapper(value)
     }
 

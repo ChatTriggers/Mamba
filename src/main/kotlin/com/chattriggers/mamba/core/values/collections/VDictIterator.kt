@@ -28,7 +28,7 @@ object VDictIteratorType : VType(LazyValue("VObjectType") { VObjectType }) {
             when {
                 self.vdict.dict.size != self.vdictKeys.size ->
                     TODO("RuntimeError: dictionary changed size during iteration")
-                self.cursor >= self.vdictKeys.size -> VExceptionWrapper(VStopIteration.construct())
+                self.cursor >= self.vdictKeys.size -> VStopIteration.construct()
                 else -> self.vdict.dict[self.vdictKeys[self.cursor++]]!!
             }.unwrap()
         }

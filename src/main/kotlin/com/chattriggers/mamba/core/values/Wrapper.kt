@@ -23,4 +23,6 @@ data class Wrapper(val value: Any) : Value {
     }.let {
         ThreadContext.currentContext.runtime.construct(it, listOf(value))
     }
+
+    override fun toString() = value.toString()
 }

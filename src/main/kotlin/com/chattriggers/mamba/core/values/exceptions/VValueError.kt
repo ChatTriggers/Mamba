@@ -2,6 +2,7 @@ package com.chattriggers.mamba.core.values.exceptions
 
 import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.LazyValue
+import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VType
 import com.chattriggers.mamba.core.values.collections.VTuple
 import com.chattriggers.mamba.core.values.collections.VTupleType
@@ -29,13 +30,14 @@ object VValueErrorType : VType(LazyValue("VExceptionType") { VExceptionType }) {
             runtime.construct(VValueErrorType, arguments())
         }
         addMethod("__new__", isStatic = true) {
-            val type = assertArgAs<VType>(0)
+            assertArgAs<VValueErrorType>(0)
 
-            if (type !is VValueErrorType) {
-                TODO()
+            val argument = when (val arg = assertArgAs<VObject>(1)) {
+                is VTuple -> arg
+                else -> runtime.construct(VTupleType, listOf(listOf(arg))) as VTuple
             }
 
-            VValueError(arguments().toValue())
+            VValueError(argument)
         }
         addMethod("__init__") {
             VNone

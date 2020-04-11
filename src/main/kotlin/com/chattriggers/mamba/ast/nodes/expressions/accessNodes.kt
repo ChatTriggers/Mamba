@@ -17,13 +17,8 @@ class MemberAccessNode(
         // Note: Currently, members is guaranteed to be a singleton list
         // containing only a regular VObject (i.e. no slices)
 
-        val value = target.execute(ctx)
-        if (value is VExceptionWrapper)
-            return value
-
-        val member = members[0].execute(ctx)
-        if (member is VExceptionWrapper)
-            return member
+        val value = target.execute(ctx).ifException { return it }
+        val member = members[0].execute(ctx).ifException { return it }
 
         return ctx.runtime.callProp(value, "__getitem__", listOf(member))
     }
@@ -41,8 +36,7 @@ class DotAccessNode(
     internal val property: IdentifierNode
 ) : ExpressionNode(lineNumber, listOf(target, property)) {
     override fun execute(ctx: ThreadContext): VObject {
-        val obj = target.execute(ctx)
-        if (obj is VExceptionWrapper) return obj
+        val obj = target.execute(ctx).ifException { return it }
 
         return if (obj.containsSlot(property.identifier)) {
             obj.getValue(property.identifier).unwrap()

@@ -46,13 +46,11 @@ class FunctionNode(
                     it.name == param.identifier.identifier
                 }
 
-                if (argSameName == null) {
+                value = if (argSameName == null) {
                     // Use default value
-                    value = param.defaultValue!!.execute(ctx)
-                    if (value is VExceptionWrapper)
-                        return value
+                    param.defaultValue!!.execute(ctx).ifException { return it }
                 } else {
-                    value = argSameName.value.unwrap()
+                    argSameName.value.unwrap()
                 }
             } else {
                 // We have an argument at this index, but we
@@ -72,9 +70,7 @@ class FunctionNode(
 
                     // Use default value
                     else -> {
-                        val defaultValue = param.defaultValue!!.execute(ctx)
-                        if (defaultValue is VExceptionWrapper)
-                            return defaultValue
+                        val defaultValue = param.defaultValue!!.execute(ctx).ifException { return it }
                         defaultValue
                     }
                 }

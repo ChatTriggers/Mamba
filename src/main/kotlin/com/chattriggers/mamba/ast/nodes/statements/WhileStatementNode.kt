@@ -17,8 +17,7 @@ class WhileStatementNode(
         var broke = false
 
         while (true) {
-            val condition = condition.execute(ctx)
-            if (condition is VExceptionWrapper) return condition
+            val condition = condition.execute(ctx).ifException { return it }
 
             if (!ctx.runtime.toBoolean(condition)) {
                 break

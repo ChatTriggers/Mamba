@@ -100,7 +100,7 @@ class Runtime(private val ctx: ThreadContext) {
                 if (obj.containsSlot("__call__"))
                     return callPropWithArgs(obj, Wrapper("__call__"), args)
 
-                VExceptionWrapper(VTypeError.construct("'${obj.className}' object is not callable"))
+                VTypeError.construct("'${obj.className}' object is not callable")
             }
             else -> TODO("Error")
         }

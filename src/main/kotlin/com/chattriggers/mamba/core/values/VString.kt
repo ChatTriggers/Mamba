@@ -28,7 +28,7 @@ object VStringType : VType(LazyValue("VObjectType") { VObjectType }) {
 
             if (type !is VStringType) {
                 val name = type.className
-                return@addMethod VExceptionWrapper(VTypeError.construct("string.__new__($name) is not safe, use $name.__new__()"))
+                return@addMethod VTypeError.construct("string.__new__($name) is not safe, use $name.__new__()")
             }
 
             when (val arg = argumentValueRaw(1)) {

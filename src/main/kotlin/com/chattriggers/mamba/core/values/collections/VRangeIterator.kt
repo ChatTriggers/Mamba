@@ -32,7 +32,7 @@ object VRangeIteratorType : VType(LazyValue("VObjectType") { VObjectType }) {
                     start > stop && step > 0
 
             if (shouldThrow) {
-                return@addMethod VExceptionWrapper(VStopIteration.construct())
+                return@addMethod VStopIteration.construct()
             }
 
             self.vrange.current += step

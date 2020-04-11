@@ -55,7 +55,7 @@ object VRangeType : VType(LazyValue("VObjectType") { VObjectType }) {
             val third = argAs<VInt>(3)
 
             if (third != null && third.int == 0) {
-                return@addMethod VExceptionWrapper(VValueError.construct("range() arg 3 must not be 0"))
+                return@addMethod VValueError.construct("range() arg 3 must not be 0")
             }
 
             when {

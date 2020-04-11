@@ -25,7 +25,7 @@ object VTupleIteratorType : VType(LazyValue("VObjectType") { VObjectType }) {
             val self = assertSelfAs<VTupleIterator>()
 
             if (self.cursor >= self.vtuple.items.size) {
-                VExceptionWrapper(VStopIteration.construct())
+                VStopIteration.construct()
             } else {
                 self.vtuple.items[self.cursor++]
             }

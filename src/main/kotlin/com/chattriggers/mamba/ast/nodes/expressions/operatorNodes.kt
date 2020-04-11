@@ -14,13 +14,8 @@ class OrExpresionNode(
     private val right: ExpressionNode
 ) : ExpressionNode(lineNumber, listOf(left, right)) {
     override fun execute(ctx: ThreadContext): VObject {
-        val leftValue = left.execute(ctx)
-        if (leftValue is VExceptionWrapper)
-            return leftValue
-
-        val rightValue = right.execute(ctx)
-        if (rightValue is VExceptionWrapper)
-            return rightValue
+        val leftValue = left.execute(ctx).ifException { return it }
+        val rightValue = right.execute(ctx).ifException { return it }
 
         return (ctx.runtime.toBoolean(leftValue) or ctx.runtime.toBoolean(rightValue)).toValue()
     }
@@ -38,13 +33,8 @@ class AndExpressionNode(
     private val right: ExpressionNode
 ) : ExpressionNode(lineNumber, listOf(left, right)) {
     override fun execute(ctx: ThreadContext): VObject {
-        val leftValue = left.execute(ctx)
-        if (leftValue is VExceptionWrapper)
-            return leftValue
-
-        val rightValue = right.execute(ctx)
-        if (rightValue is VExceptionWrapper)
-            return rightValue
+        val leftValue = left.execute(ctx).ifException { return it }
+        val rightValue = right.execute(ctx).ifException { return it }
 
         return (ctx.runtime.toBoolean(leftValue) and ctx.runtime.toBoolean(rightValue)).toValue()
     }
@@ -58,10 +48,7 @@ class AndExpressionNode(
 
 class NotExpressionNode(lineNumber: Int, private val child: ExpressionNode) : ExpressionNode(lineNumber, child) {
     override fun execute(ctx: ThreadContext): VObject {
-        val childValue = child.execute(ctx)
-        if (childValue is VExceptionWrapper)
-            return childValue
-
+        val childValue = child.execute(ctx).ifException { return it }
         return ctx.runtime.toBoolean(childValue).not().toValue()
     }
     override fun print(indent: Int) {
@@ -78,11 +65,8 @@ class ComparisonNode(
 ) : ExpressionNode(lineNumber, listOf(left, right)) {
     override fun execute(ctx: ThreadContext): VObject {
         val rt = ctx.runtime
-        val leftValue = left.execute(ctx)
-        if (leftValue is VExceptionWrapper) return leftValue
-
-        val rightValue = right.execute(ctx)
-        if (rightValue is VExceptionWrapper) return rightValue
+        val leftValue = left.execute(ctx).ifException { return it }
+        val rightValue = right.execute(ctx).ifException { return it }
 
         return when (op) {
             ComparisonOperator.LT -> rt.valueCompare("__lt__", leftValue, rightValue)
@@ -116,11 +100,8 @@ class ArithmeticExpressionNode(
 ) : ExpressionNode(lineNumber, listOf(left, right)) {
     override fun execute(ctx: ThreadContext): VObject {
         val rt = ctx.runtime
-        val leftValue = left.execute(ctx)
-        if (leftValue is VExceptionWrapper) return leftValue
-
-        val rightValue = right.execute(ctx)
-        if (rightValue is VExceptionWrapper) return rightValue
+        val leftValue = left.execute(ctx).ifException { return it }
+        val rightValue = right.execute(ctx).ifException { return it }
 
         return when (op) {
             ArithmeticOperator.ADD -> rt.valueArithmetic("__add__", "__radd__", leftValue, rightValue)
@@ -153,8 +134,7 @@ class UnaryExpressionNode(
     private val child: ExpressionNode
 ) : ExpressionNode(lineNumber, child) {
     override fun execute(ctx: ThreadContext): VObject {
-        val value = child.execute(ctx)
-        if (value is VExceptionWrapper) return value
+        val value = child.execute(ctx).ifException { return it }
 
         return when (op) {
             UnaryOperator.NEG -> ctx.runtime.callProp(value, "__neg__")

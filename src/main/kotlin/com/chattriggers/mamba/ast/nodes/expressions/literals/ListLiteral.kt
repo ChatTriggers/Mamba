@@ -12,8 +12,7 @@ class ListLiteral(lineNumber: Int, private val elements: List<ExpressionNode>) :
         val list = mutableListOf<VObject>()
 
         for (node in elements) {
-            val value = node.execute(ctx)
-            if (value is VExceptionWrapper) return value
+            val value = node.execute(ctx).ifException { return it }
             list.add(value)
         }
 

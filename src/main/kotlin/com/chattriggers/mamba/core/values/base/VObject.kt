@@ -6,6 +6,8 @@ import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.*
 import com.chattriggers.mamba.core.values.collections.toValue
 import com.chattriggers.mamba.core.values.exceptions.VAttributeError
+import com.chattriggers.mamba.core.values.exceptions.VNameError
+import com.chattriggers.mamba.core.values.exceptions.VNameErrorType
 import com.chattriggers.mamba.core.values.exceptions.VTypeError
 import com.chattriggers.mamba.core.values.singletons.VNone
 
@@ -36,7 +38,17 @@ open class VObject(private vararg val baseTypes: LazyValue<VType>) : Value {
     fun getValue(key: String) = getValue(Wrapper(key))
 
     fun getValue(key: Value): Value {
-        return getSlot(key).value
+        return try {
+            getSlot(key).value
+        } catch (e: IllegalStateException) {
+            val name = when (key) {
+                is Wrapper -> key.value as String
+                is VString -> key.string
+                else -> TODO()
+            }
+
+            return VNameError.construct(name)
+        }
     }
 
     fun getSlot(key: String) = getSlot(Wrapper(key))
@@ -127,7 +139,7 @@ object VObjectType : VType() {
             when {
                 self.containsSlot(key) -> self.getValue(key).unwrap()
                 self.containsSlot("__getattr__") -> runtime.callProp(self, "__getattr__", listOf(self, key))
-                else -> VExceptionWrapper(VAttributeError.construct(key.toString(), self.className))
+                else -> VAttributeError.construct(key.toString(), self.className)
             }
 
             // TODO: Property descriptors via __get__ and __set__
@@ -146,7 +158,7 @@ object VObjectType : VType() {
 
             if (type !is VObjectType) {
                 val name = type.className
-                return@addMethod VExceptionWrapper(VTypeError.construct("object.__new__($name) is not safe, use $name.__new__()"))
+                return@addMethod VTypeError.construct("object.__new__($name) is not safe, use $name.__new__()")
             }
 
             VObject(LazyValue("VObjectType") { VObjectType })

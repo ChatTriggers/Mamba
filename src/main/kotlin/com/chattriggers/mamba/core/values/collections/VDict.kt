@@ -6,6 +6,7 @@ import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.base.VType
 import com.chattriggers.mamba.core.values.exceptions.VStopIteration
+import com.chattriggers.mamba.core.values.exceptions.VValueError
 import com.chattriggers.mamba.core.values.singletons.VNone
 
 class VDict(val dict: MutableMap<String, VObject>) : VObject(LazyValue("VDictType") { VDictType }) {
@@ -69,9 +70,8 @@ object VDictType : VType(LazyValue("VObjectType") { VObjectType }) {
                     TODO("Error")
                 }
 
-                val iterator = runtime.getIterator(iterable)
-                if (iterator is VExceptionWrapper)
-                    return@addMethod iterator
+                val iterator = runtime.getIterator(iterable).ifException { return@addMethod it }
+                var i = 0
 
                 while (true) {
                     val subIterable = runtime.getIteratorNext(iterator)
@@ -85,26 +85,19 @@ object VDictType : VType(LazyValue("VObjectType") { VObjectType }) {
                         TODO("Error")
                     }
 
-                    val subIterator = runtime.getIterator(subIterable)
-                    if (subIterator is VExceptionWrapper)
-                        return@addMethod subIterator
+                    val subIterator = runtime.getIterator(subIterable).ifException { return@addMethod it }
 
-                    val key = runtime.getIteratorNext(subIterator)
-
-                    if (key is VExceptionWrapper)
-                        return@addMethod key
-
-                    val value = runtime.getIteratorNext(subIterator)
-                    if (value is VExceptionWrapper)
-                        return@addMethod key
+                    val key = runtime.getIteratorNext(subIterator).ifException { return@addMethod it }
+                    val value = runtime.getIteratorNext(subIterator).ifException { return@addMethod it }
 
                     map[key.toString()] = value
 
                     // Sub-iterator can only have two elements
-                    val next = runtime.getIteratorNext(subIterator)
-                    if (next !is VExceptionWrapper) {
-                        TODO("ValueError")
+                    runtime.getIteratorNext(subIterator).ifNotException {
+                        return@addMethod VValueError.construct("dictionary update sequence $i has length >2; 2 is required")
                     }
+
+                    i++
                 }
             }
 

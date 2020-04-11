@@ -8,11 +8,15 @@ import com.chattriggers.mamba.core.values.VExceptionWrapper
 
 class ScriptNode(private val statements: List<StatementNode>) : Node(1, statements) {
     override fun execute(ctx: ThreadContext): VObject {
-        val result = StatementNode.executeStatements(ctx, statements)
+        StatementNode.executeStatements(ctx, statements).ifException { ex ->
+            println("Traceback (most recent call last):")
 
-        if (result is VExceptionWrapper) {
-            println("Exception:")
-            println(result.exception)
+            ex.callStack.forEach { cs ->
+                println("  File \"${cs.source}\", line ${cs.lineNumber}, in ${cs.name}")
+                println("    ${ctx.interp.lines[cs.lineNumber - 1].trim()}")
+            }
+
+            println(ex.exception)
         }
 
         return VNone

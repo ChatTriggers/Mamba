@@ -16,11 +16,8 @@ class DictLiteral(
         val map = mutableMapOf<String, VObject>()
 
         for ((keyNode, valueNode) in dict) {
-            val key = keyNode.execute(ctx)
-            if (key is VExceptionWrapper) return key
-
-            val value = valueNode.execute(ctx)
-            if (value is VExceptionWrapper) return value
+            val key = keyNode.execute(ctx).ifException { return it }
+            val value = valueNode.execute(ctx).ifException { return it }
 
             map[key.toString()] = value
         }

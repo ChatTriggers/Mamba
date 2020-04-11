@@ -41,16 +41,14 @@ class IfStatementNode(
 
     override fun execute(ctx: ThreadContext): VObject {
         val rt = ctx.runtime
-        var ifCond = ifBlock.condition.execute(ctx)
-        if (ifCond is VExceptionWrapper) return ifCond
+        var ifCond = ifBlock.condition.execute(ctx).ifException { return it }
 
         if (rt.toBoolean(ifCond)) {
             return executeStatements(ctx, ifBlock.body)
         }
 
         for (elifBlock in elifBlocks) {
-            ifCond = elifBlock.condition.execute(ctx)
-            if (ifCond is VExceptionWrapper) return ifCond
+            ifCond = elifBlock.condition.execute(ctx).ifException { return it }
             if (rt.toBoolean(ifCond))
                 return executeStatements(ctx, elifBlock.body)
         }

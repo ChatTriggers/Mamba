@@ -17,7 +17,7 @@ object VFunctionType: VType(LazyValue("VObjectType") { VObjectType }) {
         addMethod("__call__") {
             val self = assertSelfAs<VFunction>()
             val method = self.function
-            method.call(ctx, argumentsRaw())
+            method.call(ctx, argumentsRaw().let { it.subList(1, it.size) })
         }
         addMethod("__new__", isStatic = true) {
             assertArgAs<VFunctionType>(0)

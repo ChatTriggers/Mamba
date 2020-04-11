@@ -27,7 +27,11 @@ fun Value?.unwrap(): VObject {
     return when (this) {
         is LazyValue<*> -> valueProducer()
         is VObject -> this
-        is MethodWrapper -> ThreadContext.currentContext.runtime.construct(VBuiltinMethodType, listOf(this))
+        is MethodWrapper -> if (isNative) {
+            ThreadContext.currentContext.runtime.construct(VBuiltinMethodType, listOf(this))
+        } else {
+            ThreadContext.currentContext.runtime.construct(VFunctionType, listOf(this))
+        }
         is FieldWrapper -> this.field(ClassFieldBuilder(ThreadContext.currentContext))
         is Wrapper -> ThreadContext.currentContext.runtime.toVObject(this.value)
         else -> TODO()
