@@ -26,10 +26,10 @@ object VRangeIteratorType : VType(LazyValue("VObjectType") { VObjectType }) {
             val (start, stop, step) = self.vrange
             val current = self.vrange.current
 
-            val shouldThrow = step < 0 && current < stop ||
-                    step > 0 && current > stop ||
-                    start < stop && step < 0 ||
-                    start > stop && step > 0
+            val shouldThrow = step < 0 && current <= stop ||
+                    step > 0 && current >= stop ||
+                    start <= stop && step < 0 ||
+                    start >= stop && step > 0
 
             if (shouldThrow) {
                 return@addMethod VStopIteration.construct()
