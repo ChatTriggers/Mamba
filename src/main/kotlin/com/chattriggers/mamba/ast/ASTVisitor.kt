@@ -41,7 +41,29 @@ internal class ASTVisitor {
         if (flowStatement != null)
             return visitFlowStatement(flowStatement)
 
+        val globalStatement = ctx.globalStatement()
+        if (globalStatement != null)
+            return visitGlobalStatement(globalStatement)
+
+        val nonlocalStatement = ctx.nonLocalStatement()
+        if (nonlocalStatement != null)
+            return visitNonlocalStatement(nonlocalStatement)
+
         TODO("Handle other branch possibilities")
+    }
+
+    private fun visitGlobalStatement(ctx: GlobalStatementContext): StatementNode {
+        val ln = ctx.lineNumber()
+        val name = if (ctx.NAME().size > 1) TODO() else ctx.NAME(1)
+
+        return GlobalNode(ln, IdentifierNode(ln, name.text))
+    }
+
+    private fun visitNonlocalStatement(ctx: NonLocalStatementContext): StatementNode {
+        val ln = ctx.lineNumber()
+        val name = if (ctx.NAME().size > 1) TODO() else ctx.NAME(1)
+
+        return NonlocalNode(ln, IdentifierNode(ln, name.text))
     }
 
     private fun visitFlowStatement(ctx: FlowStatementContext): StatementNode {
