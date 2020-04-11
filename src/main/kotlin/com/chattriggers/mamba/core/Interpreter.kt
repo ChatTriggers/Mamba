@@ -1,37 +1,35 @@
 package com.chattriggers.mamba.core
 
-import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.ast.nodes.ScriptNode
-import com.chattriggers.mamba.core.values.VExceptionWrapper
-import com.chattriggers.mamba.core.values.base.VObjectType
-import com.chattriggers.mamba.core.values.exceptions.VBaseException
-import java.util.*
+import com.chattriggers.mamba.core.values.base.VObject
 
-class Interpreter(val fileName: String, val lines: List<String>) {
-    internal val scopeStack: List<VObject>
-        get() = scopeStackBacker.reversed()
+class Scopes {
+    var scopeStack = mutableListOf<VObject>()
 
-    private val scopeStackBacker = Stack<VObject>()
+    val currScope: VObject
+        get() = scopeStack.last()
 
     init {
-        scopeStackBacker.push(GlobalScope)
+        scopeStack.add(GlobalScope)
     }
+
+    fun captureScopes() = scopeStack.toList()
+
+    fun loadScopes(scopes: List<VObject>) {
+        scopeStack = scopes.toMutableList()
+    }
+
+    fun pushScope(scope: VObject) {
+        scopeStack.add(scope)
+    }
+
+    fun popScope() = scopeStack.removeAt(scopeStack.lastIndex)
+}
+
+class Interpreter(val fileName: String, val lines: List<String>) {
+    val scopes = Scopes()
 
     fun execute(script: ScriptNode): Any {
         return script.execute(ThreadContext.currentContext)
     }
-
-    internal fun pushScope(scope: VObject = ThreadContext.currentContext.runtime.construct(VObjectType)) {
-        scopeStackBacker.push(scope)
-    }
-
-    internal fun popScope(): VObject {
-        if (scopeStackBacker.empty()) {
-            TODO("Error")
-        }
-
-        return scopeStackBacker.pop()
-    }
-
-    internal fun getScope() = scopeStackBacker.peek()
 }

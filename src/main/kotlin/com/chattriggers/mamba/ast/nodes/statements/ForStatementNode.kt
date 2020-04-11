@@ -40,7 +40,7 @@ class ForStatementNode(
                 else return nextValue
             }
 
-            ctx.interp.getScope().putSlot(targetName, nextValue)
+            ctx.interp.scopes.currScope.putSlot(targetName, nextValue)
 
             when (val execResult = executeStatements(ctx, body)) {
                 VBreakWrapper -> {

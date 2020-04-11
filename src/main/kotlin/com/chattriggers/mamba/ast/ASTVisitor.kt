@@ -54,14 +54,14 @@ internal class ASTVisitor {
 
     private fun visitGlobalStatement(ctx: GlobalStatementContext): StatementNode {
         val ln = ctx.lineNumber()
-        val name = if (ctx.NAME().size > 1) TODO() else ctx.NAME(1)
+        val name = if (ctx.NAME().size > 1) TODO() else ctx.NAME(0)
 
         return GlobalNode(ln, IdentifierNode(ln, name.text))
     }
 
     private fun visitNonlocalStatement(ctx: NonLocalStatementContext): StatementNode {
         val ln = ctx.lineNumber()
-        val name = if (ctx.NAME().size > 1) TODO() else ctx.NAME(1)
+        val name = if (ctx.NAME().size > 1) TODO() else ctx.NAME(0)
 
         return NonlocalNode(ln, IdentifierNode(ln, name.text))
     }

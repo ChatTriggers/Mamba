@@ -29,6 +29,10 @@ open class VObject(private vararg val baseTypes: LazyValue<VType>) : Value {
 
     internal val slotMap = mutableMapOf<Value, Slot>()
 
+    // Used for VObjects that are also scopes
+    val globals = mutableListOf<String>()
+    val nonlocals = mutableListOf<String>()
+
     fun getValue(key: String) = getValue(Wrapper(key))
 
     fun getValue(key: Value): Value {

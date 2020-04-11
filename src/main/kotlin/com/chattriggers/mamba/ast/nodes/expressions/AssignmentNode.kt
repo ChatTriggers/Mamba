@@ -1,8 +1,10 @@
 package com.chattriggers.mamba.ast.nodes.expressions
 
+import com.chattriggers.mamba.core.GlobalScope
 import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.VExceptionWrapper
 import com.chattriggers.mamba.core.values.base.VObject
+import com.chattriggers.mamba.core.values.unwrap
 
 class AssignmentNode(
     lineNumber: Int,
@@ -14,7 +16,29 @@ class AssignmentNode(
         if (value is VExceptionWrapper) return value
 
         when (target) {
-            is IdentifierNode -> ctx.interp.getScope().putSlot(target.identifier, value)
+            is IdentifierNode -> {
+                val currScope = ctx.interp.scopes.currScope
+                val ident = target.identifier
+
+                if (ident in currScope.globals) {
+                    GlobalScope.putSlot(ident, value)
+                } else if (ident in currScope.nonlocals) {
+                    var found = false
+
+                    for (scope in ctx.interp.scopes.scopeStack.reversed().drop(1).dropLast(1)) {
+                        if (scope.containsSlot(ident)) {
+                            scope.putSlot(ident, value)
+                            found = true
+                            break
+                        }
+                    }
+
+                    if (!found)
+                        TODO("NameError")
+                } else {
+                    currScope.putSlot(ident, value)
+                }
+            }
             is MemberAccessNode -> {
                 val targetObj = target.target.execute(ctx)
                 if (targetObj is VExceptionWrapper)
