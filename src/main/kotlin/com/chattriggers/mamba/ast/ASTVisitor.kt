@@ -49,6 +49,10 @@ internal class ASTVisitor {
         if (nonlocalStatement != null)
             return visitNonlocalStatement(nonlocalStatement)
 
+        val passStatement = ctx.passStatement()
+        if (passStatement != null)
+            return PassNode(passStatement.lineNumber())
+
         TODO("Handle other branch possibilities")
     }
 
