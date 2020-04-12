@@ -1,11 +1,8 @@
 package com.chattriggers.mamba.ast.nodes.expressions
 
-import com.chattriggers.mamba.ast.nodes.Node
 import com.chattriggers.mamba.core.CallFrame
 import com.chattriggers.mamba.core.ThreadContext
-import com.chattriggers.mamba.core.values.VExceptionWrapper
 import com.chattriggers.mamba.core.values.Value
-import com.chattriggers.mamba.core.values.base.VBuiltinMethod
 import com.chattriggers.mamba.core.values.base.VFunction
 import com.chattriggers.mamba.core.values.base.VObject
 
@@ -14,9 +11,7 @@ data class ArgumentNode(
     val name: String?,
     val spread: Boolean,
     val kwSpread: Boolean
-) {
-
-}
+)
 
 data class Argument(
     val value: Value,

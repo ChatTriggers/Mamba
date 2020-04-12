@@ -51,8 +51,8 @@ object GlobalScopeType : VType(LazyValue("VObjectType") { VObjectType }) {
             val iterable = assertArgAs<VObject>(0)
             val returnList = runtime.iterableToList(iterable)
 
-            if (returnList is VExceptionWrapper || returnList is VBaseException) {
-                returnList as VObject
+            if (returnList is VBaseException) {
+                returnList
             } else {
                 @Suppress("UNCHECKED_CAST")
                 val list = (returnList as Wrapper).value as List<VObject>
@@ -65,8 +65,8 @@ object GlobalScopeType : VType(LazyValue("VObjectType") { VObjectType }) {
             val iterable = assertArgAs<VObject>(0)
             val returnList = runtime.iterableToList(iterable)
 
-            if (returnList is VExceptionWrapper || returnList is VBaseException) {
-                returnList as VObject
+            if (returnList is VBaseException) {
+                returnList
             } else {
                 @Suppress("UNCHECKED_CAST")
                 val list = (returnList as Wrapper).value as List<VObject>

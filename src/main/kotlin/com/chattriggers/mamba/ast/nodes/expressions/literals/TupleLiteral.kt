@@ -3,7 +3,6 @@ package com.chattriggers.mamba.ast.nodes.expressions.literals
 import com.chattriggers.mamba.core.values.collections.VTuple
 import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
 import com.chattriggers.mamba.core.ThreadContext
-import com.chattriggers.mamba.core.values.VExceptionWrapper
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.collections.VTupleType
 

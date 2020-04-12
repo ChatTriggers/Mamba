@@ -2,7 +2,6 @@ package com.chattriggers.mamba.ast.nodes.expressions
 
 import com.chattriggers.mamba.core.GlobalScope
 import com.chattriggers.mamba.core.ThreadContext
-import com.chattriggers.mamba.core.values.VExceptionWrapper
 import com.chattriggers.mamba.core.values.Wrapper
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.collections.VListType
@@ -26,7 +25,9 @@ class IdentifierNode(lineNumber: Int, val identifier: String) : ExpressionNode(l
             }
         }
 
-        return VExceptionWrapper(lineNumber, VNameError.construct(identifier))
+        return VNameError.construct(identifier).apply {
+            initializeCallstack(lineNumber)
+        }
     }
 
     override fun print(indent: Int) {

@@ -2,7 +2,6 @@ package com.chattriggers.mamba.ast.nodes.expressions
 
 import com.chattriggers.mamba.core.GlobalScope
 import com.chattriggers.mamba.core.ThreadContext
-import com.chattriggers.mamba.core.values.VExceptionWrapper
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.exceptions.VSyntaxError
 
@@ -32,10 +31,11 @@ class AssignmentNode(
                         }
                     }
 
-                    if (!found)
-                        return VExceptionWrapper(lineNumber, VSyntaxError.construct(
-                            "no binding for nonlocal '$ident' found"
-                        ))
+                    if (!found) {
+                        return VSyntaxError.construct("no binding for nonlocal '$ident' found").apply {
+                            initializeCallstack(lineNumber)
+                        }
+                    }
                 } else {
                     currScope.putSlot(ident, value)
                 }

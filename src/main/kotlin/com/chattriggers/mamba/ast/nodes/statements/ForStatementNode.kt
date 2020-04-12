@@ -4,9 +4,9 @@ import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
 import com.chattriggers.mamba.ast.nodes.expressions.IdentifierNode
 import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.VBreakWrapper
-import com.chattriggers.mamba.core.values.VExceptionWrapper
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.VReturnWrapper
+import com.chattriggers.mamba.core.values.exceptions.VBaseException
 import com.chattriggers.mamba.core.values.exceptions.VStopIteration
 import com.chattriggers.mamba.core.values.singletons.VNone
 
@@ -28,24 +28,24 @@ class ForStatementNode(
 
         var didBreak = false
 
-        outer@
+        loop@
         while (true) {
             val nextValue = ctx.runtime.getIteratorNext(iterator)
 
-            if (nextValue is VExceptionWrapper) {
-                if (nextValue.exception is VStopIteration) break
-                else return nextValue
-            } else if (nextValue is VStopIteration) break
+            when (nextValue) {
+                is VStopIteration -> break@loop
+                is VBaseException -> return nextValue
+            }
 
             ctx.interp.scopes.currScope.putSlot(targetName, nextValue)
 
             when (val execResult = executeStatements(ctx, body)) {
                 VBreakWrapper -> {
                     didBreak = true
-                    break@outer
+                    break@loop
                 }
                 is VReturnWrapper -> return execResult
-                is VExceptionWrapper -> return execResult
+                is VBaseException -> return execResult
             }
         }
 

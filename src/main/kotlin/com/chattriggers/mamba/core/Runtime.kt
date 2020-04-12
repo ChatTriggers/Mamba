@@ -150,20 +150,11 @@ class Runtime(private val ctx: ThreadContext) {
         val list = mutableListOf<VObject>()
 
         while (true) {
-            val next = getIteratorNext(iterator)
-            if (next is VExceptionWrapper) {
-                if (next.exception is VStopIteration) {
-                    return Wrapper(list)
-                }
-                return next
+            when (val next = getIteratorNext(iterator)) {
+                is VStopIteration -> return Wrapper(list)
+                is VBaseException -> return next
+                else -> list.add(next)
             }
-            list.add(next)
-        }
-    }
-
-    companion object {
-        inline fun <reified T : VBaseException> isException(obj: VObject): Boolean {
-            return obj is VExceptionWrapper && obj.exception is T
         }
     }
 }

@@ -10,6 +10,7 @@ import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.base.VFunctionType
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
+import com.chattriggers.mamba.core.values.exceptions.VBaseException
 
 data class ParameterNode(
     val identifier: IdentifierNode,
@@ -88,7 +89,7 @@ class FunctionNode(
         try {
             return when (val returned = executeStatements(ctx, statements)) {
                 is VReturnWrapper -> returned.wrapped
-                is VExceptionWrapper -> return returned
+                is VBaseException -> return returned
                 is VFlowWrapper -> TODO() // Should have been handled by an enclosing node
                 else -> VNone
             }

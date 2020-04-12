@@ -1,5 +1,7 @@
 package com.chattriggers.mamba.core.values.exceptions
 
+import com.chattriggers.mamba.core.CallFrame
+import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.LazyValue
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
@@ -14,6 +16,26 @@ open class VBaseException(
     type: LazyValue<VType> = LazyValue("VBaseExceptionType") { VBaseExceptionType }
 ) : VObject(type) {
     override val className = "BaseException"
+
+    private val savedCallStack = ThreadContext.currentContext.interp.callStack.toList().map { it.copy() }
+    var callStack: List<CallFrame>? = null
+
+    init {
+    }
+
+    fun initializeCallstack(lineNumber: Int) {
+        if (callStack != null) return
+
+        callStack = savedCallStack
+
+        for ((index, callFrame) in callStack!!.withIndex()) {
+            callFrame.lineNumber = if (index == callStack!!.lastIndex) {
+                lineNumber
+            } else {
+                callStack!![index + 1].lineNumber
+            }
+        }
+    }
 
     override fun toString() = StringBuilder().apply {
         append(className)

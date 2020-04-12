@@ -6,7 +6,6 @@ import com.chattriggers.mamba.core.values.collections.VDict
 import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
 import com.chattriggers.mamba.ast.nodes.expressions.IdentifierNode
 import com.chattriggers.mamba.core.ThreadContext
-import com.chattriggers.mamba.core.values.VExceptionWrapper
 import com.chattriggers.mamba.core.values.collections.VDictType
 class DictLiteral(
     lineNumber: Int,

@@ -1,10 +1,8 @@
 package com.chattriggers.mamba.ast.nodes.expressions.literals
 
 import com.chattriggers.mamba.core.values.base.VObject
-import com.chattriggers.mamba.core.values.collections.VList
 import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
 import com.chattriggers.mamba.core.ThreadContext
-import com.chattriggers.mamba.core.values.VExceptionWrapper
 import com.chattriggers.mamba.core.values.collections.VListType
 
 class ListLiteral(lineNumber: Int, private val elements: List<ExpressionNode>) : ExpressionNode(lineNumber, elements) {

@@ -1,8 +1,6 @@
 package com.chattriggers.mamba.ast.nodes
 
 import com.chattriggers.mamba.core.ThreadContext
-import com.chattriggers.mamba.core.values.VExceptionWrapper
-import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.exceptions.VBaseException
 
@@ -33,10 +31,10 @@ abstract class Node(val lineNumber: Int, val children: List<Node>) {
         return null
     }
 
-    inline fun VObject.ifException(block: (VExceptionWrapper) -> Unit): VObject {
-        when (this) {
-            is VExceptionWrapper -> block(this)
-            is VBaseException -> block(VExceptionWrapper(lineNumber, this))
+    inline fun VObject.ifException(block: (VBaseException) -> Unit): VObject {
+        if (this is VBaseException) {
+            initializeCallstack(lineNumber)
+            block(this)
         }
 
         return this

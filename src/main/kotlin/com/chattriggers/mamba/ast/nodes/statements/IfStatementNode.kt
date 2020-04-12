@@ -4,7 +4,6 @@ import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.ast.nodes.Node
 import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
 import com.chattriggers.mamba.core.ThreadContext
-import com.chattriggers.mamba.core.values.VExceptionWrapper
 
 enum class IfConditionalNodeType {
     IF,

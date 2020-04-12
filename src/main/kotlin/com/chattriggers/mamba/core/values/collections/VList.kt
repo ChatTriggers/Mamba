@@ -5,6 +5,7 @@ import com.chattriggers.mamba.core.values.*
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.base.VType
+import com.chattriggers.mamba.core.values.exceptions.VBaseException
 import com.chattriggers.mamba.core.values.exceptions.VStopIteration
 import com.chattriggers.mamba.core.values.numbers.VInt
 import com.chattriggers.mamba.core.values.singletons.VNone
@@ -58,15 +59,13 @@ object VListType : VType(LazyValue("VObjectType") { VObjectType }) {
 
                 val iterator = runtime.getIterator(iterable)
 
+                loop@
                 while (true) {
-                    val result = runtime.getIteratorNext(iterator)
-
-                    if (result is VExceptionWrapper) {
-                        if (result.exception is VStopIteration) break
-                        else return@addMethod result
+                    when (val result = runtime.getIteratorNext(iterator)) {
+                        is VStopIteration -> break@loop
+                        is VBaseException -> return@addMethod result
+                        else -> list.add(result)
                     }
-
-                    list.add(result)
                 }
             }
 

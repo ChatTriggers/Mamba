@@ -4,7 +4,6 @@ import com.chattriggers.mamba.api.ArithmeticOperator
 import com.chattriggers.mamba.api.ComparisonOperator
 import com.chattriggers.mamba.api.UnaryOperator
 import com.chattriggers.mamba.core.ThreadContext
-import com.chattriggers.mamba.core.values.VExceptionWrapper
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.singletons.toValue
 

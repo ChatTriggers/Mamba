@@ -2,11 +2,11 @@ package com.chattriggers.mamba.core.values.collections
 
 import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.LazyValue
-import com.chattriggers.mamba.core.values.VExceptionWrapper
 import com.chattriggers.mamba.core.values.Wrapper
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.base.VType
+import com.chattriggers.mamba.core.values.exceptions.VBaseException
 import com.chattriggers.mamba.core.values.exceptions.VStopIteration
 import com.chattriggers.mamba.core.values.numbers.VInt
 import com.chattriggers.mamba.core.values.singletons.VNone
@@ -65,15 +65,13 @@ object VTupleType : VType(LazyValue("VObjectType") { VObjectType }) {
 
                 val iterator = runtime.getIterator(iterable)
 
+                loop@
                 while (true) {
-                    val next = runtime.getIteratorNext(iterator)
-
-                    if (next is VExceptionWrapper) {
-                        if (next.exception is VStopIteration) break
-                        else return@addMethod next
-                    } else if (next is VStopIteration) break
-
-                    list.add(next)
+                    when (val next = runtime.getIteratorNext(iterator)) {
+                        is VStopIteration -> break@loop
+                        is VBaseException -> return@addMethod next
+                        else -> list.add(next)
+                    }
                 }
             }
 

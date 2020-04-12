@@ -33,17 +33,3 @@ class VReturnWrapper(val wrapped: VObject) : VFlowWrapper()
 object VBreakWrapper : VFlowWrapper()
 
 object VContinueWrapper : VFlowWrapper()
-
-class VExceptionWrapper(val lineNumber: Int, val exception: VBaseException) : VFlowWrapper() {
-    val callStack = ThreadContext.currentContext.interp.callStack.toList().map { it.copy() }
-
-    init {
-        for ((index, callFrame) in callStack.withIndex()) {
-            callFrame.lineNumber = if (index == callStack.lastIndex) {
-                lineNumber
-            } else {
-                callStack[index + 1].lineNumber
-            }
-        }
-    }
-}

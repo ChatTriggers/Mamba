@@ -2,7 +2,6 @@ package com.chattriggers.mamba.core
 
 import com.chattriggers.mamba.ast.nodes.expressions.Argument
 import com.chattriggers.mamba.ast.nodes.statements.FunctionNode
-import com.chattriggers.mamba.core.values.VExceptionWrapper
 import com.chattriggers.mamba.core.values.Value
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VType
@@ -64,29 +63,17 @@ class ClassMethodBuilder(val ctx: ThreadContext, private val _args: List<Argumen
 
     inline fun VObject.ifException(block: (VObject) -> Unit): VObject {
         when (this) {
-            is VExceptionWrapper, is VBaseException -> block(this)
+            is VBaseException -> block(this)
         }
 
         return this
     }
 
     inline fun VObject.ifNotException(block: (VObject) -> Unit): VObject {
-        if (this !is VExceptionWrapper && this !is VBaseException)
+        if (this !is VBaseException)
             block(this)
 
         return this
-    }
-
-    inline fun <reified T : VBaseException> VObject.isException() = when (this) {
-        is VBaseException -> this is T
-        is VExceptionWrapper -> this.exception is T
-        else -> false
-    }
-
-    fun VObject.getException() = when (this) {
-        is VBaseException -> this
-        is VExceptionWrapper -> this.exception
-        else -> TODO()
     }
 }
 
