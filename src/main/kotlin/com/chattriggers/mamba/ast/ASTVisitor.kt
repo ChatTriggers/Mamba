@@ -77,10 +77,15 @@ internal class ASTVisitor {
             val testList = returnStatement.testList()
             val tests = testList.test()
 
-            if (tests.size > 1) {
-                TODO("Handle other branch possibilities")
+            val ln = returnStatement.lineNumber()
+
+            // Check the childCount rather than tests.size to account
+            // for statements like "return 1," that return a tuple, but only
+            // have one test
+            return if (testList.childCount > 1) {
+                ReturnNode(ln, TupleLiteral(ln, tests.map(::visitTest)))
             } else {
-                return ReturnNode(ctx.lineNumber(), visitTest(tests[0]))
+                ReturnNode(ln, visitTest(tests[0]))
             }
         }
 
