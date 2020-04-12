@@ -4,6 +4,7 @@ import com.chattriggers.mamba.core.IMethod
 import com.chattriggers.mamba.core.Slot
 import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.*
+import com.chattriggers.mamba.core.values.collections.VString
 import com.chattriggers.mamba.core.values.collections.toValue
 import com.chattriggers.mamba.core.values.exceptions.VAttributeError
 import com.chattriggers.mamba.core.values.exceptions.VNameError

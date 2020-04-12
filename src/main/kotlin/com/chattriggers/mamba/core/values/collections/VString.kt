@@ -1,12 +1,15 @@
-package com.chattriggers.mamba.core.values
+package com.chattriggers.mamba.core.values.collections
 
 import com.chattriggers.mamba.core.ThreadContext
+import com.chattriggers.mamba.core.values.LazyValue
+import com.chattriggers.mamba.core.values.Wrapper
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.base.VType
 import com.chattriggers.mamba.core.values.exceptions.VTypeError
 import com.chattriggers.mamba.core.values.numbers.toValue
 import com.chattriggers.mamba.core.values.singletons.VNone
+import com.chattriggers.mamba.core.values.unwrap
 
 class VString(val string: String) : VObject(LazyValue("VStringType") { VStringType }) {
     override val className = "str"

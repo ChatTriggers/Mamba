@@ -4,8 +4,8 @@ import com.chattriggers.mamba.ast.nodes.Node
 import com.chattriggers.mamba.ast.nodes.expressions.Argument
 import com.chattriggers.mamba.ast.nodes.expressions.DotAccessNode
 import com.chattriggers.mamba.ast.nodes.expressions.IdentifierNode
-import com.chattriggers.mamba.core.values.VString
-import com.chattriggers.mamba.core.values.VStringType
+import com.chattriggers.mamba.core.values.collections.VString
+import com.chattriggers.mamba.core.values.collections.VStringType
 import com.chattriggers.mamba.core.values.Value
 import com.chattriggers.mamba.core.values.Wrapper
 import com.chattriggers.mamba.core.values.base.VObject

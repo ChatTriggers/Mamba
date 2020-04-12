@@ -7,7 +7,7 @@ import com.chattriggers.mamba.core.values.base.VType
 import com.chattriggers.mamba.core.values.collections.VTuple
 import com.chattriggers.mamba.core.values.collections.VTupleType
 import com.chattriggers.mamba.core.values.singletons.VNone
-import com.chattriggers.mamba.core.values.toValue
+import com.chattriggers.mamba.core.values.collections.toValue
 
 class VSyntaxError(args: VTuple) : VException(args, LazyValue("VSyntaxErrorType") { VSyntaxErrorType }) {
     override val className = "SyntaxError"

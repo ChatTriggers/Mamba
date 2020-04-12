@@ -7,7 +7,7 @@ import com.chattriggers.mamba.core.values.collections.VTupleType
 import com.chattriggers.mamba.core.values.exceptions.VAssertionError
 import com.chattriggers.mamba.core.values.exceptions.VAssertionErrorType
 import com.chattriggers.mamba.core.values.singletons.VNone
-import com.chattriggers.mamba.core.values.toValue
+import com.chattriggers.mamba.core.values.collections.toValue
 
 class AssertNode(
     lineNumber: Int,

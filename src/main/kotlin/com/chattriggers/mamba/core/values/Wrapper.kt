@@ -2,6 +2,7 @@ package com.chattriggers.mamba.core.values
 
 import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.base.VObject
+import com.chattriggers.mamba.core.values.collections.VStringType
 import com.chattriggers.mamba.core.values.numbers.VFloatType
 import com.chattriggers.mamba.core.values.numbers.VIntType
 import com.chattriggers.mamba.core.values.singletons.VBoolType
