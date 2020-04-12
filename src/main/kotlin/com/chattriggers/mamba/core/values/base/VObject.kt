@@ -7,7 +7,6 @@ import com.chattriggers.mamba.core.values.*
 import com.chattriggers.mamba.core.values.collections.toValue
 import com.chattriggers.mamba.core.values.exceptions.VAttributeError
 import com.chattriggers.mamba.core.values.exceptions.VNameError
-import com.chattriggers.mamba.core.values.exceptions.VNameErrorType
 import com.chattriggers.mamba.core.values.exceptions.VTypeError
 import com.chattriggers.mamba.core.values.singletons.VNone
 

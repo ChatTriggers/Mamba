@@ -1,12 +1,11 @@
 package com.chattriggers.mamba.ast.nodes.expressions.literals
 
-import com.chattriggers.mamba.core.values.base.VObject
-import com.chattriggers.mamba.core.values.numbers.VComplex
-import com.chattriggers.mamba.core.values.numbers.toValue
 import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
 import com.chattriggers.mamba.core.ThreadContext
+import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.numbers.VComplexType
 import com.chattriggers.mamba.core.values.numbers.VFloatType
+import com.chattriggers.mamba.core.values.numbers.toValue
 
 class IntegerLiteral(lineNumber: Int, private val num: Int) : ExpressionNode(lineNumber) {
     override fun execute(ctx: ThreadContext): VObject = num.toValue()

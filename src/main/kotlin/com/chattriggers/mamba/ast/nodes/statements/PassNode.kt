@@ -1,6 +1,5 @@
 package com.chattriggers.mamba.ast.nodes.statements
 
-import com.chattriggers.mamba.ast.nodes.Node
 import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.singletons.VNone
 

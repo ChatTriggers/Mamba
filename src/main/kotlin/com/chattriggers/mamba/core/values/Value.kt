@@ -4,7 +4,10 @@ import com.chattriggers.mamba.core.ClassFieldBuilder
 import com.chattriggers.mamba.core.FieldWrapper
 import com.chattriggers.mamba.core.MethodWrapper
 import com.chattriggers.mamba.core.ThreadContext
-import com.chattriggers.mamba.core.values.base.*
+import com.chattriggers.mamba.core.values.base.VBuiltinMethodType
+import com.chattriggers.mamba.core.values.base.VFunctionType
+import com.chattriggers.mamba.core.values.base.VObject
+
 /**
  * Superclass of every value accessible in the Python runtime.
  *

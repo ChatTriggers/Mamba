@@ -1,9 +1,7 @@
 package com.chattriggers.mamba.core.values.base
 
-import com.chattriggers.mamba.core.*
+import com.chattriggers.mamba.core.MethodWrapper
 import com.chattriggers.mamba.core.values.LazyValue
-import com.chattriggers.mamba.core.values.Value
-import com.chattriggers.mamba.core.values.Wrapper
 import com.chattriggers.mamba.core.values.singletons.VNone
 
 class VBuiltinMethod(

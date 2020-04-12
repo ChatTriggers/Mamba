@@ -1,8 +1,8 @@
 package com.chattriggers.mamba.ast.nodes.expressions
 
 import com.chattriggers.mamba.core.ThreadContext
-import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.base.VObject
+import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.unwrap
 
 class MemberAccessNode(

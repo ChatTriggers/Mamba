@@ -1,7 +1,9 @@
 package com.chattriggers.mamba.core.values.collections
 
 import com.chattriggers.mamba.core.ThreadContext
-import com.chattriggers.mamba.core.values.*
+import com.chattriggers.mamba.core.values.LazyValue
+import com.chattriggers.mamba.core.values.VString
+import com.chattriggers.mamba.core.values.Wrapper
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.base.VType
@@ -9,6 +11,7 @@ import com.chattriggers.mamba.core.values.exceptions.VBaseException
 import com.chattriggers.mamba.core.values.exceptions.VStopIteration
 import com.chattriggers.mamba.core.values.exceptions.VValueError
 import com.chattriggers.mamba.core.values.singletons.VNone
+import com.chattriggers.mamba.core.values.unwrap
 
 class VDict(val dict: MutableMap<String, VObject>) : VObject(LazyValue("VDictType") { VDictType }) {
     override val className = "dict"

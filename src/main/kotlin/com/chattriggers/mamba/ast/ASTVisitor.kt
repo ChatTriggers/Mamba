@@ -3,11 +3,11 @@ package com.chattriggers.mamba.ast
 import com.chattriggers.mamba.api.ArithmeticOperator
 import com.chattriggers.mamba.api.ComparisonOperator
 import com.chattriggers.mamba.api.UnaryOperator
-import com.chattriggers.mamba.generated.Python3Parser.*
-import com.chattriggers.mamba.ast.nodes.*
+import com.chattriggers.mamba.ast.nodes.ScriptNode
 import com.chattriggers.mamba.ast.nodes.expressions.*
 import com.chattriggers.mamba.ast.nodes.expressions.literals.*
 import com.chattriggers.mamba.ast.nodes.statements.*
+import com.chattriggers.mamba.generated.Python3Parser.*
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.tree.TerminalNode
 

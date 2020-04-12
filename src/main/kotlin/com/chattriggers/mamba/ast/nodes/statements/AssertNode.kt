@@ -4,7 +4,6 @@ import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
 import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.collections.VTupleType
-import com.chattriggers.mamba.core.values.collections.toValue
 import com.chattriggers.mamba.core.values.exceptions.VAssertionError
 import com.chattriggers.mamba.core.values.exceptions.VAssertionErrorType
 import com.chattriggers.mamba.core.values.singletons.VNone

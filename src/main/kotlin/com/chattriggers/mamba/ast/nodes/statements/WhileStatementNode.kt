@@ -1,10 +1,10 @@
 package com.chattriggers.mamba.ast.nodes.statements
 
+import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
+import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.VBreakWrapper
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.singletons.VNone
-import com.chattriggers.mamba.ast.nodes.expressions.ExpressionNode
-import com.chattriggers.mamba.core.ThreadContext
 
 class WhileStatementNode(
     lineNumber: Int,

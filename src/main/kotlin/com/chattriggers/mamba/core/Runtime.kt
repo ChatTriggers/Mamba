@@ -4,14 +4,21 @@ import com.chattriggers.mamba.ast.nodes.Node
 import com.chattriggers.mamba.ast.nodes.expressions.Argument
 import com.chattriggers.mamba.ast.nodes.expressions.DotAccessNode
 import com.chattriggers.mamba.ast.nodes.expressions.IdentifierNode
-import com.chattriggers.mamba.core.values.*
-import com.chattriggers.mamba.core.values.base.*
+import com.chattriggers.mamba.core.values.VString
+import com.chattriggers.mamba.core.values.VStringType
+import com.chattriggers.mamba.core.values.Value
+import com.chattriggers.mamba.core.values.Wrapper
+import com.chattriggers.mamba.core.values.base.VObject
+import com.chattriggers.mamba.core.values.base.VType
 import com.chattriggers.mamba.core.values.collections.*
 import com.chattriggers.mamba.core.values.exceptions.VBaseException
 import com.chattriggers.mamba.core.values.exceptions.VStopIteration
-import com.chattriggers.mamba.core.values.numbers.*
 import com.chattriggers.mamba.core.values.exceptions.VTypeError
-import com.chattriggers.mamba.core.values.singletons.*
+import com.chattriggers.mamba.core.values.numbers.*
+import com.chattriggers.mamba.core.values.singletons.VFalse
+import com.chattriggers.mamba.core.values.singletons.VNone
+import com.chattriggers.mamba.core.values.singletons.VNotImplemented
+import com.chattriggers.mamba.core.values.singletons.VTrue
 
 class Runtime(private val ctx: ThreadContext) {
     fun toBoolean(value: VObject): Boolean {

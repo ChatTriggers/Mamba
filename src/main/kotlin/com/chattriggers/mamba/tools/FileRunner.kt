@@ -1,8 +1,8 @@
 package com.chattriggers.mamba.tools
 
+import com.chattriggers.mamba.ast.ASTTransformer
 import com.chattriggers.mamba.core.Interpreter
 import com.chattriggers.mamba.core.Parser
-import com.chattriggers.mamba.ast.ASTTransformer
 import com.chattriggers.mamba.core.ThreadContext
 import java.io.File
 

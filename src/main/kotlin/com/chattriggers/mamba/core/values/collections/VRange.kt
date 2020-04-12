@@ -1,11 +1,11 @@
 package com.chattriggers.mamba.core.values.collections
 
-import com.chattriggers.mamba.core.values.*
-import com.chattriggers.mamba.core.values.exceptions.VValueError
-import com.chattriggers.mamba.core.values.numbers.VInt
+import com.chattriggers.mamba.core.values.LazyValue
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.base.VType
+import com.chattriggers.mamba.core.values.exceptions.VValueError
+import com.chattriggers.mamba.core.values.numbers.VInt
 import com.chattriggers.mamba.core.values.singletons.VNone
 
 class VRange(val start: Int, val stop: Int, val step: Int = 1) : VObject(LazyValue("VRangeType") { VRangeType }) {

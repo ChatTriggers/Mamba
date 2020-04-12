@@ -1,10 +1,6 @@
 package com.chattriggers.mamba.core.values
 
-import com.chattriggers.mamba.core.CallFrame
-import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.base.VObject
-import com.chattriggers.mamba.core.values.exceptions.VBaseException
-import java.util.*
 
 /**
  * This class is a way for child nodes to communicate

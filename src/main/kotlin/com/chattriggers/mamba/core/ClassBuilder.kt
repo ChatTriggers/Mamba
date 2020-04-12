@@ -5,9 +5,6 @@ import com.chattriggers.mamba.ast.nodes.statements.FunctionNode
 import com.chattriggers.mamba.core.values.Value
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VType
-import com.chattriggers.mamba.core.values.Wrapper
-import com.chattriggers.mamba.core.values.base.VBuiltinMethodType
-import com.chattriggers.mamba.core.values.base.VFunctionType
 import com.chattriggers.mamba.core.values.exceptions.VBaseException
 import com.chattriggers.mamba.core.values.unwrap
 
