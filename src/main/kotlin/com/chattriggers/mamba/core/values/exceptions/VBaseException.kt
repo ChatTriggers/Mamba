@@ -19,9 +19,6 @@ open class VBaseException(
     private val savedCallStack = ThreadContext.currentContext.interp.callStack.toList().map { it.copy() }
     var callStack: List<CallFrame>? = null
 
-    init {
-    }
-
     fun initializeCallstack(lineNumber: Int) {
         if (callStack != null) return
 
@@ -34,6 +31,17 @@ open class VBaseException(
                 callStack!![index + 1].lineNumber
             }
         }
+    }
+
+    fun printTrace(ctx: ThreadContext) {
+        println("Traceback (most recent call last):")
+
+        callStack!!.forEach { cs ->
+            println("  File \"${cs.source}\", line ${cs.lineNumber}, in ${cs.name}")
+            println("    ${ctx.interp.lines[cs.lineNumber - 1].trim()}")
+        }
+
+        println(toString())
     }
 
     override fun toString() = StringBuilder().apply {

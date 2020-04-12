@@ -19,7 +19,10 @@ fun main() {
     ThreadContext.enterContext(context)
 
     try {
-        interpreter.execute(script)
+        val output = interpreter.execute(script)
+
+        println("Program output:")
+        println(output)
     } finally {
         ThreadContext.exitContext()
     }
