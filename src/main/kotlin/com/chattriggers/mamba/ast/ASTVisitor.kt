@@ -57,7 +57,33 @@ internal class ASTVisitor {
         if (assertStatement != null)
             return visitAssertStatement(assertStatement)
 
+        val importStatement = ctx.importStatement()
+        if (importStatement != null)
+            return visitImportStatement(importStatement)
+
         TODO("Handle other branch possibilities")
+    }
+
+    private fun visitImportStatement(ctx: ImportStatementContext): StatementNode {
+        if (ctx.importFrom() != null)
+            TODO()
+
+        val dottedAsNames = ctx.importName().dottedAsNames()
+        val dottedAsNameList = dottedAsNames.dottedAsName()
+
+        if (dottedAsNameList.size > 1)
+            TODO()
+
+        val dottedAsName = dottedAsNameList[0]
+
+        if (dottedAsName.NAME() != null)
+            TODO()
+
+        val dottedName = dottedAsName.dottedName()
+        if (dottedName.NAME().size > 1)
+            TODO()
+
+        return ImportNode(dottedAsName.lineNumber(), dottedName.NAME()[0].text)
     }
 
     private fun visitAssertStatement(ctx: AssertStatementContext): StatementNode {

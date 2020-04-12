@@ -6,6 +6,7 @@ import com.chattriggers.mamba.core.values.Value
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VType
 import com.chattriggers.mamba.core.values.exceptions.VBaseException
+import com.chattriggers.mamba.core.values.exceptions.VTypeErrorType
 import com.chattriggers.mamba.core.values.unwrap
 
 class ClassMethodBuilder(val ctx: ThreadContext, private val _args: List<Argument>) {
@@ -34,10 +35,11 @@ class ClassMethodBuilder(val ctx: ThreadContext, private val _args: List<Argumen
     // Equivalent to **kwargs in a python function definition
     fun namedArguments() = _args.filter { it.name != null }
 
-    inline fun <reified T : Value> assertArgAs(index: Int): T {
+    inline fun <reified T : Value> assertArgAs(index: Int, ifNot: (Value) -> Nothing = { TODO() }): T {
         val arg = argumentValueRaw(index)
-        if (arg !is T)
-            TODO()
+        if (arg !is T) {
+            ifNot(arg)
+        }
         return arg
     }
 

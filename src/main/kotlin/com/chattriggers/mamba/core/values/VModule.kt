@@ -9,11 +9,9 @@ open class VModule(val name: String, val type: LazyValue<VType>) : VObject(type)
     override fun toString() = "<module '$name' (built-in)>"
 
     companion object {
-        fun getNativeModules(): List<VModule> {
-            return listOf(
-                ModuleMath
-            )
-        }
+        val nativeModules = listOf(
+            ModuleMath
+        )
     }
 }
 
