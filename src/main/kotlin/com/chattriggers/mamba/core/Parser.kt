@@ -9,12 +9,13 @@ import org.antlr.v4.runtime.CommonTokenStream
 import java.io.File
 
 object Parser {
-    internal fun parseFromString(string: String): Python3Parser.SingleInputContext {
+    internal fun parseFromString(string: String, displayTree: Boolean = false): Python3Parser.FileInputContext {
         val input = CharStreams.fromString(string)
         val parser = createParser(input)
-        val parsedStatement = parser.singleInput()
+        val parsedStatement = parser.fileInput()
 
-        Trees.inspect(parsedStatement, parser)
+        if (displayTree)
+            Trees.inspect(parsedStatement, parser)
 
         return parsedStatement
     }
@@ -24,9 +25,8 @@ object Parser {
         val parser = createParser(input)
         val parsedFile = parser.fileInput()
 
-        if (displayTree) {
+        if (displayTree)
             Trees.inspect(parsedFile, parser)
-        }
 
         return parsedFile
     }

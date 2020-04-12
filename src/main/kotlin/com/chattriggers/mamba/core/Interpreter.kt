@@ -1,6 +1,7 @@
 package com.chattriggers.mamba.core
 
 import com.chattriggers.mamba.ast.nodes.ScriptNode
+import com.chattriggers.mamba.core.values.base.VObject
 import java.util.*
 
 class Interpreter(val fileName: String, val lines: List<String>) {
@@ -12,7 +13,7 @@ class Interpreter(val fileName: String, val lines: List<String>) {
         callStack.push(CallFrame("<module>", fileName, -1))
     }
 
-    fun execute(script: ScriptNode): Any {
+    fun execute(script: ScriptNode): VObject {
         return script.execute(ThreadContext.currentContext)
     }
 }

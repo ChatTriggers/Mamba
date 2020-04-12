@@ -97,7 +97,7 @@ object VIntType : VType(LazyValue("VObjectType") { VObjectType }) {
         addMethod("__floor__") {
             assertSelfAs<VInt>()
         }
-        addMethod("__floordiv") {
+        addMethod("__floordiv__") {
             val self = assertSelfAs<VInt>()
 
             when (val other = assertArgAs<VObject>(1)) {
