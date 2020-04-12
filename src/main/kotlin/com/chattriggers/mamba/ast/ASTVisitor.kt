@@ -53,7 +53,19 @@ internal class ASTVisitor {
         if (passStatement != null)
             return PassNode(passStatement.lineNumber())
 
+        val assertStatement = ctx.assertStatement()
+        if (assertStatement != null)
+            return visitAssertStatement(assertStatement)
+
         TODO("Handle other branch possibilities")
+    }
+
+    private fun visitAssertStatement(ctx: AssertStatementContext): StatementNode {
+        return AssertNode(
+            ctx.lineNumber(),
+            visitTest(ctx.test(0)),
+            ctx.test(1)?.let(::visitTest)
+        )
     }
 
     private fun visitGlobalStatement(ctx: GlobalStatementContext): StatementNode {
