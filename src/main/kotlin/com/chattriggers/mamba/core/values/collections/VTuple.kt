@@ -55,7 +55,7 @@ object VTupleType : VType(LazyValue("VObjectType") { VObjectType }) {
                         null
                     } else arg.unwrap()
                 }
-                else -> unwrap()
+                else -> arg.unwrap()
             }
 
             if (iterable != null) {
