@@ -20,10 +20,9 @@ class AssertNode(
 
         if (!isTrue) {
             val messageValue = message?.execute(ctx)?.ifException { return it } ?: "".toValue()
-
-            return ctx.runtime.construct(VAssertionErrorType, listOf(
-                ctx.runtime.construct(VTupleType, listOf(listOf(messageValue)))
-            )) as VAssertionError
+            return VAssertionError.construct(messageValue).apply {
+                initializeCallstack(lineNumber)
+            }
         }
 
         return VNone

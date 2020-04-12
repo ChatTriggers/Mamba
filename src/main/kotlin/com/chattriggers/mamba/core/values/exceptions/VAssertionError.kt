@@ -2,6 +2,7 @@ package com.chattriggers.mamba.core.values.exceptions
 
 import com.chattriggers.mamba.core.ThreadContext
 import com.chattriggers.mamba.core.values.LazyValue
+import com.chattriggers.mamba.core.values.Value
 import com.chattriggers.mamba.core.values.base.VObject
 import com.chattriggers.mamba.core.values.base.VType
 import com.chattriggers.mamba.core.values.collections.VTuple
@@ -13,13 +14,13 @@ class VAssertionError(args: VTuple) : VException(args, LazyValue("VAssertionErro
     override val className = "AssertionError"
 
     companion object {
-        fun construct(message: String? = null): VAssertionError {
+        fun construct(arg: VObject? = null): VAssertionError {
             val rt = ThreadContext.currentContext.runtime
 
             return rt.construct(VAssertionErrorType, listOf(
                 rt.construct(VTupleType, listOf(
-                    if (message != null) {
-                        listOf(message.toValue())
+                    if (arg != null) {
+                        listOf(arg)
                     } else {
                         emptyList()
                     }
