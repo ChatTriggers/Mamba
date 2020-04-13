@@ -31,7 +31,7 @@ class Runtime(private val ctx: ThreadContext) {
             value is VList -> value.list.isNotEmpty()
             value is VDict -> value.dict.isNotEmpty()
             value is VTuple -> value.items.isNotEmpty()
-            value is VRange -> value.start == 0 && value.stop == 0 && value.step == 1
+            value is VRange -> value.start.int == 0 && value.stop.int == 0 && value.step.int == 1
             value.containsSlot("__bool__") -> callProp(value, "__bool__") != VFalse
             value.containsSlot("__len__") -> toInt(callProp(value, "__len__")) != 0
             else -> true

@@ -7,9 +7,7 @@ import com.chattriggers.mamba.core.values.collections.VTuple
 import com.chattriggers.mamba.core.values.collections.VTupleType
 import com.chattriggers.mamba.core.values.singletons.VNone
 
-class VNotImplementedError(
-    args: VTuple
-) : VException(args, LazyValue("VNotImplementedErrorType") { VNotImplementedErrorType }) {
+class VNotImplementedError: VException(LazyValue("VNotImplementedErrorType") { VNotImplementedErrorType }) {
     override val className = "NotImplementedError"
 }
 
@@ -20,15 +18,12 @@ object VNotImplementedErrorType : VType(LazyValue("VExceptionType") { VException
         }
         addMethod("__new__", isStatic = true) {
             assertArgAs<VNotImplementedErrorType>(0)
-
-            val argument = when (val arg = assertArgAs<VObject>(1)) {
-                is VTuple -> arg
-                else -> runtime.construct(VTupleType, listOf(listOf(arg))) as VTuple
-            }
-
-            VNotImplementedError(argument)
+            VNotImplementedError()
         }
         addMethod("__init__") {
+            assertSelfAs<VNotImplementedError>().args = arguments().drop(1).let { args ->
+                runtime.construct(VTupleType, listOf(args)) as VTuple
+            }
             VNone
         }
     }

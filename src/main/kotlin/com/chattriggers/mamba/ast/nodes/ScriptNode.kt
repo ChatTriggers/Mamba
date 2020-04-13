@@ -6,7 +6,7 @@ import com.chattriggers.mamba.core.values.base.VObject
 
 class ScriptNode(private val statements: List<StatementNode>) : Node(1, statements) {
     override fun execute(ctx: ThreadContext): VObject {
-        return StatementNode.executeStatementsWithReturn(ctx, statements)
+        return StatementNode.executeStatements(ctx, statements, returnValue = true)
     }
 
     override fun print(indent: Int) {

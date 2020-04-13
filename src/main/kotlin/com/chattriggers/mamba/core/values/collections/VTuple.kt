@@ -12,8 +12,10 @@ import com.chattriggers.mamba.core.values.numbers.VInt
 import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.unwrap
 
-class VTuple(val items: List<VObject>) : VObject(LazyValue("VTupleType") { VTupleType }) {
+class VTuple : VObject(LazyValue("VTupleType") { VTupleType }) {
     override val className = "tuple"
+
+    lateinit var items: List<VObject>
 
     override fun toString() = when (items.size) {
         0 -> "()"
@@ -28,14 +30,14 @@ object VTupleType : VType(LazyValue("VObjectType") { VObjectType }) {
             runtime.construct(VTupleType, arguments())
         }
         addMethod("__new__", isStatic = true) {
-            val type = assertArgAs<VType>(0)
-
-            if (type !is VTupleType) {
-                TODO()
-            }
+            assertArgAs<VTupleType>(0)
+            VTuple()
+        }
+        addMethod("__init__") {
+            val self = assertSelfAs<VTuple>()
 
             if (argSize == 1) {
-                return@addMethod VTuple(emptyList())
+                return@addMethod VNone
             } else if (argSize > 2) {
                 TODO()
             }
@@ -75,9 +77,8 @@ object VTupleType : VType(LazyValue("VObjectType") { VObjectType }) {
                 }
             }
 
-            VTuple(list)
-        }
-        addMethod("__init__") {
+            self.items = list.toList()
+
             VNone
         }
 

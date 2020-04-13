@@ -8,9 +8,11 @@ import com.chattriggers.mamba.core.values.exceptions.VStopIteration
 import com.chattriggers.mamba.core.values.numbers.toValue
 import com.chattriggers.mamba.core.values.singletons.VNone
 
-class VRangeIterator(val vrange: VRange) : VObject(LazyValue { VRangeIteratorType }) {
+class VRangeIterator : VObject(LazyValue { VRangeIteratorType }) {
     override val className: String
         get() = "range_iterator"
+
+    lateinit var vrange: VRange
 
     override fun toString() = "<range_iterator object>"
 }
@@ -24,7 +26,7 @@ object VRangeIteratorType : VType(LazyValue("VObjectType") { VObjectType }) {
             val self = assertSelfAs<VRangeIterator>()
 
             val (start, stop, step) = self.vrange
-            val current = self.vrange.current
+            val current = self.vrange.current.int
 
             val shouldThrow = step < 0 && current <= stop ||
                     step > 0 && current >= stop ||
@@ -35,22 +37,18 @@ object VRangeIteratorType : VType(LazyValue("VObjectType") { VObjectType }) {
                 return@addMethod VStopIteration.construct()
             }
 
-            self.vrange.current += step
+            self.vrange.current.int += step
             current.toValue()
         }
         addMethod("__call__") {
             runtime.construct(VRangeIteratorType, arguments())
         }
         addMethod("__new__", isStatic = true) {
-            val type = assertArgAs<VType>(0)
-
-            if (type !is VRangeIteratorType) {
-                TODO()
-            }
-
-            VRangeIterator(assertArgAs(1))
+            assertArgAs<VRangeIteratorType>(0)
+            VRangeIterator()
         }
         addMethod("__init__") {
+            assertSelfAs<VRangeIterator>().vrange = assertArgAs(1)
             VNone
         }
     }

@@ -4,10 +4,10 @@ import com.chattriggers.mamba.core.MethodWrapper
 import com.chattriggers.mamba.core.values.LazyValue
 import com.chattriggers.mamba.core.values.singletons.VNone
 
-class VFunction(
-    val function: MethodWrapper
-) : VObject(LazyValue("VMethodType") { VFunctionType }) {
+class VFunction : VObject(LazyValue("VMethodType") { VFunctionType }) {
     override val className = "function"
+
+    lateinit var function: MethodWrapper
 
     override fun toString() = "<function TODO[at TODO]>"
 }
@@ -21,9 +21,10 @@ object VFunctionType: VType(LazyValue("VObjectType") { VObjectType }) {
         }
         addMethod("__new__", isStatic = true) {
             assertArgAs<VFunctionType>(0)
-            VFunction(assertArgAs(1))
+            VFunction()
         }
         addMethod("__init__") {
+            assertSelfAs<VFunction>().function = assertArgAs(1)
             VNone
         }
     }

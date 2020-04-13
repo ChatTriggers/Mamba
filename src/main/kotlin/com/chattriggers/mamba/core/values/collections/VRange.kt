@@ -6,14 +6,17 @@ import com.chattriggers.mamba.core.values.base.VObjectType
 import com.chattriggers.mamba.core.values.base.VType
 import com.chattriggers.mamba.core.values.exceptions.VValueError
 import com.chattriggers.mamba.core.values.numbers.VInt
+import com.chattriggers.mamba.core.values.numbers.toValue
 import com.chattriggers.mamba.core.values.singletons.VNone
 
-class VRange(val start: Int, val stop: Int, val step: Int = 1) : VObject(LazyValue("VRangeType") { VRangeType }) {
-    internal var current = start
+class VRange : VObject(LazyValue("VRangeType") { VRangeType }) {
+    lateinit var start: VInt
+    lateinit var stop: VInt
+    lateinit var step: VInt
+
+    lateinit var current: VInt
 
     override val className = "dict"
-
-    constructor(stop: Int) : this(0, stop)
 
     override fun toString() = StringBuilder().apply {
         append("range(")
@@ -22,7 +25,7 @@ class VRange(val start: Int, val stop: Int, val step: Int = 1) : VObject(LazyVal
         append(", ")
         append(stop)
 
-        if (step != -1) {
+        if (step.int != -1) {
             append(", ")
             append(step)
         }
@@ -30,9 +33,9 @@ class VRange(val start: Int, val stop: Int, val step: Int = 1) : VObject(LazyVal
         append(")")
     }.toString()
 
-    operator fun component1() = start
-    operator fun component2() = stop
-    operator fun component3() = step
+    operator fun component1() = start.int
+    operator fun component2() = stop.int
+    operator fun component3() = step.int
 }
 
 object VRangeType : VType(LazyValue("VObjectType") { VObjectType }) {
@@ -44,11 +47,11 @@ object VRangeType : VType(LazyValue("VObjectType") { VObjectType }) {
             runtime.construct(VRangeType, arguments())
         }
         addMethod("__new__", isStatic = true) {
-            val type = assertArgAs<VType>(0)
-
-            if (type !is VRangeType) {
-                TODO()
-            }
+            assertArgAs<VRangeType>(0)
+            VRange()
+        }
+        addMethod("__init__") {
+            val self = assertSelfAs<VRange>()
 
             val first = assertArgAs<VInt>(1)
             val second = argAs<VInt>(2)
@@ -58,13 +61,16 @@ object VRangeType : VType(LazyValue("VObjectType") { VObjectType }) {
                 return@addMethod VValueError.construct("range() arg 3 must not be 0")
             }
 
-            when {
-                second == null -> VRange(first.int)
-                third == null -> VRange(first.int, second.int)
-                else -> VRange(first.int, second.int, third.int)
+            val start = when (second) {
+                null -> 0.toValue() as VInt
+                else -> first
             }
-        }
-        addMethod("__init__") {
+
+            self.start = start
+            self.stop = second ?: first
+            self.step = third ?: 1.toValue() as VInt
+            self.current = start
+
             VNone
         }
     }

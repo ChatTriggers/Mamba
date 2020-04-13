@@ -9,7 +9,7 @@ import com.chattriggers.mamba.core.values.collections.VTupleType
 import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.collections.toValue
 
-class VTypeError(args: VTuple) : VException(args, LazyValue("VTypeErrorType") { VTypeErrorType }) {
+class VTypeError : VException(LazyValue("VTypeErrorType") { VTypeErrorType }) {
     override val className = "TypeError"
 
     companion object {
@@ -32,15 +32,12 @@ object VTypeErrorType : VType(LazyValue("VExceptionType") { VExceptionType }) {
         }
         addMethod("__new__", isStatic = true) {
             assertArgAs<VTypeErrorType>(0)
-
-            val argument = when (val arg = assertArgAs<VObject>(1)) {
-                is VTuple -> arg
-                else -> runtime.construct(VTupleType, listOf(listOf(arg))) as VTuple
-            }
-
-            VTypeError(argument)
+            VTypeError()
         }
         addMethod("__init__") {
+            assertSelfAs<VTypeError>().args = arguments().drop(1).let { args ->
+                runtime.construct(VTupleType, listOf(args)) as VTuple
+            }
             VNone
         }
     }

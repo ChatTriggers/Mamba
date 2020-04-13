@@ -11,8 +11,10 @@ import com.chattriggers.mamba.core.values.numbers.toValue
 import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.unwrap
 
-class VString(val string: String) : VObject(LazyValue("VStringType") { VStringType }) {
+class VString : VObject(LazyValue("VStringType") { VStringType }) {
     override val className = "str"
+
+    var string = ""
 
     override fun toString() = string
 
@@ -27,19 +29,19 @@ object VStringType : VType(LazyValue("VObjectType") { VObjectType }) {
             runtime.construct(VStringType, arguments())
         }
         addMethod("__new__", isStatic = true) {
-            val type = assertArgAs<VType>(0)
-
-            if (type !is VStringType) {
-                val name = type.className
-                return@addMethod VTypeError.construct("string.__new__($name) is not safe, use $name.__new__()")
-            }
-
-            when (val arg = argumentValueRaw(1)) {
-                is Wrapper -> VString(arg.value.toString())
-                else -> VString(runtime.callProp(arg.unwrap(), "__str__").toString())
-            }
+            assertArgAs<VStringType>(0)
+            VString()
         }
         addMethod("__init__") {
+            val self = assertSelfAs<VString>()
+
+            if (argSize == 1) return@addMethod VNone
+
+            self.string= when (val arg = argumentValueRaw(1)) {
+                is Wrapper -> arg.value.toString()
+                else -> runtime.callProp(arg.unwrap(), "__str__").toString()
+            }
+
             VNone
         }
 

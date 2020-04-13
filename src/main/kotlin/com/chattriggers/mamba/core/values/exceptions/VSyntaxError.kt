@@ -9,7 +9,7 @@ import com.chattriggers.mamba.core.values.collections.VTupleType
 import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.collections.toValue
 
-class VSyntaxError(args: VTuple) : VException(args, LazyValue("VSyntaxErrorType") { VSyntaxErrorType }) {
+class VSyntaxError : VException(LazyValue("VSyntaxErrorType") { VSyntaxErrorType }) {
     override val className = "SyntaxError"
 
     companion object {
@@ -28,19 +28,16 @@ class VSyntaxError(args: VTuple) : VException(args, LazyValue("VSyntaxErrorType"
 object VSyntaxErrorType : VType(LazyValue("VExceptionType") { VExceptionType }) {
     init {
         addMethod("__call__") {
-            runtime.construct(VNameErrorType, arguments().let { it.subList(1, it.size) })
+            runtime.construct(VNameErrorType, arguments())
         }
         addMethod("__new__", isStatic = true) {
             assertArgAs<VSyntaxErrorType>(0)
-
-            val argument = when (val arg = assertArgAs<VObject>(1)) {
-                is VTuple -> arg
-                else -> runtime.construct(VTupleType, listOf(listOf(arg))) as VTuple
-            }
-
-            VSyntaxError(argument)
+            VSyntaxError()
         }
         addMethod("__init__") {
+            assertSelfAs<VSyntaxError>().args = arguments().drop(1).let { args ->
+                runtime.construct(VTupleType, listOf(args)) as VTuple
+            }
             VNone
         }
     }

@@ -11,10 +11,11 @@ import com.chattriggers.mamba.core.values.collections.VTupleType
 import com.chattriggers.mamba.core.values.singletons.VNone
 
 open class VBaseException(
-    val args: VTuple,
     type: LazyValue<VType> = LazyValue("VBaseExceptionType") { VBaseExceptionType }
 ) : VObject(type) {
     override val className = "BaseException"
+
+    lateinit var args: VTuple
 
     private val savedCallStack = ThreadContext.currentContext.interp.callStack.toList().map { it.copy() }
     var callStack: List<CallFrame>? = null
@@ -68,15 +69,12 @@ object VBaseExceptionType : VType(LazyValue("VObjectType") { VObjectType }) {
         }
         addMethod("__new__", isStatic = true) {
             assertArgAs<VBaseExceptionType>(0)
-
-            val argument = when (val arg = assertArgAs<VObject>(1)) {
-                is VTuple -> arg
-                else -> runtime.construct(VTupleType, listOf(listOf(arg))) as VTuple
-            }
-
-            VValueError(argument)
+            VBaseException()
         }
         addMethod("__init__") {
+            assertSelfAs<VBaseException>().args = arguments().drop(1).let { args ->
+                runtime.construct(VTupleType, listOf(args)) as VTuple
+            }
             VNone
         }
     }

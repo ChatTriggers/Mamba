@@ -13,8 +13,10 @@ import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.singletons.VTrue
 import kotlin.math.*
 
-open class VInt(val int: Int, type: LazyValue<VType> = LazyValue("VIntType") { VIntType }) : VObject(type) {
+open class VInt(type: LazyValue<VType> = LazyValue("VIntType") { VIntType }) : VObject(type) {
     override val className = "int"
+
+    var int = 0
 
     override fun toString() = int.toString()
 }
@@ -25,25 +27,20 @@ object VIntType : VType(LazyValue("VObjectType") { VObjectType }) {
             construct(VIntType, *arguments().toTypedArray())
         }
         addMethod("__new__", isStatic = true) {
-            val type = assertArgAs<VType>(0)
-
-            if (type !is VIntType) {
-                TODO()
-            }
-
-            var num = 0
+            assertArgAs<VIntType>(0)
+            VInt()
+        }
+        addMethod("__init__") {
+            val self = assertSelfAs<VInt>()
 
             if (argSize > 0) {
-                num = when (val v = argumentValueRaw(1)) {
+                self.int = when (val v = argumentValueRaw(1)) {
                     is Wrapper -> v.value as Int
                     is VObject -> runtime.toInt(v)
                     else -> TODO("Error")
                 }
             }
 
-            VInt(num)
-        }
-        addMethod("__init__") {
             VNone
         }
 

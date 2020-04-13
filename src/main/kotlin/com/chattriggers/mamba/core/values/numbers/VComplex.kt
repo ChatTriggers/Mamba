@@ -14,8 +14,11 @@ import kotlin.math.floor
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-class VComplex(val real: Double, val imag: Double) : VObject(LazyValue("VComplexType") { VComplexType }) {
+class VComplex : VObject(LazyValue("VComplexType") { VComplexType }) {
     override val className = "complex"
+
+    var real = 0.0
+    var imag = 0.0
 
     override fun toString(): String {
         val r = when (real) {
@@ -43,34 +46,28 @@ object VComplexType : VType(LazyValue("VObjectType") { VObjectType }) {
             construct(VComplexType, *arguments().toTypedArray())
         }
         addMethod("__new__", isStatic = true) {
-            val type = assertArgAs<VType>(0)
-
-            if (type !is VComplexType) {
-                TODO()
-            }
-
-            var real = 0.0
-            var imag = 0.0
-
-            if (argSize > 0) {
-                real = when (val v = argumentValueRaw(1)) {
-                    is Wrapper -> v.value as Double
-                    is VObject -> runtime.toDouble(v)
-                    else -> TODO("Error")
-                }
-            }
-
-            if (argSize > 1) {
-                imag = when (val v = argumentValueRaw(2)) {
-                    is Wrapper -> v.value as Double
-                    is VObject -> runtime.toDouble(v)
-                    else -> TODO("Error")
-                }
-            }
-
-            VComplex(real, imag)
+            assertArgAs<VComplexType>(0)
+            VComplex()
         }
         addMethod("__init__") {
+            val self = assertSelfAs<VComplex>()
+
+            if (argSize > 1) {
+                self.real = when (val v = argumentValueRaw(1)) {
+                    is Wrapper -> v.value as Double
+                    is VObject -> runtime.toDouble(v)
+                    else -> TODO("Error")
+                }
+            }
+
+            if (argSize > 2) {
+                self.imag = when (val v = argumentValueRaw(2)) {
+                    is Wrapper -> v.value as Double
+                    is VObject -> runtime.toDouble(v)
+                    else -> TODO("Error")
+                }
+            }
+
             VNone
         }
 

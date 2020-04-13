@@ -7,8 +7,9 @@ import com.chattriggers.mamba.core.values.base.VType
 import com.chattriggers.mamba.core.values.exceptions.VStopIteration
 import com.chattriggers.mamba.core.values.singletons.VNone
 
-class VListIterator(internal val vlist: VList) : VObject(LazyValue("VListIteratorType") { VListIteratorType }) {
-    internal var cursor = 0
+class VListIterator : VObject(LazyValue("VListIteratorType") { VListIteratorType }) {
+    lateinit var vlist: VList
+    var cursor = 0
 
     override val className = "list_iterator"
 
@@ -33,15 +34,11 @@ object VListIteratorType : VType(LazyValue("VObjectType") { VObjectType }) {
             runtime.construct(VListIteratorType, arguments())
         }
         addMethod("__new__", isStatic = true) {
-            val type = assertArgAs<VType>(0)
-
-            if (type !is VListIteratorType) {
-                TODO()
-            }
-
-            VListIterator(assertArgAs(1))
+            assertArgAs<VListIteratorType>(0)
+            VListIterator()
         }
         addMethod("__init__") {
+            assertSelfAs<VListIterator>().vlist = assertArgAs(1)
             VNone
         }
     }

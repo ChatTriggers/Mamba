@@ -6,10 +6,10 @@ import com.chattriggers.mamba.core.values.base.VType
 import com.chattriggers.mamba.core.values.numbers.VInt
 import com.chattriggers.mamba.core.values.numbers.VIntType
 
-sealed class VBool(val boolean: Boolean) : VInt(if (boolean) 1 else 0, LazyValue("VBoolType") { VBoolType }) {
+sealed class VBool : VInt(LazyValue("VBoolType") { VBoolType }) {
     override val className = "bool"
 
-    override fun toString() = boolean.toString().capitalize()
+    override fun toString() = (int != 0).toString().capitalize()
 }
 
 object VBoolType : VType(LazyValue("VIntType") { VIntType }) {
@@ -18,11 +18,7 @@ object VBoolType : VType(LazyValue("VIntType") { VIntType }) {
             construct(VBoolType, *arguments().toTypedArray())
         }
         addMethod("__new__", isStatic = true) {
-            val type = assertArgAs<VType>(0)
-
-            if (type !is VBoolType) {
-                TODO()
-            }
+            assertArgAs<VBoolType>(0)
 
             val b = when (argSize) {
                 1 -> false
@@ -41,9 +37,17 @@ object VBoolType : VType(LazyValue("VIntType") { VIntType }) {
     }
 }
 
-object VTrue : VBool(true)
+object VTrue : VBool() {
+    init {
+        int = 1
+    }
+}
 
-object VFalse : VBool(false)
+object VFalse : VBool() {
+    init {
+        int = 0
+    }
+}
 
 fun Boolean.toValue() = when (this) {
     true -> VTrue

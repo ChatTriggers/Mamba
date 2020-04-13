@@ -12,8 +12,10 @@ import com.chattriggers.mamba.core.values.numbers.VInt
 import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.unwrap
 
-class VList(val list: MutableList<VObject>) : VObject(LazyValue("VListType") { VListType }) {
+class VList : VObject(LazyValue("VListType") { VListType }) {
     override val className = "list"
+
+    val list = mutableListOf<VObject>()
 
     override fun toString() = "[${list.joinToString()}]"
 }
@@ -24,19 +26,17 @@ object VListType : VType(LazyValue("VObjectType") { VObjectType }) {
             runtime.construct(VListType, arguments())
         }
         addMethod("__new__", isStatic = true) {
-            val type = assertArgAs<VType>(0)
-
-            if (type !is VListType) {
-                TODO()
-            }
+            assertArgAs<VListType>(0)
+            VList()
+        }
+        addMethod("__init__") {
+            val self = assertSelfAs<VList>()
 
             if (argSize == 1) {
-                return@addMethod VList(mutableListOf())
+                return@addMethod VNone
             } else if (argSize > 2) {
                 TODO()
             }
-
-            val list = mutableListOf<VObject>()
 
             val iterable = when (val arg = argumentValueRaw(1)) {
                 is Wrapper -> {
@@ -45,7 +45,7 @@ object VListType : VType(LazyValue("VObjectType") { VObjectType }) {
                     if (value is List<*>) {
                         if (value.isNotEmpty()) {
                             @Suppress("UNCHECKED_CAST")
-                            list.addAll(value as List<VObject>)
+                            self.list.addAll(value as List<VObject>)
                         }
 
                         null
@@ -66,14 +66,11 @@ object VListType : VType(LazyValue("VObjectType") { VObjectType }) {
                     when (val result = runtime.getIteratorNext(iterator)) {
                         is VStopIteration -> break@loop
                         is VBaseException -> return@addMethod result
-                        else -> list.add(result)
+                        else -> self.list.add(result)
                     }
                 }
             }
 
-            VList(list)
-        }
-        addMethod("__init__") {
             VNone
         }
 

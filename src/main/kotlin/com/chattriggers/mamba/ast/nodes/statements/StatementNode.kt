@@ -13,7 +13,7 @@ open class StatementNode(lineNumber: Int, children: List<Node>): Node(lineNumber
     constructor(lineNumber: Int) : this(lineNumber, emptyList())
 
     override fun execute(ctx: ThreadContext): VObject {
-        return executeStatementsWithReturn(ctx, children)
+        return executeStatements(ctx, children, returnValue = true)
     }
 
     override fun print(indent: Int) {
@@ -22,7 +22,7 @@ open class StatementNode(lineNumber: Int, children: List<Node>): Node(lineNumber
     }
 
     companion object {
-        fun executeStatementsWithReturn(ctx: ThreadContext, statements: List<Node>): VObject {
+        fun executeStatements(ctx: ThreadContext, statements: List<Node>, returnValue: Boolean = false): VObject {
             var lastReturned: VObject = VNone
 
             for (statement in statements) {
@@ -31,11 +31,8 @@ open class StatementNode(lineNumber: Int, children: List<Node>): Node(lineNumber
                     return lastReturned
             }
 
-            return lastReturned
-        }
-
-        fun executeStatements(ctx: ThreadContext, statements: List<Node>): VObject {
-            executeStatementsWithReturn(ctx, statements)
+            if (returnValue)
+                return lastReturned
             return VNone
         }
     }

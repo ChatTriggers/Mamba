@@ -12,8 +12,10 @@ import com.chattriggers.mamba.core.values.exceptions.VValueError
 import com.chattriggers.mamba.core.values.singletons.VNone
 import com.chattriggers.mamba.core.values.unwrap
 
-class VDict(val dict: MutableMap<String, VObject>) : VObject(LazyValue("VDictType") { VDictType }) {
+class VDict : VObject(LazyValue("VDictType") { VDictType }) {
     override val className = "dict"
+
+    val dict = mutableMapOf<String, VObject>()
 
     override fun toString() = StringBuilder().apply {
         append("{")
@@ -37,17 +39,16 @@ object VDictType : VType(LazyValue("VObjectType") { VObjectType }) {
             constructFromArgs(VDictType, argumentsRaw())
         }
         addMethod("__new__", isStatic = true) {
-            val type = assertArgAs<VType>(0)
-
-            if (type !is VDictType) {
-                TODO()
-            }
+            assertArgAs<VType>(0)
+            VDict()
+        }
+        addMethod("__init__") {
+            val self = assertSelfAs<VDict>()
 
             if (argSize == 1) {
-                return@addMethod VTuple(emptyList())
+                return@addMethod VNone
             }
 
-            val map = mutableMapOf<String, VObject>()
             val arg1 = argumentRaw(1)
 
             val iterable = when {
@@ -60,7 +61,7 @@ object VDictType : VType(LazyValue("VObjectType") { VObjectType }) {
                         // Put values directly into the map
                         if (value.isNotEmpty()) {
                             @Suppress("UNCHECKED_CAST")
-                            map.putAll(value as MutableMap<String, VObject>)
+                            self.dict.putAll(value as MutableMap<String, VObject>)
                         }
                         null
                     } else wrapper.unwrap()
@@ -94,7 +95,7 @@ object VDictType : VType(LazyValue("VObjectType") { VObjectType }) {
                     val key = runtime.getIteratorNext(subIterator).ifException { return@addMethod it }
                     val value = runtime.getIteratorNext(subIterator).ifException { return@addMethod it }
 
-                    map[key.toString()] = value
+                    self.dict[key.toString()] = value
 
                     // Sub-iterator can only have two elements
                     runtime.getIteratorNext(subIterator).ifNotException {
@@ -108,12 +109,9 @@ object VDictType : VType(LazyValue("VObjectType") { VObjectType }) {
             val namedArgs = namedArguments()
 
             for (arg in namedArgs) {
-                map[arg.name!!] = arg.value.unwrap()
+                self.dict[arg.name!!] = arg.value.unwrap()
             }
 
-            VDict(map)
-        }
-        addMethod("__init__") {
             VNone
         }
 

@@ -14,8 +14,10 @@ import kotlin.math.absoluteValue
 import kotlin.math.floor
 import kotlin.math.pow
 
-class VFloat(val double: Double) : VObject(LazyValue("VFloatType") { VFloatType }) {
+class VFloat : VObject(LazyValue("VFloatType") { VFloatType }) {
     override val className = "float"
+
+    var double = 0.0
 
     override fun toString() = double.toString()
 }
@@ -26,16 +28,14 @@ object VFloatType : VType(LazyValue("VObjectType") { VObjectType }) {
             construct(VFloatType, *arguments().toTypedArray())
         }
         addMethod("__new__", isStatic = true) {
-            val type = assertArgAs<VType>(0)
+            assertArgAs<VFloatType>(0)
+            VFloat()
+        }
+        addMethod("__init__") {
+            val self = assertSelfAs<VFloat>()
 
-            if (type !is VFloatType) {
-                TODO()
-            }
-
-            var num = 0.0
-
-            if (argSize > 0) {
-                num = when (val v = argumentValueRaw(1)) {
+            if (argSize > 1) {
+                self.double = when (val v = argumentValueRaw(1)) {
                     is VObject -> runtime.toDouble(v)
                     is Wrapper -> when (val wrapped = v.value) {
                         is String -> java.lang.Double.parseDouble(wrapped)
@@ -46,9 +46,6 @@ object VFloatType : VType(LazyValue("VObjectType") { VObjectType }) {
                 }
             }
 
-            VFloat(num)
-        }
-        addMethod("__init__") {
             VNone
         }
 

@@ -8,10 +8,8 @@ import com.chattriggers.mamba.core.values.collections.VTuple
 import com.chattriggers.mamba.core.values.collections.VTupleType
 import com.chattriggers.mamba.core.values.singletons.VNone
 
-class VStopIteration(args: VTuple) : VException(args, LazyValue("VStopIterationType") { VStopIterationType }) {
+class VStopIteration : VException(LazyValue("VStopIterationType") { VStopIterationType }) {
     override val className = "StopIteration"
-
-    constructor() : this(ThreadContext.currentContext.runtime.construct(VTupleType, emptyList()) as VTuple)
 
     companion object {
         fun construct(): VStopIteration {
@@ -31,15 +29,12 @@ object VStopIterationType : VType(LazyValue("VExceptionType") { VExceptionType }
         }
         addMethod("__new__", isStatic = true) {
             assertArgAs<VStopIterationType>(0)
-
-            val argument = when (val arg = assertArgAs<VObject>(1)) {
-                is VTuple -> arg
-                else -> runtime.construct(VTupleType, listOf(listOf(arg))) as VTuple
-            }
-
-            VStopIteration(argument)
+            VStopIteration()
         }
         addMethod("__init__") {
+            assertSelfAs<VStopIteration>().args = arguments().drop(1).let { args ->
+                runtime.construct(VTupleType, listOf(args)) as VTuple
+            }
             VNone
         }
     }
